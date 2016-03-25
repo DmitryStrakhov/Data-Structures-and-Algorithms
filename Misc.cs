@@ -13,5 +13,36 @@ namespace Data_Structures_and_Algorithms {
             }
             return n * Factorial(n - 1);
         }
+        public static void BinaryStrings(int n, Action<string> action) {
+            Guard.IsPositive(n);
+            char[] s = new char[n];
+            BinaryStringsCore(n, s, action);
+        }
+        static void BinaryStringsCore(int n, char[] s, Action<string> action) {
+            if(n == 0) {
+                action(new string(s));
+                return;
+            }
+            s[n - 1] = '0';
+            BinaryStringsCore(n - 1, s, action);
+            s[n - 1] = '1';
+            BinaryStringsCore(n - 1, s, action);
+        }
+        public static void KAryStrings(int n, int k, Action<string> action) {
+            Guard.IsPositive(n);
+            Guard.IsPositive(k);
+            char[] s = new char[n];
+            KAryStringsCore(n, k, s, action);
+        }
+        static void KAryStringsCore(int n, int k, char[] s, Action<string> action) {
+            if(n == 0) {
+                action(new string(s));
+                return;
+            }
+            for(int i = 0; i < k; i++) {
+                s[n - 1] = (char)(i + '0');
+                KAryStringsCore(n - 1, k, s, action);
+            }
+        }
     }
 }

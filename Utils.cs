@@ -9,5 +9,8 @@ namespace Data_Structures_and_Algorithms {
         public static void IsNotNegative(long value) {
             if(value < 0) throw new ArgumentException("value");
         }
+        public static void IsPositive(int value) {
+            if(value <= 0) throw new ArgumentException("value");
+        }
     }
 }
