@@ -53,33 +53,33 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
 
         [Test]
-        public void OneBitThreeAryStringTest() {
+        public void OneBitThreeAryStringsTest() {
             List<string> list = new List<string>();
             RecursionBase.KAryStrings(1, 3, s => list.Add(s));
             Assert.AreEqual(3, list.Count);
             CollectionAssert.AreEquivalent(new string[] { "0", "2", "1" }, list);
         }
         [Test]
-        public void TwoBitsThreeAryStringTest() {
+        public void TwoBitsThreeAryStringsTest() {
             List<string> list = new List<string>();
             RecursionBase.KAryStrings(2, 3, s => list.Add(s));
             Assert.AreEqual(9, list.Count);
             CollectionAssert.AreEquivalent(new string[] { "00", "10", "20", "01", "11", "21", "02", "12", "22" }, list);
         }
         [Test, ExpectedException(typeof(ArgumentException))]
-        public void KAryStringGuardCase1Test() {
+        public void KAryStringsGuardCase1Test() {
             RecursionBase.KAryStrings(0, 1, s => { });
         }
         [Test, ExpectedException(typeof(ArgumentException))]
-        public void KAryStringGuardCase2Test() {
+        public void KAryStringsGuardCase2Test() {
             RecursionBase.KAryStrings(-1, 1, s => { });
         }
         [Test, ExpectedException(typeof(ArgumentException))]
-        public void KAryStringGuardCase3Test() {
+        public void KAryStringsGuardCase3Test() {
             RecursionBase.KAryStrings(1, 0, s => { });
         }
         [Test, ExpectedException(typeof(ArgumentException))]
-        public void KAryStringGuardCase4Test() {
+        public void KAryStringsGuardCase4Test() {
             RecursionBase.KAryStrings(1, -1, s => { });
         }
     }
