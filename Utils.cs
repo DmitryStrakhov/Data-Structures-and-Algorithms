@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
     public static class Guard {
-        public static void IsNotNegative(long value) {
-            if(value < 0) throw new ArgumentException("value");
+        public static void IsNotNegative(long value, string argument) {
+            if(value < 0) throw new ArgumentException(argument);
         }
-        public static void IsPositive(int value) {
-            if(value <= 0) throw new ArgumentException("value");
+        public static void IsPositive(int value, string argument) {
+            if(value <= 0) throw new ArgumentException(argument);
+        }
+        public static void IsNotNull(object value, string argument) {
+            if(value == null) throw new ArgumentException(argument);
         }
     }
 }

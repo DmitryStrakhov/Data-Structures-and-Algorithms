@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace Data_Structures_and_Algorithms {
     public static partial class RecursionBase {
         public static long Factorial(long n) {
-            Guard.IsNotNegative(n);
+            Guard.IsNotNegative(n, "n");
             if(n <= 1) {
                 return 1;
             }
             return n * Factorial(n - 1);
         }
         public static void BinaryStrings(int n, Action<string> action) {
-            Guard.IsPositive(n);
+            Guard.IsPositive(n, "n");
             char[] s = new char[n];
             BinaryStringsCore(n, s, action);
         }
@@ -29,8 +29,8 @@ namespace Data_Structures_and_Algorithms {
             BinaryStringsCore(n - 1, s, action);
         }
         public static void KAryStrings(int n, int k, Action<string> action) {
-            Guard.IsPositive(n);
-            Guard.IsPositive(k);
+            Guard.IsPositive(n, "n");
+            Guard.IsPositive(k, "n");
             char[] s = new char[n];
             KAryStringsCore(n, k, s, action);
         }
