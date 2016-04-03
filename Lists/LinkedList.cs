@@ -18,7 +18,7 @@ namespace Data_Structures_and_Algorithms {
             this.value = value;
             this.next = next;
         }
-        internal void Redirect(SinglyLinkedListNode<T> node) {
+        public void Redirect(SinglyLinkedListNode<T> node) {
             this.next = node;
         }
         public T Value { get { return value; } }
