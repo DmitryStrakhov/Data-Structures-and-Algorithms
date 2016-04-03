@@ -33,31 +33,29 @@ namespace Data_Structures_and_Algorithms {
         }
         public void Insert(T value, int position) {
             Guard.IsPositive(position, "position");
-            SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<T>(value, this.head);
             if(position == 1) {
-                this.head = newNode;
+                this.head = new SinglyLinkedListNode<T>(value, this.head);
             }
             else {
                 SinglyLinkedListNode<T> prev = GetNode(position - 1);
-                newNode.Redirect(prev.Next);
-                prev.Redirect(newNode);
+                prev.Redirect(new SinglyLinkedListNode<T>(value, prev.Next));
             }
         }
-        public ILinkedListNode<T> RemoveAt(int position) {
+        public T RemoveAt(int position) {
             Guard.IsPositive(position, "position");
             Guard.IsNotNull(this.head, "position");
-            SinglyLinkedListNode<T> target;
+            T value = default(T);
             if(position == 1) {
-                target = this.head;
+                value = this.head.Value;
                 this.head = this.head.Next;
             }
             else {
                 SinglyLinkedListNode<T> node = GetNode(position - 1);
                 Guard.IsNotNull(node.Next, "position");
-                target = node.Next;
-                node.Redirect(target.Next);
+                value = node.Next.Value;
+                node.Redirect(node.Next.Next);
             }
-            return target;
+            return value;
         }
         public void Clear(bool dispose) {
             if(dispose) {
@@ -85,10 +83,10 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsPositive(position, "position");
             return GetNode(position).Value;
         }
-        public void Traverse(Action<ILinkedListNode<T>> action) {
+        public void Traverse(Action<T> action) {
             SinglyLinkedListNode<T> node = this.head;
             while(node != null) {
-                action(node);
+                action(node.Value);
                 node = node.Next;
             }
         }

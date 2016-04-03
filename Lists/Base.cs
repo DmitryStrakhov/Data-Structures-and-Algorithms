@@ -11,10 +11,10 @@ namespace Data_Structures_and_Algorithms {
 
     public interface ILinkedList<T> {
         void Insert(T value, int position);
-        ILinkedListNode<T> RemoveAt(int position);
+        T RemoveAt(int position);
         void Clear(bool dispose);
         int GetLenght();
         T GetValue(int position);
-        void Traverse(Action<ILinkedListNode<T>> action);
+        void Traverse(Action<T> action);
     }
 }

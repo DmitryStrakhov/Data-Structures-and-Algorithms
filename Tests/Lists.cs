@@ -41,7 +41,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Insert(2, 1);
             linkedList.Insert(1, 1);
             List<int> list = new List<int>();
-            linkedList.Traverse(x => list.Add(x.Value));
+            linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4, 5 }, list);
         }
         [Test]
@@ -95,7 +95,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Insert(30, 2);
             linkedList.Insert(20, 2);
             List<int> list = new List<int>();
-            linkedList.Traverse(x => list.Add(x.Value));
+            linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 10, 20, 30 }, list);
         }
 
@@ -120,22 +120,21 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Insert(40, 4);
 
             List<int> list = new List<int>();
-            ILinkedListNode<int> node;
-            node = linkedList.RemoveAt(1);
-            Assert.AreEqual(10, node.Value);
-            linkedList.Traverse(x => list.Add(x.Value));
+            int value = linkedList.RemoveAt(1);
+            Assert.AreEqual(10, value);
+            linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 20, 30, 40 }, list);
 
             list.Clear();
-            node = linkedList.RemoveAt(2);
-            Assert.AreEqual(30, node.Value);
-            linkedList.Traverse(x => list.Add(x.Value));
+            value = linkedList.RemoveAt(2);
+            Assert.AreEqual(30, value);
+            linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 20, 40 }, list);
 
             list.Clear();
-            node = linkedList.RemoveAt(2);
-            Assert.AreEqual(40, node.Value);
-            linkedList.Traverse(x => list.Add(x.Value));
+            value = linkedList.RemoveAt(2);
+            Assert.AreEqual(40, value);
+            linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 20 }, list);
         }
     }
