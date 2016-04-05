@@ -90,9 +90,28 @@ namespace Data_Structures_and_Algorithms {
                 node = node.Next;
             }
         }
+        public T GetLastValue(int position) {
+            Guard.IsPositive(position, "position");
+            Guard.IsNotNull(this.head, "position");
+            SinglyLinkedListNode<T> node = this.head;
+            SinglyLinkedListNode<T> target = this.head;
+            int place = position;
+            while(node != null) {
+                if(place <= 0) {
+                    target = target.Next;
+                }
+                place--;
+                node = node.Next;
+            }
+            if(place > 0) {
+                throw new ArgumentException("position");
+            }
+            return target.Value;
+        }
 
         internal SinglyLinkedListNode<T> GetNode(int position) {
             Guard.IsPositive(position, "position");
+            Guard.IsNotNull(this.head, "position");
             int nodePos = 1;
             SinglyLinkedListNode<T> node = this.head;
             while(node != null && nodePos++ < position) {

@@ -15,6 +15,7 @@ namespace Data_Structures_and_Algorithms {
         void Clear(bool dispose);
         int GetLenght();
         T GetValue(int position);
+        T GetLastValue(int position);
         void Traverse(Action<T> action);
     }
 }

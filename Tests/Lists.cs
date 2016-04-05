@@ -137,6 +137,36 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 20 }, list);
         }
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void SinglyLinkedListGetLastValueGuardCase1Test() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            int value = linkedList.GetLastValue(0);
+        }
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void SinglyLinkedListGetLastValueGuardCase2Test() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.Insert(20, 2);
+            int value = linkedList.GetLastValue(3);
+        }
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void SinglyLinkedListGetLastValueGuardCase3Test() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            int value = linkedList.GetLastValue(1);
+        }
+        [Test]
+        public void SinglyLinkedListGetLastValueTest() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.Insert(20, 2);
+            linkedList.Insert(30, 3);
+            linkedList.Insert(40, 4);
+            Assert.AreEqual(40, linkedList.GetLastValue(1));
+            Assert.AreEqual(30, linkedList.GetLastValue(2));
+            Assert.AreEqual(20, linkedList.GetLastValue(3));
+            Assert.AreEqual(10, linkedList.GetLastValue(4));
+        }
     }
 }
 
