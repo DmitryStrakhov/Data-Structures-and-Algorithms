@@ -167,6 +167,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetLastValue(3));
             Assert.AreEqual(10, linkedList.GetLastValue(4));
         }
+
     }
 }
 
