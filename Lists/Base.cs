@@ -17,5 +17,7 @@ namespace Data_Structures_and_Algorithms {
         T GetValue(int position);
         T GetLastValue(int position);
         void Traverse(Action<T> action);
+        void Reverse();
+        void ReverseRecursive();
     }
 }

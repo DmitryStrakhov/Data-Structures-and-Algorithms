@@ -167,7 +167,50 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetLastValue(3));
             Assert.AreEqual(10, linkedList.GetLastValue(4));
         }
-
+        [Test]
+        public void SinglyLinkedListReverseSimpleTest() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.Reverse();
+            Assert.AreEqual(1, linkedList.GetLenght());
+            Assert.AreEqual(10, linkedList.GetValue(1));
+        }
+        [Test]
+        public void SinglyLinkedListReverseTest() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.Insert(20, 2);
+            linkedList.Insert(30, 3);
+            linkedList.Insert(40, 4);
+            linkedList.Reverse();
+            Assert.AreEqual(4, linkedList.GetLenght());
+            Assert.AreEqual(40, linkedList.GetValue(1));
+            Assert.AreEqual(30, linkedList.GetValue(2));
+            Assert.AreEqual(20, linkedList.GetValue(3));
+            Assert.AreEqual(10, linkedList.GetValue(4));
+        }
+        [Test]
+        public void SinglyLinkedListReverseRecursiveSimpleTest() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.ReverseRecursive();
+            Assert.AreEqual(1, linkedList.GetLenght());
+            Assert.AreEqual(10, linkedList.GetValue(1));
+        }
+        [Test]
+        public void SinglyLinkedListReverseRecursiveTest() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.Insert(20, 2);
+            linkedList.Insert(30, 3);
+            linkedList.Insert(40, 4);
+            linkedList.ReverseRecursive();
+            Assert.AreEqual(4, linkedList.GetLenght());
+            Assert.AreEqual(40, linkedList.GetValue(1));
+            Assert.AreEqual(30, linkedList.GetValue(2));
+            Assert.AreEqual(20, linkedList.GetValue(3));
+            Assert.AreEqual(10, linkedList.GetValue(4));
+        }
     }
 }
 

@@ -108,7 +108,33 @@ namespace Data_Structures_and_Algorithms {
             }
             return target.Value;
         }
+        public void Reverse() {
+            if(this.head == null) return;
+            SinglyLinkedListNode<T> prev = null;
+            SinglyLinkedListNode<T> node = this.head;
+            while(node != null) {
+                SinglyLinkedListNode<T> next = node.Next;
+                node.Redirect(prev);
+                prev = node;
+                node = next;
+            }
+            this.head = prev;
+        }
+        public void ReverseRecursive() {
+            ReverseRecursive(this.head);
+        }
 
+        internal SinglyLinkedListNode<T> ReverseRecursive(SinglyLinkedListNode<T> node) {
+            if(node == null)
+                return null;
+            if(node.Next == null)
+                return node;
+            this.head = node.Next;
+            SinglyLinkedListNode<T> listHead = ReverseRecursive(this.head);
+            node.Redirect(null);
+            listHead.Redirect(node);
+            return node;
+        }
         internal SinglyLinkedListNode<T> GetNode(int position) {
             Guard.IsPositive(position, "position");
             Guard.IsNotNull(this.head, "position");
