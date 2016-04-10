@@ -211,6 +211,17 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetValue(3));
             Assert.AreEqual(10, linkedList.GetValue(4));
         }
+        [Test]
+        public void SinglyLinkedListTraverseReversiveTest() {
+            SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
+            linkedList.Insert(10, 1);
+            linkedList.Insert(20, 2);
+            linkedList.Insert(30, 3);
+            linkedList.Insert(40, 4);
+            List<int> list = new List<int>();
+            linkedList.TraverseReversive(x => list.Add(x));
+            CollectionAssert.AreEqual(new int[] { 40, 30, 20, 10 }, list);
+        }
     }
 }
 

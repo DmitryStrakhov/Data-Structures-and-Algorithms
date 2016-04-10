@@ -123,7 +123,16 @@ namespace Data_Structures_and_Algorithms {
         public void ReverseRecursive() {
             ReverseRecursive(this.head);
         }
+        public void TraverseReversive(Action<T> action) {
+            if(this.head == null) return;
+            TraverseReversive(this.head, action);
+        }
 
+        internal void TraverseReversive(SinglyLinkedListNode<T> listHead, Action<T> action) {
+            if(listHead == null) return;
+            TraverseReversive(listHead.Next, action);
+            action(listHead.Value);
+        }
         internal SinglyLinkedListNode<T> ReverseRecursive(SinglyLinkedListNode<T> node) {
             if(node == null)
                 return null;
