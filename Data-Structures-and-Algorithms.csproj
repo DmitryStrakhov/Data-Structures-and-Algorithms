@@ -45,8 +45,10 @@
     <Compile Include="List\LinkedList.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stack\Stack.cs" />
     <Compile Include="Tests\Lists.cs" />
     <Compile Include="Tests\Misc.cs" />
+    <Compile Include="Tests\Stack.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
