@@ -74,6 +74,19 @@ namespace Data_Structures_and_Algorithms.Tests {
             stack.Push(12);
             Assert.AreEqual(12, stack.Peek());
         }
+        [Test]
+        public void StackClearTest() {
+            Stack<int> stack = new Stack<int>();
+            stack.Push(1);
+            stack.Push(2);
+            stack.Push(3);
+            stack.Push(4);
+            stack.Push(5);
+            Assert.AreEqual(5, stack.Size);
+            stack.Clear();
+            Assert.AreEqual(0, stack.Size);
+            Assert.IsNull(stack.GetHead());
+        }
     }
 }
 

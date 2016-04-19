@@ -32,6 +32,21 @@ namespace Data_Structures_and_Algorithms {
             }
             return this.head.Value;
         }
+        public void Clear() { Clear(false); }
+        public void Clear(bool dispose) {
+            if(this.head == null) return;
+            if(dispose) {
+                SinglyLinkedListNode<T> node = this.head;
+                while(node != null) {
+                    IDisposable obj = node.Value as IDisposable;
+                    if(obj != null)
+                        obj.Dispose();
+                    node = node.Next;
+                }
+            }
+            this.head = null;
+            this.size = 0;
+        }
         public int Size {
             get { return size; }
         }
