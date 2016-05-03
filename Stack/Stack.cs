@@ -15,7 +15,7 @@ namespace Data_Structures_and_Algorithms {
         }
         public void Push(T value) {
             this.head = new SinglyLinkedListNode<T>(value, this.head);
-            size++;
+            this.size++;
         }
         public T Pop() {
             if(IsEmpty) {
