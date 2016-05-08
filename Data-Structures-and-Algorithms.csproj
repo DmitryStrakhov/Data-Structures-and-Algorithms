@@ -41,7 +41,6 @@
     <Reference Include="NUnit.Framework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="List\Base.cs" />
     <Compile Include="List\LinkedList.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

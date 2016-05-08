@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
     [DebuggerDisplay("Value: {Value}")]
-    public class SinglyLinkedListNode<T> : ILinkedListNode<T> {
+    public class SinglyLinkedListNode<T> {
         T value;
         SinglyLinkedListNode<T> next;
 
@@ -25,7 +25,7 @@ namespace Data_Structures_and_Algorithms {
         public SinglyLinkedListNode<T> Next { get { return next; } }
     }
 
-    public class SinglyLinkedList<T> : ILinkedList<T> {
+    public class SinglyLinkedList<T> {
         SinglyLinkedListNode<T> head;
 
         public SinglyLinkedList() {
