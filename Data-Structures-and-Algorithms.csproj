@@ -50,6 +50,9 @@
     <Compile Include="Tests\Misc.cs" />
     <Compile Include="Tests\Queue.cs" />
     <Compile Include="Tests\Stack.cs" />
+    <Compile Include="Tests\Tree.cs" />
+    <Compile Include="Tree\Node.cs" />
+    <Compile Include="Tree\Tree.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
