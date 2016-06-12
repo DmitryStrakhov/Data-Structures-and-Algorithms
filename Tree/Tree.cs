@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,12 +9,16 @@ namespace Data_Structures_and_Algorithms {
     public class BinaryTree<T> {
         BinaryTreeNode<T> root;
 
+        public BinaryTree()
+            : this(null) {
+        }
         public BinaryTree(BinaryTreeNode<T> root) {
             this.root = root;
         }
 
         public BinaryTreeNode<T> Root { get { return root; } }
 
+        #region Traversal
         public void PreOrderTraverse(Action<BinaryTreeNode<T>> action) {
             BinaryTreeNode<T> node = Root;
             if(node == null) return;
@@ -65,17 +70,66 @@ namespace Data_Structures_and_Algorithms {
             InOrderTraverseRecursive(action, node.Right);
         }
         public void PostOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            BinaryTreeNode<T> node = Root;
+            DoPostOrderTraverse(action);
+        }
+        public void PostOrderTraverseRecursive(Action<BinaryTreeNode<T>> action) {
+            if(Root == null) return;
+            PostOrderTraverseRecursive(action, Root);
+        }
+        protected void PostOrderTraverseRecursive(Action<BinaryTreeNode<T>> action, BinaryTreeNode<T> node) {
             if(node == null) return;
+            PostOrderTraverseRecursive(action, node.Left);
+            PostOrderTraverseRecursive(action, node.Right);
+            action(node);
+        }
+        public void LevelOrderTraverse(Action<BinaryTreeNode<T>> action) {
+            DoLevelOrderTraverse((n, level) => { action(n); return true; });
+        }
+        #endregion
+
+        #region Utils
+        protected void DoLevelOrderTraverse(Func<BinaryTreeNode<T>, int, bool> handler) {
+            if(Root == null) return;
+            int level = 0;
+            Queue<BinaryTreeNode<T>> queue = new Queue<BinaryTreeNode<T>>();
+            queue.EnQueue(Root);
+            queue.EnQueue(null);
+            while(!queue.IsEmpty) {
+                BinaryTreeNode<T> node = queue.DeQueue();
+                if(node == null) {
+                    if(!queue.IsEmpty)
+                        queue.EnQueue(null);
+                    level++;
+                }
+                else {
+                    if(!handler(node, level))
+                        return;
+                    if(node.Left != null) {
+                        queue.EnQueue(node.Left);
+                    }
+                    if(node.Right != null) {
+                        queue.EnQueue(node.Right);
+                    }
+                }
+            }
+        }
+        protected bool DoPostOrderTraverse(Action<BinaryTreeNode<T>> action, Func<bool> traversalFinished = null, Action<BinaryTreeNode<T>, BinaryTreeNode<T>, int> visitingNode = null) {
+            BinaryTreeNode<T> node = Root;
+            if(node == null) return true;
             Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
             while(true) {
                 if(node != null) {
+                    if(visitingNode != null) {
+                        visitingNode(node, stack.IsEmpty ? null : stack.Peek(), stack.Size);
+                    }
                     stack.Push(node);
                     node = node.Left;
                 }
                 else {
-                    if(stack.IsEmpty)
-                        return;
+                    if(stack.IsEmpty) {
+                        if(traversalFinished != null) return traversalFinished();
+                        return true;
+                    }
                     if(stack.Peek().Right == null) {
                         node = stack.Pop();
                         action(node);
@@ -90,29 +144,120 @@ namespace Data_Structures_and_Algorithms {
                 }
             }
         }
-        public void PostOrderTraverseRecursive(Action<BinaryTreeNode<T>> action) {
-            if(Root == null) return;
-            PostOrderTraverseRecursive(action, Root);
+        #endregion
+
+        #region Insert
+        public void Insert(T value) {
+            Insert(new BinaryTreeNode<T>(value));
         }
-        protected void PostOrderTraverseRecursive(Action<BinaryTreeNode<T>> action, BinaryTreeNode<T> node) {
-            if(node == null) return;
-            PostOrderTraverseRecursive(action, node.Left);
-            PostOrderTraverseRecursive(action, node.Right);
-            action(node);
-        }
-        public void LevelOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            if(Root == null) return;
-            Queue<BinaryTreeNode<T>> queue = new Queue<BinaryTreeNode<T>>();
-            queue.EnQueue(Root);
-            while(!queue.IsEmpty) {
-                BinaryTreeNode<T> node = queue.DeQueue();
-                action(node);
-                if(node.Left != null)
-                    queue.EnQueue(node.Left);
-                if(node.Right != null)
-                    queue.EnQueue(node.Right);
+        public virtual void Insert(BinaryTreeNode<T> node) {
+            Guard.IsNotNull(node, nameof(node));
+            if(Root == null) {
+                this.root = node;
+                return;
             }
+            DoLevelOrderTraverse((n, level) => {
+                bool isFull = n.IsFull;
+                if(!isFull)
+                    n.AddChild(node);
+                return isFull;
+            });
+        }
+        #endregion
+
+        #region Delete
+        public virtual bool DeleteNode(T value) {
+            if(Root == null)
+                return false;
+            BinaryTreeNode<T> nodeToDelete = null;
+            BinaryTreeNode<T> nodeDeepest = Root;
+            BinaryTreeNode<T> itParent = null;
+            int maxLevel = 0;
+            return DoPostOrderTraverse(n => {
+                if(nodeToDelete == null && BinaryTreeNode<T>.AreEquals(n.Value, value)) nodeToDelete = n;
+            },
+            () => {
+                if(nodeToDelete == null || nodeDeepest == null) return false;
+                if(ReferenceEquals(Root, nodeDeepest)) {
+                    this.root = null;
+                }
+                else {
+                    BinaryTreeNode<T>.ExchangeValues(nodeDeepest, nodeToDelete);
+                    itParent.RemoveChild(nodeDeepest);
+                }
+                return true;
+            },
+            (n, parent, level) => {
+                if(level > maxLevel) {
+                    nodeDeepest = n;
+                    itParent = parent;
+                }
+            }
+            );
+        }
+        #endregion
+
+        #region Metrics
+        public BinaryTreeNode<T> GetDeepestNode() {
+            BinaryTreeNode<T> node = null;
+            DoLevelOrderTraverse((n, level) => { node = n; return true; });
+            return node;
+        }
+        public virtual int GetTreeHeight() {
+            if(Root == null) return 0;
+            int level = 0;
+            DoLevelOrderTraverse((n, lvl) => { level = lvl; return true; });
+            return level;
+        }
+        public int GetTreeWidth() {
+            int result = 0;
+            GetTreeWidth(Root, ref result);
+            return result;
+        }
+        protected int GetTreeWidth(BinaryTreeNode<T> node, ref int result) {
+            if(node == null) return 0;
+            int lHeight = GetTreeWidth(node.Left, ref result);
+            int rHeight = GetTreeWidth(node.Right, ref result);
+            if(lHeight + rHeight + 1 > result)
+                result = lHeight + rHeight + 1;
+            return Math.Max(lHeight, rHeight) + 1;
+        }
+        public BinaryTreeNode<T> GetLeastCommonAncestor(BinaryTreeNode<T> x, BinaryTreeNode<T> y) {
+            Guard.IsNotNull(x, nameof(x));
+            Guard.IsNotNull(y, nameof(y));
+            return GetLeastCommonAncestor(Root, x, y);
+        }
+        protected BinaryTreeNode<T> GetLeastCommonAncestor(BinaryTreeNode<T> node, BinaryTreeNode<T> x, BinaryTreeNode<T> y) {
+            if(node == null || ReferenceEquals(node, x) || ReferenceEquals(node, y)) return node;
+            BinaryTreeNode<T> left = GetLeastCommonAncestor(node.Left, x, y);
+            BinaryTreeNode<T> right = GetLeastCommonAncestor(node.Right, x, y);
+            if(left != null && right != null) return node;
+            return left ?? right;
         }
 
+        static readonly ReadOnlyCollection<BinaryTreeNode<T>> EmptyNodeCollection = new ReadOnlyCollection<BinaryTreeNode<T>>(new BinaryTreeNode<T>[0]);
+
+        public ReadOnlyCollection<BinaryTreeNode<T>> GetAncestors(BinaryTreeNode<T> node) {
+            Guard.IsNotNull(node, nameof(node));
+            if(Root == null) return EmptyNodeCollection;
+            Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
+            GetAncestors(Root, node, stack);
+            if(stack.IsEmpty) return EmptyNodeCollection;
+            List<BinaryTreeNode<T>> list = new List<BinaryTreeNode<T>>(stack.Size);
+            while(!stack.IsEmpty) {
+                list.Add(stack.Pop());
+            }
+            return new ReadOnlyCollection<BinaryTreeNode<T>>(list);
+        }
+        protected bool GetAncestors(BinaryTreeNode<T> root, BinaryTreeNode<T> node, Stack<BinaryTreeNode<T>> stack) {
+            if(root == null) return false;
+            if(ReferenceEquals(root, node)) return true;
+            if(GetAncestors(root.Left, node, stack) || GetAncestors(root.Right, node, stack)) {
+                stack.Push(root);
+                return true;
+            }
+            return false;
+        }
+        #endregion
     }
 }
