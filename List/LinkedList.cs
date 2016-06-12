@@ -32,7 +32,7 @@ namespace Data_Structures_and_Algorithms {
             this.head = null;
         }
         public void Insert(T value, int position) {
-            Guard.IsPositive(position, "position");
+            Guard.IsPositive(position, nameof(position));
             if(position == 1) {
                 this.head = new SinglyLinkedListNode<T>(value, this.head);
             }
@@ -42,8 +42,8 @@ namespace Data_Structures_and_Algorithms {
             }
         }
         public T RemoveAt(int position) {
-            Guard.IsPositive(position, "position");
-            Guard.IsNotNull(this.head, "position");
+            Guard.IsPositive(position, nameof(position));
+            Guard.IsNotNull(this.head, nameof(position));
             T value = default(T);
             if(position == 1) {
                 value = this.head.Value;
@@ -51,7 +51,7 @@ namespace Data_Structures_and_Algorithms {
             }
             else {
                 SinglyLinkedListNode<T> node = GetNode(position - 1);
-                Guard.IsNotNull(node.Next, "position");
+                Guard.IsNotNull(node.Next, nameof(position));
                 value = node.Next.Value;
                 node.Redirect(node.Next.Next);
             }
@@ -80,7 +80,7 @@ namespace Data_Structures_and_Algorithms {
             return itemCount;
         }
         public T GetValue(int position) {
-            Guard.IsPositive(position, "position");
+            Guard.IsPositive(position, nameof(position));
             return GetNode(position).Value;
         }
         public void Traverse(Action<T> action) {
@@ -91,8 +91,8 @@ namespace Data_Structures_and_Algorithms {
             }
         }
         public T GetLastValue(int position) {
-            Guard.IsPositive(position, "position");
-            Guard.IsNotNull(this.head, "position");
+            Guard.IsPositive(position, nameof(position));
+            Guard.IsNotNull(this.head, nameof(position));
             SinglyLinkedListNode<T> node = this.head;
             SinglyLinkedListNode<T> target = this.head;
             int place = position;
@@ -145,8 +145,8 @@ namespace Data_Structures_and_Algorithms {
             return node;
         }
         internal SinglyLinkedListNode<T> GetNode(int position) {
-            Guard.IsPositive(position, "position");
-            Guard.IsNotNull(this.head, "position");
+            Guard.IsPositive(position, nameof(position));
+            Guard.IsNotNull(this.head, nameof(position));
             int nodePos = 1;
             SinglyLinkedListNode<T> node = this.head;
             while(node != null && nodePos++ < position) {
