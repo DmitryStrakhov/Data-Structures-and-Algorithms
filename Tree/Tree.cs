@@ -83,13 +83,13 @@ namespace Data_Structures_and_Algorithms {
             action(node);
         }
         public void LevelOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            DoLevelOrderTraverse((n, level) => { action(n); return true; });
+            DoLevelOrderTraverse((n, level) => { action(n); return false; });
         }
         #endregion
 
         #region Utils
-        protected void DoLevelOrderTraverse(Func<BinaryTreeNode<T>, int, bool> handler) {
-            if(Root == null) return;
+        protected BinaryTreeNode<T> DoLevelOrderTraverse(Func<BinaryTreeNode<T>, int, bool> predicate) {
+            if(Root == null) return null;
             int level = 0;
             Queue<BinaryTreeNode<T>> queue = new Queue<BinaryTreeNode<T>>();
             queue.EnQueue(Root);
@@ -102,8 +102,8 @@ namespace Data_Structures_and_Algorithms {
                     level++;
                 }
                 else {
-                    if(!handler(node, level))
-                        return;
+                    if(predicate(node, level))
+                        return node;
                     if(node.Left != null) {
                         queue.EnQueue(node.Left);
                     }
@@ -112,6 +112,7 @@ namespace Data_Structures_and_Algorithms {
                     }
                 }
             }
+            return null;
         }
         protected bool DoPostOrderTraverse(Action<BinaryTreeNode<T>> action, Func<bool> traversalFinished = null, Action<BinaryTreeNode<T>, BinaryTreeNode<T>, int> visitingNode = null) {
             BinaryTreeNode<T> node = Root;
@@ -157,10 +158,11 @@ namespace Data_Structures_and_Algorithms {
                 return;
             }
             DoLevelOrderTraverse((n, level) => {
-                bool isFull = n.IsFull;
-                if(!isFull)
+                if(!n.IsFull) {
                     n.AddChild(node);
-                return isFull;
+                    return true;
+                }
+                return false;
             });
         }
         #endregion
@@ -200,13 +202,13 @@ namespace Data_Structures_and_Algorithms {
         #region Metrics
         public BinaryTreeNode<T> GetDeepestNode() {
             BinaryTreeNode<T> node = null;
-            DoLevelOrderTraverse((n, level) => { node = n; return true; });
+            DoLevelOrderTraverse((n, level) => { node = n; return false; });
             return node;
         }
         public virtual int GetTreeHeight() {
             if(Root == null) return 0;
             int level = 0;
-            DoLevelOrderTraverse((n, lvl) => { level = lvl; return true; });
+            DoLevelOrderTraverse((n, lvl) => { level = lvl; return false; });
             return level;
         }
         public int GetTreeWidth() {
@@ -259,5 +261,10 @@ namespace Data_Structures_and_Algorithms {
             return false;
         }
         #endregion
+
+        public virtual BinaryTreeNode<T> Search(Func<BinaryTreeNode<T>, bool> predicate) {
+            Guard.IsNotNull(predicate, nameof(predicate));
+            return DoLevelOrderTraverse((x, level) => predicate(x));
+        }
     }
 }
