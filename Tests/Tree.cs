@@ -283,6 +283,20 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEqual(new int[] { 1, 2, 5 }, ancestors);
         }
 
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void SearchGuardTest() {
+            BinaryTree<int> tree = BuildBinaryTree();
+            tree.Search(null);
+        }
+        [Test]
+        public void SearchTest() {
+            BinaryTree<int> tree = BuildBinaryTree();
+            BinaryTreeNode<int> left = tree.Search(x => x.Value == 2);
+            Assert.IsTrue(ReferenceEquals(left, tree.Root.Left));
+            BinaryTreeNode<int> right = tree.Search(x => x.Value == 3);
+            Assert.IsTrue(ReferenceEquals(right, tree.Root.Right));
+        }
+
         static BinaryTree<int> BuildBinaryTree() {
             BinaryTreeNode<int> node2 = new BinaryTreeNode<int>(2, new BinaryTreeNode<int>(4), new BinaryTreeNode<int>(5));
             BinaryTreeNode<int> node3 = new BinaryTreeNode<int>(3, new BinaryTreeNode<int>(6), new BinaryTreeNode<int>(7));
