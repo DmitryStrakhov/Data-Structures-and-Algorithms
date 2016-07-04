@@ -12,6 +12,9 @@ namespace Data_Structures_and_Algorithms {
         public BinaryTree()
             : this(null) {
         }
+        public BinaryTree(T rootValue)
+            : this(new BinaryTreeNode<T>(rootValue)) {
+        }
         public BinaryTree(BinaryTreeNode<T> root) {
             this.root = root;
         }
@@ -148,14 +151,14 @@ namespace Data_Structures_and_Algorithms {
         #endregion
 
         #region Insert
-        public void Insert(T value) {
-            Insert(new BinaryTreeNode<T>(value));
+        public BinaryTreeNode<T> Insert(T value) {
+            return Insert(new BinaryTreeNode<T>(value));
         }
-        public virtual void Insert(BinaryTreeNode<T> node) {
+        public virtual BinaryTreeNode<T> Insert(BinaryTreeNode<T> node) {
             Guard.IsNotNull(node, nameof(node));
             if(Root == null) {
                 this.root = node;
-                return;
+                return node;
             }
             DoLevelOrderTraverse((n, level) => {
                 if(!n.IsFull) {
@@ -164,6 +167,7 @@ namespace Data_Structures_and_Algorithms {
                 }
                 return false;
             });
+            return node;
         }
         #endregion
 
@@ -265,6 +269,30 @@ namespace Data_Structures_and_Algorithms {
         public virtual BinaryTreeNode<T> Search(Func<BinaryTreeNode<T>, bool> predicate) {
             Guard.IsNotNull(predicate, nameof(predicate));
             return DoLevelOrderTraverse((x, level) => predicate(x));
+        }
+
+        public ThreadedBinaryTree<T> BuildThreadedTree() {
+            ThreadedBinaryTreeDummyNode<T> dummy = new ThreadedBinaryTreeDummyNode<T>();
+            ThreadedBinaryTreeNode<T> root = BuildThreadedTree(Root, dummy, dummy);
+            dummy.AddChild(root);
+            return new ThreadedBinaryTree<T>(dummy);
+        }
+        internal ThreadedBinaryTreeNode<T> BuildThreadedTree(BinaryTreeNode<T> root, ThreadedBinaryTreeNode<T> nodeParent, ThreadedBinaryTreeNode<T> vertex) {
+            if(root == null) return null;
+            bool isLeftThreaded = (root.Left == null);
+            bool isRightThreaded = (root.Right == null);
+            ThreadedBinaryTreeNode<T> node = new ThreadedBinaryTreeNode<T>(root.Value, isLeftThreaded, null, isRightThreaded, null);
+            ThreadedBinaryTreeNode<T> left = BuildThreadedTree(root.Left, node, vertex);
+            ThreadedBinaryTreeNode<T> right = BuildThreadedTree(root.Right, nodeParent, node);
+            if(isLeftThreaded) {
+                left = vertex;
+            }
+            if(isRightThreaded) {
+                right = nodeParent;
+            }
+            node.AddChild(left);
+            node.AddChild(right);
+            return node;
         }
     }
 }

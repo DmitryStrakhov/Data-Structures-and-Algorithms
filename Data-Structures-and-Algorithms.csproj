@@ -50,9 +50,12 @@
     <Compile Include="Tests\Misc.cs" />
     <Compile Include="Tests\Queue.cs" />
     <Compile Include="Tests\Stack.cs" />
-    <Compile Include="Tests\Tree.cs" />
-    <Compile Include="Tree\Node.cs" />
-    <Compile Include="Tree\Tree.cs" />
+    <Compile Include="Tests\ThreadedBinaryTree.cs" />
+    <Compile Include="Tests\BinaryTree.cs" />
+    <Compile Include="Tree\BinaryNode.cs" />
+    <Compile Include="Tree\ThreadedBinaryNode.cs" />
+    <Compile Include="Tree\ThreadedBinaryTree.cs" />
+    <Compile Include="Tree\BinaryTree.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

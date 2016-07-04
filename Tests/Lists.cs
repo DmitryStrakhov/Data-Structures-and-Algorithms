@@ -16,7 +16,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(tailNode.Next);
             SinglyLinkedListNode<int> node = new SinglyLinkedListNode<int>(10, tailNode);
             Assert.AreEqual(10, node.Value);
-            Assert.IsTrue(ReferenceEquals(tailNode, node.Next));
+            Assert.AreSame(tailNode, node.Next);
         }
         [Test]
         public void SinglyLinkedListSimpleTest() {

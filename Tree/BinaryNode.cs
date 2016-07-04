@@ -20,6 +20,33 @@ namespace Data_Structures_and_Algorithms {
             this.left = left;
             this.right = right;
         }
+
+        public BinaryTreeNode<T> InsertLeft(T value) {
+            BinaryTreeNode<T> node = new BinaryTreeNode<T>(value);
+            node.left = this.Left;
+            this.left = node;
+            return node;
+        }
+        public BinaryTreeNode<T> InsertRight(T value) {
+            BinaryTreeNode<T> node = new BinaryTreeNode<T>(value);
+            node.right = Right;
+            this.right = node;
+            return node;
+        }
+        public BinaryTreeNode<T> RemoveLeft() {
+            BinaryTreeNode<T> leftNode = Left;
+            this.left = null;
+            return leftNode;
+        }
+        public BinaryTreeNode<T> RemoveRight() {
+            BinaryTreeNode<T> rightNode = Right;
+            this.right = null;
+            return rightNode;
+        }
+
+        internal void AddChild(T value) {
+            AddChild(new BinaryTreeNode<T>(value));
+        }
         internal void AddChild(BinaryTreeNode<T> node) {
             if(IsFull) return;
             if(Left == null) {
