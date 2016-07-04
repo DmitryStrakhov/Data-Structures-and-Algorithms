@@ -277,15 +277,15 @@ namespace Data_Structures_and_Algorithms {
             dummy.AddChild(root);
             return new ThreadedBinaryTree<T>(dummy);
         }
-        internal ThreadedBinaryTreeNode<T> BuildThreadedTree(BinaryTreeNode<T> root, ThreadedBinaryTreeNode<T> nodeParent, ThreadedBinaryTreeNode<T> vertex) {
+        internal ThreadedBinaryTreeNode<T> BuildThreadedTree(BinaryTreeNode<T> root, ThreadedBinaryTreeNode<T> nodeParent, ThreadedBinaryTreeNode<T> nodeRecentVisited) {
             if(root == null) return null;
             bool isLeftThreaded = (root.Left == null);
             bool isRightThreaded = (root.Right == null);
             ThreadedBinaryTreeNode<T> node = new ThreadedBinaryTreeNode<T>(root.Value, isLeftThreaded, null, isRightThreaded, null);
-            ThreadedBinaryTreeNode<T> left = BuildThreadedTree(root.Left, node, vertex);
+            ThreadedBinaryTreeNode<T> left = BuildThreadedTree(root.Left, node, nodeRecentVisited);
             ThreadedBinaryTreeNode<T> right = BuildThreadedTree(root.Right, nodeParent, node);
             if(isLeftThreaded) {
-                left = vertex;
+                left = nodeRecentVisited;
             }
             if(isRightThreaded) {
                 right = nodeParent;

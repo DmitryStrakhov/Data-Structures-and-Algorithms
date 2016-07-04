@@ -287,7 +287,4 @@ namespace Data_Structures_and_Algorithms.Tests {
     }
 }
 
-//
-//BuildThreadedTree
-
 #endif
