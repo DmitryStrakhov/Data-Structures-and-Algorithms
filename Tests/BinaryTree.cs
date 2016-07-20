@@ -339,18 +339,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             IEnumerable<int> ancestors = tree.GetAncestors(n8).Select(x => x.Value);
             CollectionAssert.AreEqual(new int[] { 1, 2, 5 }, ancestors);
         }
-
-        [Test, ExpectedException(typeof(ArgumentException))]
-        public void SearchGuardTest() {
-            BinaryTree<int> tree = BuildTestBinaryTree();
-            tree.Search(null);
-        }
         [Test]
         public void SearchTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
-            BinaryTreeNode<int> left = tree.Search(x => x.Value == 2);
+            BinaryTreeNode<int> left = tree.Search(2);
             Assert.AreSame(left, tree.Root.Left);
-            BinaryTreeNode<int> right = tree.Search(x => x.Value == 3);
+            BinaryTreeNode<int> right = tree.Search(3);
             Assert.AreSame(right, tree.Root.Right);
         }
 

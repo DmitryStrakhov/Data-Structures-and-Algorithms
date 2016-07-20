@@ -6,158 +6,77 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
-    public class BinaryTree<T> {
-        BinaryTreeNode<T> root;
-
+    public class BinaryTree<T> : BinaryTreeBase<T> {
         public BinaryTree()
             : this(null) {
         }
         public BinaryTree(T rootValue)
             : this(new BinaryTreeNode<T>(rootValue)) {
         }
-        public BinaryTree(BinaryTreeNode<T> root) {
-            this.root = root;
+        public BinaryTree(BinaryTreeNode<T> root)
+            : base(root) {
         }
-
-        public BinaryTreeNode<T> Root { get { return root; } }
+        public new BinaryTreeNode<T> Root { get { return (BinaryTreeNode<T>)base.Root; } }
 
         #region Traversal
         public void PreOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            BinaryTreeNode<T> node = Root;
-            if(node == null) return;
-            Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
-            while(true) {
-                while(node != null) {
-                    action(node);
-                    stack.Push(node);
-                    node = node.Left;
-                }
-                if(stack.IsEmpty)
-                    return;
-                node = stack.Pop().Right;
-            }
+            DoPreOrderTraverse(x => action((BinaryTreeNode<T>)x));
         }
         public void PreOrderTraverseRecursive(Action<BinaryTreeNode<T>> action) {
-            if(Root == null) return;
-            PreOrderTraverseRecursive(action, Root);
-        }
-        protected void PreOrderTraverseRecursive(Action<BinaryTreeNode<T>> action, BinaryTreeNode<T> node) {
-            if(node == null) return;
-            action(node);
-            PreOrderTraverseRecursive(action, node.Left);
-            PreOrderTraverseRecursive(action, node.Right);
+            DoPreOrderTraverseRecursive(x => action((BinaryTreeNode<T>)x));
         }
         public void InOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            BinaryTreeNode<T> node = Root;
-            if(node == null) return;
-            Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
-            while(true) {
-                while(node != null) {
-                    stack.Push(node);
-                    node = node.Left;
-                }
-                if(stack.IsEmpty)
-                    return;
-                action(stack.Peek());
-                node = stack.Pop().Right;
-            }
+            DoInOrderTraverse(x => action((BinaryTreeNode<T>)x));
         }
         public void InOrderTraverseRecursive(Action<BinaryTreeNode<T>> action) {
-            if(Root == null) return;
-            InOrderTraverseRecursive(action, Root);
-        }
-        protected void InOrderTraverseRecursive(Action<BinaryTreeNode<T>> action, BinaryTreeNode<T> node) {
-            if(node == null) return;
-            InOrderTraverseRecursive(action, node.Left);
-            action(node);
-            InOrderTraverseRecursive(action, node.Right);
+            DoInOrderTraverseRecursive(x => action((BinaryTreeNode<T>)x));
         }
         public void PostOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            DoPostOrderTraverse(action);
+            DoPostOrderTraverse(x => action((BinaryTreeNode<T>)x));
         }
         public void PostOrderTraverseRecursive(Action<BinaryTreeNode<T>> action) {
-            if(Root == null) return;
-            PostOrderTraverseRecursive(action, Root);
-        }
-        protected void PostOrderTraverseRecursive(Action<BinaryTreeNode<T>> action, BinaryTreeNode<T> node) {
-            if(node == null) return;
-            PostOrderTraverseRecursive(action, node.Left);
-            PostOrderTraverseRecursive(action, node.Right);
-            action(node);
+            DoPostOrderTraverseRecursive(x => action((BinaryTreeNode<T>)x));
         }
         public void LevelOrderTraverse(Action<BinaryTreeNode<T>> action) {
-            DoLevelOrderTraverse((n, level) => { action(n); return false; });
-        }
-        #endregion
-
-        #region Utils
-        protected BinaryTreeNode<T> DoLevelOrderTraverse(Func<BinaryTreeNode<T>, int, bool> predicate) {
-            if(Root == null) return null;
-            int level = 0;
-            Queue<BinaryTreeNode<T>> queue = new Queue<BinaryTreeNode<T>>();
-            queue.EnQueue(Root);
-            queue.EnQueue(null);
-            while(!queue.IsEmpty) {
-                BinaryTreeNode<T> node = queue.DeQueue();
-                if(node == null) {
-                    if(!queue.IsEmpty)
-                        queue.EnQueue(null);
-                    level++;
-                }
-                else {
-                    if(predicate(node, level))
-                        return node;
-                    if(node.Left != null) {
-                        queue.EnQueue(node.Left);
-                    }
-                    if(node.Right != null) {
-                        queue.EnQueue(node.Right);
-                    }
-                }
-            }
-            return null;
-        }
-        protected bool DoPostOrderTraverse(Action<BinaryTreeNode<T>> action, Func<bool> traversalFinished = null, Action<BinaryTreeNode<T>, BinaryTreeNode<T>, int> visitingNode = null) {
-            BinaryTreeNode<T> node = Root;
-            if(node == null) return true;
-            Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
-            while(true) {
-                if(node != null) {
-                    if(visitingNode != null) {
-                        visitingNode(node, stack.IsEmpty ? null : stack.Peek(), stack.Size);
-                    }
-                    stack.Push(node);
-                    node = node.Left;
-                }
-                else {
-                    if(stack.IsEmpty) {
-                        if(traversalFinished != null) return traversalFinished();
-                        return true;
-                    }
-                    if(stack.Peek().Right == null) {
-                        node = stack.Pop();
-                        action(node);
-                        while(!stack.IsEmpty && node == stack.Peek().Right) {
-                            action(node = stack.Pop());
-                        }
-                    }
-                    if(!stack.IsEmpty) {
-                        node = stack.Peek().Right;
-                    }
-                    else node = null;
-                }
-            }
+            DoLevelOrderTraverse(x => action((BinaryTreeNode<T>)x));
         }
         #endregion
 
         #region Insert
         public BinaryTreeNode<T> Insert(T value) {
-            return Insert(new BinaryTreeNode<T>(value));
+            return (BinaryTreeNode<T>)DoInsert(new BinaryTreeNode<T>(value));
         }
-        public virtual BinaryTreeNode<T> Insert(BinaryTreeNode<T> node) {
+        public BinaryTreeNode<T> Insert(BinaryTreeNode<T> node) {
+            return (BinaryTreeNode<T>)DoInsert(node);
+        }
+        #endregion
+
+        #region Metrics
+        public BinaryTreeNode<T> GetDeepestNode() {
+            return (BinaryTreeNode<T>)DoGetDeepestNode();
+        }
+        public BinaryTreeNode<T> GetLeastCommonAncestor(BinaryTreeNode<T> x, BinaryTreeNode<T> y) {
+            return (BinaryTreeNode<T>)DoGetLeastCommonAncestor(x, y);
+        }
+        public ReadOnlyCollection<BinaryTreeNode<T>> GetAncestors(BinaryTreeNode<T> node) {
+            var ancestorList = DoGetAncestors(node).OfType<BinaryTreeNode<T>>().ToList();
+            return new ReadOnlyCollection<BinaryTreeNode<T>>(ancestorList);
+        }
+        #endregion
+
+        #region Search
+        public BinaryTreeNode<T> Search(T value) {
+            return (BinaryTreeNode<T>)DoSearch(value);
+        }
+        #endregion
+
+        protected override BinaryTreeNodeBase<T> DoSearch(T value) {
+            return DoLevelOrderTraverse((x, level) => BinaryTreeNodeBase<T>.AreEquals(x.Value, value));
+        }
+        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node) {
             Guard.IsNotNull(node, nameof(node));
             if(Root == null) {
-                this.root = node;
+                SetRoot(node);
                 return node;
             }
             DoLevelOrderTraverse((n, level) => {
@@ -169,26 +88,23 @@ namespace Data_Structures_and_Algorithms {
             });
             return node;
         }
-        #endregion
-
-        #region Delete
-        public virtual bool DeleteNode(T value) {
+        protected override bool DoDelete(T value) {
             if(Root == null)
                 return false;
-            BinaryTreeNode<T> nodeToDelete = null;
-            BinaryTreeNode<T> nodeDeepest = Root;
-            BinaryTreeNode<T> itParent = null;
+            BinaryTreeNodeBase<T> nodeToDelete = null;
+            BinaryTreeNodeBase<T> nodeDeepest = Root;
+            BinaryTreeNodeBase<T> itParent = null;
             int maxLevel = 0;
             return DoPostOrderTraverse(n => {
-                if(nodeToDelete == null && BinaryTreeNode<T>.AreEquals(n.Value, value)) nodeToDelete = n;
+                if(nodeToDelete == null && BinaryTreeNodeBase<T>.AreEquals(n.Value, value)) nodeToDelete = n;
             },
             () => {
                 if(nodeToDelete == null || nodeDeepest == null) return false;
                 if(ReferenceEquals(Root, nodeDeepest)) {
-                    this.root = null;
+                    SetRoot(null);
                 }
                 else {
-                    BinaryTreeNode<T>.ExchangeValues(nodeDeepest, nodeToDelete);
+                    BinaryTreeNodeBase<T>.ExchangeValues(nodeDeepest, nodeToDelete);
                     itParent.RemoveChild(nodeDeepest);
                 }
                 return true;
@@ -200,99 +116,6 @@ namespace Data_Structures_and_Algorithms {
                 }
             }
             );
-        }
-        #endregion
-
-        #region Metrics
-        public BinaryTreeNode<T> GetDeepestNode() {
-            BinaryTreeNode<T> node = null;
-            DoLevelOrderTraverse((n, level) => { node = n; return false; });
-            return node;
-        }
-        public virtual int GetTreeHeight() {
-            if(Root == null) return 0;
-            int level = 0;
-            DoLevelOrderTraverse((n, lvl) => { level = lvl; return false; });
-            return level;
-        }
-        public int GetTreeWidth() {
-            int result = 0;
-            GetTreeWidth(Root, ref result);
-            return result;
-        }
-        protected int GetTreeWidth(BinaryTreeNode<T> node, ref int result) {
-            if(node == null) return 0;
-            int lHeight = GetTreeWidth(node.Left, ref result);
-            int rHeight = GetTreeWidth(node.Right, ref result);
-            if(lHeight + rHeight + 1 > result)
-                result = lHeight + rHeight + 1;
-            return Math.Max(lHeight, rHeight) + 1;
-        }
-        public BinaryTreeNode<T> GetLeastCommonAncestor(BinaryTreeNode<T> x, BinaryTreeNode<T> y) {
-            Guard.IsNotNull(x, nameof(x));
-            Guard.IsNotNull(y, nameof(y));
-            return GetLeastCommonAncestor(Root, x, y);
-        }
-        protected BinaryTreeNode<T> GetLeastCommonAncestor(BinaryTreeNode<T> node, BinaryTreeNode<T> x, BinaryTreeNode<T> y) {
-            if(node == null || ReferenceEquals(node, x) || ReferenceEquals(node, y)) return node;
-            BinaryTreeNode<T> left = GetLeastCommonAncestor(node.Left, x, y);
-            BinaryTreeNode<T> right = GetLeastCommonAncestor(node.Right, x, y);
-            if(left != null && right != null) return node;
-            return left ?? right;
-        }
-
-        static readonly ReadOnlyCollection<BinaryTreeNode<T>> EmptyNodeCollection = new ReadOnlyCollection<BinaryTreeNode<T>>(new BinaryTreeNode<T>[0]);
-
-        public ReadOnlyCollection<BinaryTreeNode<T>> GetAncestors(BinaryTreeNode<T> node) {
-            Guard.IsNotNull(node, nameof(node));
-            if(Root == null) return EmptyNodeCollection;
-            Stack<BinaryTreeNode<T>> stack = new Stack<BinaryTreeNode<T>>();
-            GetAncestors(Root, node, stack);
-            if(stack.IsEmpty) return EmptyNodeCollection;
-            List<BinaryTreeNode<T>> list = new List<BinaryTreeNode<T>>(stack.Size);
-            while(!stack.IsEmpty) {
-                list.Add(stack.Pop());
-            }
-            return new ReadOnlyCollection<BinaryTreeNode<T>>(list);
-        }
-        protected bool GetAncestors(BinaryTreeNode<T> root, BinaryTreeNode<T> node, Stack<BinaryTreeNode<T>> stack) {
-            if(root == null) return false;
-            if(ReferenceEquals(root, node)) return true;
-            if(GetAncestors(root.Left, node, stack) || GetAncestors(root.Right, node, stack)) {
-                stack.Push(root);
-                return true;
-            }
-            return false;
-        }
-        #endregion
-
-        public virtual BinaryTreeNode<T> Search(Func<BinaryTreeNode<T>, bool> predicate) {
-            Guard.IsNotNull(predicate, nameof(predicate));
-            return DoLevelOrderTraverse((x, level) => predicate(x));
-        }
-
-        public ThreadedBinaryTree<T> BuildThreadedTree() {
-            ThreadedBinaryTreeDummyNode<T> dummy = new ThreadedBinaryTreeDummyNode<T>();
-            ThreadedBinaryTreeNode<T> root = BuildThreadedTree(Root, dummy, dummy);
-            dummy.AddChild(root);
-            return new ThreadedBinaryTree<T>(dummy);
-        }
-        internal ThreadedBinaryTreeNode<T> BuildThreadedTree(BinaryTreeNode<T> root, ThreadedBinaryTreeNode<T> nodeParent, ThreadedBinaryTreeNode<T> nodeRecentVisited) {
-            if(root == null) return null;
-            bool isLeftThreaded = (root.Left == null);
-            bool isRightThreaded = (root.Right == null);
-            ThreadedBinaryTreeNode<T> node = new ThreadedBinaryTreeNode<T>(root.Value, isLeftThreaded, null, isRightThreaded, null);
-            ThreadedBinaryTreeNode<T> left = BuildThreadedTree(root.Left, node, nodeRecentVisited);
-            ThreadedBinaryTreeNode<T> right = BuildThreadedTree(root.Right, nodeParent, node);
-            if(isLeftThreaded) {
-                left = nodeRecentVisited;
-            }
-            if(isRightThreaded) {
-                right = nodeParent;
-            }
-            node.AddChild(left);
-            node.AddChild(right);
-            return node;
         }
     }
 }
