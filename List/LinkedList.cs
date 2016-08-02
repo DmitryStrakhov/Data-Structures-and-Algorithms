@@ -21,7 +21,10 @@ namespace Data_Structures_and_Algorithms {
         public void Redirect(SinglyLinkedListNode<T> node) {
             this.next = node;
         }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public T Value { get { return value; } }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public SinglyLinkedListNode<T> Next { get { return next; } }
     }
 

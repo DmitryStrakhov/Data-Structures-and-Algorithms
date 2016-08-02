@@ -189,7 +189,10 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(y, nameof(y));
             return DoGetLeastCommonAncestor(Root, x, y);
         }
-        BinaryTreeNodeBase<T> DoGetLeastCommonAncestor(BinaryTreeNodeBase<T> node, BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
+        protected virtual BinaryTreeNodeBase<T> DoGetLeastCommonAncestor(BinaryTreeNodeBase<T> node, BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
+            return DoGetLeastCommonAncestorRecursive(node, x, y);
+        }
+        protected BinaryTreeNodeBase<T> DoGetLeastCommonAncestorRecursive(BinaryTreeNodeBase<T> node, BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
             if(node == null || ReferenceEquals(node, x) || ReferenceEquals(node, y)) return node;
             BinaryTreeNodeBase<T> left = DoGetLeastCommonAncestor(node.Left, x, y);
             BinaryTreeNodeBase<T> right = DoGetLeastCommonAncestor(node.Right, x, y);

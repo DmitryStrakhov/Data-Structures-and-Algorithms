@@ -35,6 +35,12 @@ namespace Data_Structures_and_Algorithms {
         public BinarySearchTreeNode<T> GetMaximum() {
             return DoGetMaximum(Root);
         }
+        public BinarySearchTreeNode<T> GetFloor(T value) {
+            return GetFloorRecursive(Root, value);
+        }
+        public BinarySearchTreeNode<T> GetCeiling(T value) {
+            return GetCeilingRecursive(Root, value);
+        }
 
         protected override BinaryTreeNodeBase<T> DoSearch(T value) {
             return DoSearchRecursive(Root, x => BinaryTreeNodeBase<T>.Compare(x.Value, value));
@@ -111,6 +117,24 @@ namespace Data_Structures_and_Algorithms {
             }
             return root;
         }
+        BinarySearchTreeNode<T> GetFloorRecursive(BinarySearchTreeNode<T> root, T value) {
+            if(root == null) return null;
+            var right = GetFloorRecursive(root.Right, value);
+            if(right != null)
+                return right;
+            if(BinarySearchTreeNode<T>.Compare(root.Value, value) <= 0) 
+                return root;
+            return GetFloorRecursive(root.Left, value);
+        }
+        BinarySearchTreeNode<T> GetCeilingRecursive(BinarySearchTreeNode<T> root, T value) {
+            if(root == null) return null;
+            var left = GetCeilingRecursive(root.Left, value);
+            if(left != null)
+                return left;
+            if(BinarySearchTreeNode<T>.Compare(root.Value, value) >= 0)
+                return root;
+            return GetCeilingRecursive(root.Right, value);
+        }
 
         #region Traversal
         public void PreOrderTraverse(Action<BinarySearchTreeNode<T>> action) {
@@ -148,5 +172,22 @@ namespace Data_Structures_and_Algorithms {
             return new ReadOnlyCollection<BinarySearchTreeNode<T>>(ancestorList);
         }
         #endregion
+
+        protected override BinaryTreeNodeBase<T> DoGetLeastCommonAncestor(BinaryTreeNodeBase<T> node, BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
+            BinaryTreeNodeBase<T> n = node;
+            int comparisonResult = BinaryTreeNodeBase<T>.Compare(x.Value, y.Value);
+            BinaryTreeNodeBase<T> minN = (comparisonResult > 0 ? y : x);
+            BinaryTreeNodeBase<T> maxN = (comparisonResult > 0 ? x : y);
+            while(n != null) {
+                int minCompResult = BinaryTreeNodeBase<T>.Compare(n.Value, minN.Value);
+                int maxCompResult = BinaryTreeNodeBase<T>.Compare(n.Value, maxN.Value);
+                if(minCompResult > 0 && maxCompResult < 0)
+                    return n;
+                if(maxCompResult == 0)
+                    return maxN;
+                n = (minCompResult < 0) ? n.Right : n.Left;
+            }
+            return null;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿#if DEBUG
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -130,6 +131,88 @@ namespace Data_Structures_and_Algorithms.Tests {
             BinarySearchTreeNode<int> n = tree.GetMaximum();
             Assert.NotNull(n);
             Assert.AreEqual(8, n.Value);
+        }
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void GetLeastCommonAncestorGuardCase1Test() {
+            BinarySearchTree<int> tree = new BinarySearchTree<int>(1);
+            tree.GetLeastCommonAncestor(null, tree.Root);
+        }
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void GetLeastCommonAncestorGuardCase2Test() {
+            BinarySearchTree<int> tree = new BinarySearchTree<int>(1);
+            tree.GetLeastCommonAncestor(tree.Root, null);
+        }
+        [Test]
+        public void GetLeastCommonAncestorSimpleTest() {
+            BinarySearchTreeNode<int> x = new BinarySearchTreeNode<int>(1);
+            BinarySearchTreeNode<int> y = new BinarySearchTreeNode<int>(2);
+            BinarySearchTree<int> emptyTree = new BinarySearchTree<int>();
+            Assert.IsNull(emptyTree.GetLeastCommonAncestor(x, y));
+        }
+        [Test]
+        public void GetLeastCommonAncestorTest() {
+            BinarySearchTree<int> tree = BuildTestBinaryTree();
+            BinarySearchTreeNode<int> n8 = tree.Root.Right;
+            BinarySearchTreeNode<int> n1 = tree.Root.Left.Left;
+            BinarySearchTreeNode<int> n0 = n1.Left;
+            BinarySearchTreeNode<int> n4 = tree.Root.Left.Right;
+            Assert.AreSame(tree.Root, tree.GetLeastCommonAncestor(n8, n0));
+            Assert.AreSame(tree.Root.Left, tree.GetLeastCommonAncestor(n4, n0));
+            Assert.AreSame(n1, tree.GetLeastCommonAncestor(n1, n0));
+        }
+        [Test]
+        public void GetFloorSimpleTest() {
+            BinarySearchTree<int> tree = new BinarySearchTree<int>();
+            Assert.IsNull(tree.GetFloor(1));
+        }
+        [Test]
+        public void GetFloorTest() {
+            BinarySearchTree<int> tree = BuildTestBinaryTree();
+            BinarySearchTreeNode<int> n;
+            n = tree.GetFloor(-1);
+            Assert.IsNull(n);
+            n = tree.GetFloor(0);
+            Assert.NotNull(n);
+            Assert.AreEqual(0, n.Value);
+            n = tree.GetFloor(3);
+            Assert.NotNull(n);
+            Assert.AreEqual(2, n.Value);
+            n = tree.GetFloor(5);
+            Assert.NotNull(n);
+            Assert.AreEqual(4, n.Value);
+            n = tree.GetFloor(7);
+            Assert.NotNull(n);
+            Assert.AreEqual(6, n.Value);
+            n = tree.GetFloor(8);
+            Assert.NotNull(n);
+            Assert.AreEqual(8, n.Value);
+            n = tree.GetFloor(100);
+            Assert.NotNull(n);
+            Assert.AreEqual(8, n.Value);
+        }
+        [Test]
+        public void GetCeilingSimpleTest() {
+            BinarySearchTree<int> tree = new BinarySearchTree<int>();
+            Assert.IsNull(tree.GetCeiling(1));
+        }
+        [Test]
+        public void GetCeilingTest() {
+            BinarySearchTree<int> tree = BuildTestBinaryTree();
+            BinarySearchTreeNode<int> n;
+            n = tree.GetCeiling(-100);
+            Assert.NotNull(n);
+            Assert.AreEqual(0, n.Value);
+            n = tree.GetCeiling(3);
+            Assert.NotNull(n);
+            Assert.AreEqual(4, n.Value);
+            n = tree.GetCeiling(7);
+            Assert.NotNull(n);
+            Assert.AreEqual(8, n.Value);
+            n = tree.GetCeiling(8);
+            Assert.NotNull(n);
+            Assert.AreEqual(8, n.Value);
+            n = tree.GetCeiling(9);
+            Assert.IsNull(n);
         }
 
         static BinarySearchTree<int> BuildTestBinaryTree() {
