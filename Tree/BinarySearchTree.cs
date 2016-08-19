@@ -55,7 +55,7 @@ namespace Data_Structures_and_Algorithms {
             return result;
         }
 
-        BinarySearchTreeNode<T> DoGetMinimum(BinarySearchTreeNode<T> root) {
+        protected BinarySearchTreeNode<T> DoGetMinimum(BinarySearchTreeNode<T> root) {
             BinarySearchTreeNode<T> left = root;
             if(left == null) return null;
             while(left.Left != null) {
@@ -63,7 +63,7 @@ namespace Data_Structures_and_Algorithms {
             }
             return left;
         }
-        BinarySearchTreeNode<T> DoGetMaximum(BinarySearchTreeNode<T> root) {
+        protected BinarySearchTreeNode<T> DoGetMaximum(BinarySearchTreeNode<T> root) {
             BinarySearchTreeNode<T> right = root;
             if(right == null) return null;
             while(right.Right != null) {
@@ -94,7 +94,7 @@ namespace Data_Structures_and_Algorithms {
             }
             return DoSearchRecursive(root.Right, comparerFunc);
         }
-        BinarySearchTreeNode<T> DoDeleteRecursive(T value, BinarySearchTreeNode<T> root, ref bool result) {
+        protected virtual BinarySearchTreeNode<T> DoDeleteRecursive(T value, BinarySearchTreeNode<T> root, ref bool result) {
             if(root == null) {
                 result = false;
                 return root;
