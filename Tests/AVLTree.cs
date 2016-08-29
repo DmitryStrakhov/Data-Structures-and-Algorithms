@@ -284,7 +284,24 @@ namespace Data_Structures_and_Algorithms.Tests {
                     Assert.Fail();
             });
         }
+        [Test, ExpectedException(typeof(ArgumentException))]
+        public void AVLTreeIsAVLTreeGuardTest() {
+            bool result = AVLTree<int>.IsAVLTree(null);
+        }
+        [Test]
+        public void AVLTreeIsAVLTreeTest1() {
+            BinarySearchTree<int> tree = BuildTree(11, 9, 17, 5, 10, 14, 22, 19, 1);
+            Assert.IsTrue(AVLTree<int>.IsAVLTree(tree));
+        }
+        [Test]
+        public void AVLTreeIsAVLTreeTest2() {
+            BinarySearchTree<int> tree = BuildTree(11, 9, 17, 5, 10, 22, 19, 1);
+            Assert.IsFalse(AVLTree<int>.IsAVLTree(tree));
+        }
 
+        static BinarySearchTree<int> BuildTree(params int[] keys) {
+            return new BinarySearchTree<int>(BuildRoot(keys));
+        }
         static BinarySearchTreeNode<int> BuildRoot(params int[] keys) {
             BinarySearchTree<int> tree = new BinarySearchTree<int>();
             for(int i = 0; i < keys.Length; i++) {

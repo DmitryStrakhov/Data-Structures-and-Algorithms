@@ -15,6 +15,22 @@ namespace Data_Structures_and_Algorithms {
             : base(rootValue) {
         }
 
+        public static bool IsAVLTree(BinarySearchTree<T> tree) {
+            Guard.IsNotNull(tree, nameof(tree));
+            return GetAVLTreeHeight(tree.Root) != int.MinValue;
+        }
+        static int GetAVLTreeHeight(BinarySearchTreeNode<T> root) {
+            if(root == null) return -1;
+            int lHeight = GetAVLTreeHeight(root.Left);
+            if(lHeight == int.MinValue)
+                return int.MinValue;
+            int rHeight = GetAVLTreeHeight(root.Right);
+            if(rHeight == int.MinValue)
+                return int.MinValue;
+            if(Math.Abs(lHeight - rHeight) > 1) return int.MinValue;
+            return Math.Max(lHeight, rHeight) + 1;
+        }
+
         protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node) {
             return DoInsertRecursive(Root, (BinarySearchTreeNode<T>)node);
         }
