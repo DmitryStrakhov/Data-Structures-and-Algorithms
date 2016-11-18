@@ -41,6 +41,7 @@
     <Reference Include="NUnit.Framework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisjointSet\DisjointSet.cs" />
     <Compile Include="List\LinkedList.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
+    <Compile Include="Tests\DisjointSet.cs" />
     <Compile Include="Tests\Lists.cs" />
     <Compile Include="Tests\Misc.cs" />
     <Compile Include="Tests\PriorityQueue.cs" />

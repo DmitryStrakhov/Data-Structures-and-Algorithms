@@ -40,5 +40,8 @@ namespace Data_Structures_and_Algorithms {
                 action(item);
             }
         }
+        public static IEnumerable<T> Yield<T>(this T item) {
+            yield return item;
+        }
     }
 }
