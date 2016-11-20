@@ -20,7 +20,7 @@ namespace Data_Structures_and_Algorithms {
                 Guard.IsNotNull(item, nameof(item));
             }
             if(Values.ContainsKey(item)) {
-                ThrowAlreadyReservedHandle(nameof(item));
+                ThrowHandleIsAlreadyReserved(nameof(item));
             }
             Values[item] = new SetItem(item, 0);
             return item;
@@ -30,7 +30,7 @@ namespace Data_Structures_and_Algorithms {
                 Guard.IsNotNull(item, nameof(item));
             }
             if(!Values.ContainsKey(item)) {
-                ThrowUnknownHandle(nameof(item));
+                ThrowHandleIsUnknown(nameof(item));
             }
             return DoFind(item);
         }
@@ -49,10 +49,10 @@ namespace Data_Structures_and_Algorithms {
                 Guard.IsNotNull(y, nameof(y));
             }
             if(!Values.ContainsKey(x)) {
-                ThrowUnknownHandle(nameof(x));
+                ThrowHandleIsUnknown(nameof(x));
             }
             if(!Values.ContainsKey(y)) {
-                ThrowUnknownHandle(nameof(y));
+                ThrowHandleIsUnknown(nameof(y));
             }
             T xSetId = Find(x);
             T ySetId = Find(y);
@@ -77,10 +77,10 @@ namespace Data_Structures_and_Algorithms {
                 Guard.IsNotNull(y, nameof(y));
             }
             if(!Values.ContainsKey(x)) {
-                ThrowUnknownHandle(nameof(x));
+                ThrowHandleIsUnknown(nameof(x));
             }
             if(!Values.ContainsKey(y)) {
-                ThrowUnknownHandle(nameof(y));
+                ThrowHandleIsUnknown(nameof(y));
             }
             return Find(x).Equals(Find(y));
         }
@@ -102,7 +102,7 @@ namespace Data_Structures_and_Algorithms {
                 Guard.IsNotNull(item, nameof(item));
             }
             if(!Values.ContainsKey(item)) {
-                ThrowUnknownHandle(nameof(item));
+                ThrowHandleIsUnknown(nameof(item));
             }
             T setId = Find(item);
             var itemList = Items.Where(x => Find(x).Equals(setId)).ToList();
@@ -118,10 +118,10 @@ namespace Data_Structures_and_Algorithms {
             get { return !HandleIsValueType; }
         }
 
-        static void ThrowUnknownHandle(string argument) {
+        static void ThrowHandleIsUnknown(string argument) {
             throw new InvalidOperationException(string.Format("Set doesn't contain the item: {0}", argument));
         }
-        static void ThrowAlreadyReservedHandle(string argument) {
+        static void ThrowHandleIsAlreadyReserved(string argument) {
             throw new InvalidOperationException(string.Format("Set already contains the item: {0}", argument));
         }
 
