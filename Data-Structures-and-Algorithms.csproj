@@ -42,6 +42,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DisjointSet\DisjointSet.cs" />
+    <Compile Include="Graph\AdjListGraph.cs" />
+    <Compile Include="Graph\AdjMatrixGraph.cs" />
+    <Compile Include="Graph\AdjSetGraph.cs" />
+    <Compile Include="Graph\Base.cs" />
     <Compile Include="List\LinkedList.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -51,6 +55,7 @@
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
     <Compile Include="Tests\DisjointSet.cs" />
+    <Compile Include="Tests\Graph.cs" />
     <Compile Include="Tests\Lists.cs" />
     <Compile Include="Tests\Misc.cs" />
     <Compile Include="Tests\PriorityQueue.cs" />
@@ -59,6 +64,7 @@
     <Compile Include="Tests\ThreadedBinaryTree.cs" />
     <Compile Include="Tests\BinaryTree.cs" />
     <Compile Include="BinaryHeap\BinaryHeap.cs" />
+    <Compile Include="Tests\Assertions.cs" />
     <Compile Include="Tree\BinaryNode.cs" />
     <Compile Include="Tree\BinarySearchTree.cs" />
     <Compile Include="Tree\BinarySearchNode.cs" />
