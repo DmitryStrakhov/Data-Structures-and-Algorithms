@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class BinaryTreeTests {
-        [Test]
+        [TestMethod]
         public void BinaryTreeSimpleTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
-            Assert.NotNull(tree.Root);
+            Assert.IsNotNull(tree.Root);
             Assert.AreEqual(1, tree.Root.Value);
 
             BinaryTreeNode<int> node2 = tree.Root.Left;
@@ -26,64 +26,64 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(6, node3.Left.Value);
             Assert.AreEqual(7, node3.Right.Value);
         }
-        [Test]
+        [TestMethod]
         public void BuildBigBinaryTreeTest() {
             BinaryTree<int> tree = BuildTestBigBinaryTree();
-            Assert.NotNull(tree.Root);
+            Assert.IsNotNull(tree.Root);
             List<int> values = new List<int>();
             tree.LevelOrderTraverse(x => values.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 13, 11, 12 }, values);
         }
-        [Test]
+        [TestMethod]
         public void PreOrderTraverseTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.PreOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 1, 2, 4, 5, 3, 6, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void PreOrderTraverseRecursiveTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.PreOrderTraverseRecursive(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 1, 2, 4, 5, 3, 6, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void InOrderTraverseTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 2, 5, 1, 6, 3, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void InOrderTraverseRecursiveTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.InOrderTraverseRecursive(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 2, 5, 1, 6, 3, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void PostOrderTraverseTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.PostOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 5, 2, 6, 7, 3, 1 }, list);
         }
-        [Test]
+        [TestMethod]
         public void PostOrderTraverseRecursiveTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.PostOrderTraverseRecursive(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 5, 2, 6, 7, 3, 1 }, list);
         }
-        [Test]
+        [TestMethod]
         public void LevelOrderTraverseTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             List<int> list = new List<int>();
             tree.LevelOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4, 5, 6, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeIsFullTest() {
             BinaryTreeNode<int> node = new BinaryTreeNode<int>(1);
             Assert.IsFalse(node.IsFull);
@@ -92,19 +92,19 @@ namespace Data_Structures_and_Algorithms.Tests {
             node.AddChild(new BinaryTreeNode<int>(3));
             Assert.IsTrue(node.IsFull);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeAddChildTest() {
             BinaryTreeNode<int> node = new BinaryTreeNode<int>(1);
             Assert.IsNull(node.Left);
             Assert.IsNull(node.Right);
             node.AddChild(new BinaryTreeNode<int>(2));
-            Assert.NotNull(node.Left);
+            Assert.IsNotNull(node.Left);
             Assert.IsNull(node.Right);
             node.AddChild(new BinaryTreeNode<int>(3));
-            Assert.NotNull(node.Left);
-            Assert.NotNull(node.Right);
+            Assert.IsNotNull(node.Left);
+            Assert.IsNotNull(node.Right);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeInsertSimpleTest() {
             BinaryTreeNode<int> n = new BinaryTreeNode<int>(1);
             Assert.IsNull(n.Left);
@@ -117,7 +117,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(3, rightNode.Value);
             Assert.AreEqual(3, n.Right.Value);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeInsertTest() {
             BinaryTreeNode<int> n = new BinaryTreeNode<int>(1);
             n.AddChild(2);
@@ -133,7 +133,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(n.Right.Left);
             Assert.AreEqual(3, n.Right.Right.Value);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeRemoveLeftTest() {
             BinaryTreeNode<int> n = new BinaryTreeNode<int>(1);
             Assert.IsNull(n.Left);
@@ -147,7 +147,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(n.Right);
             Assert.AreEqual(5, left.Value);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeRemoveRightTest() {
             BinaryTreeNode<int> n = new BinaryTreeNode<int>(1);
             Assert.IsNull(n.Right);
@@ -161,12 +161,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(n.Right);
             Assert.AreEqual(7, right.Value);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void InsertGuardTest() {
             BinaryTree<int> tree = new BinaryTree<int>();
             tree.Insert(null);
         }
-        [Test]
+        [TestMethod]
         public void InsertTest() {
             BinaryTree<int> tree = new BinaryTree<int>();
             Assert.IsNull(tree.Root);
@@ -184,52 +184,52 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(6, tree.Root.Right.Left.Value);
             Assert.IsNull(tree.Root.Right.Right);
         }
-        [Test]
+        [TestMethod]
         public void GetTreeHeightSimpleTest() {
             BinaryTree<int> tree = new BinaryTree<int>();
             Assert.AreEqual(0, tree.GetTreeHeight());
         }
-        [Test]
+        [TestMethod]
         public void GetTreeHeightTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             tree.Root.Left.Right.AddChild(new BinaryTreeNode<int>(8));
             tree.Root.Left.Right.AddChild(new BinaryTreeNode<int>(9));
             Assert.AreEqual(3, tree.GetTreeHeight());
         }
-        [Test]
+        [TestMethod]
         public void GetDeepestNodeSimpleTest() {
             BinaryTree<int> tree = new BinaryTree<int>();
             Assert.IsNull(tree.GetDeepestNode());
             tree.Insert(1);
             Assert.AreEqual(tree.Root, tree.GetDeepestNode());
         }
-        [Test]
+        [TestMethod]
         public void GetDeepestNodeTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             BinaryTreeNode<int> node = new BinaryTreeNode<int>(8);
             tree.Root.Left.Right.AddChild(node);
             BinaryTreeNode<int> deepestNode = tree.GetDeepestNode();
-            Assert.NotNull(deepestNode);
+            Assert.IsNotNull(deepestNode);
             Assert.AreSame(deepestNode, node);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeRemoveChildTest() {
             BinaryTreeNode<int> left = new BinaryTreeNode<int>(2);
             BinaryTreeNode<int> right = new BinaryTreeNode<int>(3);
             BinaryTreeNode<int> root = new BinaryTreeNode<int>(1, left, right);
-            Assert.NotNull(root.Left);
-            Assert.NotNull(root.Right);
+            Assert.IsNotNull(root.Left);
+            Assert.IsNotNull(root.Right);
             root.RemoveChild(new BinaryTreeNode<int>(4));
-            Assert.NotNull(root.Left);
-            Assert.NotNull(root.Right);
+            Assert.IsNotNull(root.Left);
+            Assert.IsNotNull(root.Right);
             root.RemoveChild(left);
             Assert.IsNull(root.Left);
-            Assert.NotNull(root.Right);
+            Assert.IsNotNull(root.Right);
             root.RemoveChild(right);
             Assert.IsNull(root.Left);
             Assert.IsNull(root.Right);
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeAreEqualsTest() {
             Assert.IsTrue(BinaryTreeNode<int>.AreEquals(null, null));
             Assert.IsTrue(BinaryTreeNode<object>.AreEquals(new BinaryTreeNode<object>(null), new BinaryTreeNode<object>(null)));
@@ -242,7 +242,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsTrue(BinaryTreeNode<int>.AreEquals(z, x));
             Assert.IsTrue(BinaryTreeNode<int>.AreEquals(x, x));
         }
-        [Test]
+        [TestMethod]
         public void BinaryTreeNodeExchangeValuesTest() {
             BinaryTreeNode<int> x = new BinaryTreeNode<int>(1);
             BinaryTreeNode<int> y = new BinaryTreeNode<int>(2);
@@ -252,16 +252,16 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(2, x.Value);
             Assert.AreEqual(1, y.Value);
         }
-        [Test]
+        [TestMethod]
         public void DeleteNodeSimpleTest() {
             BinaryTree<int> tree = new BinaryTree<int>();
             Assert.IsFalse(tree.DeleteNode(1));
             tree.Insert(1);
-            Assert.NotNull(tree.Root);
+            Assert.IsNotNull(tree.Root);
             Assert.IsTrue(tree.DeleteNode(1));
             Assert.IsNull(tree.Root);
         }
-        [Test]
+        [TestMethod]
         public void DeleteNodeTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             Assert.IsFalse(tree.DeleteNode(10));
@@ -275,36 +275,36 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(2, values.Count);
             CollectionAssert.AreEquivalent(new int[] { 1, 2 }, values);
         }
-        [Test]
+        [TestMethod]
         public void GetTreeWidthSimpleTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             Assert.AreEqual(5, tree.GetTreeWidth());
         }
-        [Test]
+        [TestMethod]
         public void GetTreeWidthTest() {
             BinaryTree<int> tree = BuildTestBigBinaryTree();
             Assert.AreEqual(9, tree.GetTreeWidth());
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void GetLeastCommonAncestorGuardCase1Test() {
             BinaryTree<int> tree = new BinaryTree<int>();
             tree.Insert(1);
             tree.GetLeastCommonAncestor(null, tree.Root);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void GetLeastCommonAncestorGuardCase2Test() {
             BinaryTree<int> tree = new BinaryTree<int>();
             tree.Insert(1);
             tree.GetLeastCommonAncestor(tree.Root, null);
         }
-        [Test]
+        [TestMethod]
         public void GetLeastCommonAncestorSimpleTest() {
             BinaryTreeNode<int> x = new BinaryTreeNode<int>(1);
             BinaryTreeNode<int> y = new BinaryTreeNode<int>(2);
             BinaryTree<int> emptyTree = new BinaryTree<int>();
             Assert.IsNull(emptyTree.GetLeastCommonAncestor(x, y));
         }
-        [Test]
+        [TestMethod]
         public void GetLeastCommonAncestorTest() {
             BinaryTree<int> tree = BuildTestBigBinaryTree();
             BinaryTreeNode<int> x = tree.Root.Left.Left;
@@ -314,32 +314,32 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreSame(tree.Root.Left, tree.GetLeastCommonAncestor(y, x));
             Assert.AreSame(tree.Root, tree.GetLeastCommonAncestor(x, z));
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void GetAncestorsGuardTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             tree.GetAncestors(null);
         }
-        [Test]
+        [TestMethod]
         public void GetAncestorsSpecialCase1Test() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             var ancestors = tree.GetAncestors(new BinaryTreeNode<int>(2));
             Assert.AreEqual(0, ancestors.Count());
         }
-        [Test]
+        [TestMethod]
         public void GetAncestorsSpecialCase2Test() {
             BinaryTree<int> tree = new BinaryTree<int>();
             tree.Insert(1);
             var ancestors = tree.GetAncestors(tree.Root);
             Assert.AreEqual(0, ancestors.Count());
         }
-        [Test]
+        [TestMethod]
         public void GetAncestorsTest() {
             BinaryTree<int> tree = BuildTestBigBinaryTree();
             BinaryTreeNode<int> n8 = tree.Root.Left.Right.Right;
             IEnumerable<int> ancestors = tree.GetAncestors(n8).Select(x => x.Value);
-            CollectionAssert.AreEqual(new int[] { 1, 2, 5 }, ancestors);
+            CollectionAssertEx.AreEqual(new int[] { 1, 2, 5 }, ancestors);
         }
-        [Test]
+        [TestMethod]
         public void SearchTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
             BinaryTreeNode<int> left = tree.Search(2);

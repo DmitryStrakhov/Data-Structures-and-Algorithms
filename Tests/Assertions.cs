@@ -1,32 +1,42 @@
 ﻿#if DEBUG
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    public class CollectionSetAssert {
-        public static void AreEqual(IEnumerable[] expected, IEnumerable[] actual) {
-            AssertCore(expected, actual, CollectionAssert.AreEqual);
+    public class CollectionAssertEx {
+        public static void AreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
+            CollectionAssert.AreEqual(expected.ToList(), actual.ToList());
         }
-        public static void AreEquivalent(IEnumerable[] expected, IEnumerable[] actual) {
-            AssertCore(expected, actual, CollectionAssert.AreEquivalent);
+        public static void AreEquivalent<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
+            CollectionAssert.AreEquivalent(expected.ToList(), actual.ToList());
         }
-        static void AssertCore(IEnumerable[] expected, IEnumerable[] actual, Action<IEnumerable, IEnumerable> doMatch) {
-            Assert.IsNotNull(expected);
-            Assert.IsNotNull(actual);
-            Assert.AreEqual(expected.Length, actual.Length);
-            for(int i = 0; i < expected.Length; i++) {
-                doMatch(expected[i], actual[i]);
+        public static void IsCollectionAscOrdered<T>(IEnumerable<T> collection) {
+            if(collection == null)
+                throw new AssertFailedException();
+            if(collection.Count() > 1) {
+                var array = collection.ToArray();
+                for(int i = 0; i < array.Length - 1; i++) {
+                    int compareResult = Comparer<T>.Default.Compare(array[i], array[i + 1]);
+                    if(compareResult >= 0)
+                        throw new AssertFailedException();
+                }
             }
         }
-    }
-
-    public class MatrixAssert {
+        public static void AreEqual<T>(IEnumerable<T>[] expected, IEnumerable<T>[] actual) {
+            AssertCore(expected, actual, AreEqual);
+        }
+        public static void AreEquivalent<T>(IEnumerable<T>[] expected, IEnumerable<T>[] actual) {
+            AssertCore(expected, actual, AreEquivalent);
+        }
+        public static void IsEmpty<T>(IEnumerable<T> collection) {
+            if(collection == null || collection.Count() != 0)
+                throw new AssertFailedException();
+        }
         public static void AreEqual<T>(T[,] expected, T[,] actual) {
             Assert.IsNotNull(expected);
             Assert.IsNotNull(actual);
@@ -38,6 +48,14 @@ namespace Data_Structures_and_Algorithms.Tests {
                 for(int j = 0; j <= sUpperBounds; j++) {
                     Assert.AreEqual(expected.GetValue(i, j), actual.GetValue(i, j));
                 }
+            }
+        }
+        static void AssertCore<T>(IEnumerable<T>[] expected, IEnumerable<T>[] actual, Action<IEnumerable<T>, IEnumerable<T>> doMatch) {
+            Assert.IsNotNull(expected);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(expected.Length, actual.Length);
+            for(int i = 0; i < expected.Length; i++) {
+                doMatch(expected[i], actual[i]);
             }
         }
     }

@@ -5,17 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class PriorityQueueTests {
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void AscendingPriorityQueueInsertGuardTest() {
             AscendingPriorityQueue<string, int> priorityQueue = new AscendingPriorityQueue<string, int>();
             priorityQueue.Insert(null, 1);
         }
-        [Test]
+        [TestMethod]
         public void AscendingPriorityQueueInsertTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             priorityQueue.Insert(3, 33);
@@ -27,7 +27,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { 11, 22, 33 }, valueList);
         }
-        [Test]
+        [TestMethod]
         public void AscendingPriorityQueueSizeTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             Assert.AreEqual(0, priorityQueue.Size);
@@ -39,24 +39,24 @@ namespace Data_Structures_and_Algorithms.Tests {
             priorityQueue.DeleteMinimumValue();
             Assert.AreEqual(0, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void AscendingPriorityQueueGetValueGuardCase1Test() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             priorityQueue.Insert(1, 11);
             var result = priorityQueue.GetValue(-1);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void AscendingPriorityQueueGetValueGuardCase2Test() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             priorityQueue.Insert(1, 11);
             var result = priorityQueue.GetValue(1);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void AscendingPriorityQueueGetValueGuardCase3Test() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             var result = priorityQueue.GetValue(0);
         }
-        [Test]
+        [TestMethod]
         public void AscendingPriorityQueueGetValueTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             priorityQueue.Insert(3, 33);
@@ -68,12 +68,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(33, priorityQueue.GetValue(2));
             Assert.AreEqual(3, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void AscendingPriorityQueueGetMinimumValueGuardTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             var result = priorityQueue.GetMinimumValue();
         }
-        [Test]
+        [TestMethod]
         public void AscendingPriorityQueueGetMinimumValueTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             priorityQueue.Insert(2, 22);
@@ -82,12 +82,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(11, priorityQueue.GetMinimumValue());
             Assert.AreEqual(2, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void AscendingPriorityQueueDeleteMinimumValueGuardTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             var result = priorityQueue.DeleteMinimumValue();
         }
-        [Test]
+        [TestMethod]
         public void AscendingPriorityQueueDeleteMinimumValueTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             priorityQueue.Insert(2, 22);
@@ -98,7 +98,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(22, priorityQueue.DeleteMinimumValue());
             Assert.AreEqual(0, priorityQueue.Size);
         }
-        [Test]
+        [TestMethod]
         public virtual void AscendingPriorityQueueClearTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             Assert.AreEqual(0, priorityQueue.Size);
@@ -110,12 +110,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             priorityQueue.Clear();
             Assert.AreEqual(0, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void DescendingPriorityQueueInsertGuardTest() {
             DescendingPriorityQueue<string, int> priorityQueue = new DescendingPriorityQueue<string, int>();
             priorityQueue.Insert(null, 1);
         }
-        [Test]
+        [TestMethod]
         public void DescendingPriorityQueueInsertTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.Insert(1, 11);
@@ -127,7 +127,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { 33, 22, 11 }, valueList);
         }
-        [Test]
+        [TestMethod]
         public void DescendingPriorityQueueSizeTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             Assert.AreEqual(0, priorityQueue.Size);
@@ -139,24 +139,24 @@ namespace Data_Structures_and_Algorithms.Tests {
             priorityQueue.DeleteMaximumValue();
             Assert.AreEqual(0, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void DescendingPriorityQueueGetValueGuardCase1Test() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.Insert(1, 11);
             var result = priorityQueue.GetValue(-1);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void DescendingPriorityQueueGetValueGuardCase2Test() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.Insert(1, 11);
             var result = priorityQueue.GetValue(1);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void DescendingPriorityQueueGetValueGuardCase3Test() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             var result = priorityQueue.GetValue(0);
         }
-        [Test]
+        [TestMethod]
         public void DescendingPriorityQueueGetValueTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.Insert(1, 11);
@@ -168,12 +168,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(11, priorityQueue.GetValue(2));
             Assert.AreEqual(3, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void DescendingPriorityQueueGetMaximumValueGuardTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.GetMaximumValue();
         }
-        [Test]
+        [TestMethod]
         public void DescendingPriorityQueueGetMaximumValueTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.Insert(2, 55);
@@ -182,12 +182,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(55, priorityQueue.GetMaximumValue());
             Assert.AreEqual(2, priorityQueue.Size);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void DescendingPriorityQueueDeleteMaximumValueGuardTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.DeleteMaximumValue();
         }
-        [Test]
+        [TestMethod]
         public void DescendingPriorityQueueDeleteMaximumValueTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             priorityQueue.Insert(2, 55);
@@ -198,7 +198,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(77, priorityQueue.DeleteMaximumValue());
             Assert.AreEqual(0, priorityQueue.Size);
         }
-        [Test]
+        [TestMethod]
         public virtual void DescendingPriorityQueueClearTest() {
             DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
             Assert.AreEqual(0, priorityQueue.Size);

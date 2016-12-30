@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class ThreadedBinaryTreeTests {
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeSimpleTest() {
             ThreadedBinaryTreeNode<int> n = new ThreadedBinaryTreeNode<int>(1);
             Assert.AreEqual(1, n.Value);
@@ -20,36 +20,36 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsFalse(n.IsRightThreaded);
             Assert.IsFalse(n.IsThreaded);
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeTest() {
             ThreadedBinaryTreeNode<int> n = new ThreadedBinaryTreeNode<int>(2, new ThreadedBinaryTreeNode<int>(3), new ThreadedBinaryTreeNode<int>(4));
             Assert.AreEqual(2, n.Value);
             Assert.IsFalse(n.IsThreaded);
-            Assert.NotNull(n.Left);
-            Assert.NotNull(n.Right);
+            Assert.IsNotNull(n.Left);
+            Assert.IsNotNull(n.Right);
             Assert.AreEqual(3, n.Left.Value);
             Assert.AreEqual(4, n.Right.Value);
         }
-        [Test]
+        [TestMethod]
         public void BuildTestBinaryTreeTest() {
             BinaryTree<int> tree = BuildTestBinaryTree();
-            Assert.NotNull(tree.Root);
+            Assert.IsNotNull(tree.Root);
             Assert.AreEqual(1, tree.Root.Value);
-            Assert.NotNull(tree.Root.Left);
-            Assert.NotNull(tree.Root.Right);
+            Assert.IsNotNull(tree.Root.Left);
+            Assert.IsNotNull(tree.Root.Right);
             var n2 = tree.Root.Left;
             var n3 = tree.Root.Right;
             Assert.AreEqual(2, n2.Value);
             Assert.AreEqual(3, n3.Value);
-            Assert.NotNull(n2.Left);
+            Assert.IsNotNull(n2.Left);
             Assert.IsNull(n2.Right);
             Assert.AreEqual(4, n2.Left.Value);
-            Assert.NotNull(n3.Left);
-            Assert.NotNull(n3.Right);
+            Assert.IsNotNull(n3.Left);
+            Assert.IsNotNull(n3.Right);
             Assert.AreEqual(6, n3.Left.Value);
             Assert.AreEqual(7, n3.Right.Value);
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeDummyNodeTest() {
             ThreadedBinaryTreeNode<int> root = new ThreadedBinaryTreeNode<int>(1);
             ThreadedBinaryTreeDummyNode<int> dummy = new ThreadedBinaryTreeDummyNode<int>(root);
@@ -57,7 +57,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreSame(root, dummy.Left);
             Assert.AreSame(dummy, dummy.Right);
         }
-        [Test]
+        [TestMethod]
         public void BuildThreadedTreeSimpleTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var root = threadedTree.Root;
@@ -77,37 +77,37 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsTrue(n7.IsLeftThreaded);
             Assert.IsTrue(n7.IsRightThreaded);
         }
-        [Test]
+        [TestMethod]
         public void BuildThreadedTreeTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n2 = threadedTree.Root.Left;
             var n3 = threadedTree.Root.Right;
             Assert.AreSame(n2.Right, threadedTree.Root);
             var n4 = n2.Left;
-            Assert.NotNull(n4.Left);
+            Assert.IsNotNull(n4.Left);
             Assert.AreSame(n4.Right, n2);
             var n6 = n3.Left;
             Assert.AreSame(n6.Left, threadedTree.Root);
             Assert.AreSame(n6.Right, n3);
             var n7 = n3.Right;
             Assert.AreSame(n7.Left, n3);
-            Assert.NotNull(n7.Right);
+            Assert.IsNotNull(n7.Right);
         }
-        [Test]
+        [TestMethod]
         public void PreOrderTraverseTest() {
             List<int> list = new List<int>();
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             threadedTree.PreOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 1, 2, 4, 3, 6, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void InOrderTraverseTest() {
             List<int> list = new List<int>();
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             threadedTree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 2, 1, 6, 3, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeInsertLeftSimpleTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n2 = threadedTree.Root.Left;
@@ -124,7 +124,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             threadedTree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 11, 2, 1, 6, 3, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeInsertLeftTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n4 = threadedTree.Root.Left.Left;
@@ -142,7 +142,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             threadedTree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 11, 4, 2, 1, 6, 3, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeInsertRightSimpleTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n3 = threadedTree.Root.Right;
@@ -163,7 +163,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             threadedTree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 2, 1, 6, 3, 11, 7 }, list);
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeInsertRightTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n7 = threadedTree.Root.Right.Right;
@@ -181,13 +181,13 @@ namespace Data_Structures_and_Algorithms.Tests {
             threadedTree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 4, 2, 1, 6, 3, 7, 11 }, list);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void ThreadedBinaryTreeNodeRemoveLeftGuardTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n4 = threadedTree.Root.Left.Left;
             n4.RemoveLeft();
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeRemoveLeftTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var root = threadedTree.Root;
@@ -198,13 +198,13 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsFalse(root.IsRightThreaded);
             Assert.AreSame(root.Left, dummy);
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void ThreadedBinaryTreeNodeRemoveRightGuardTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var n7 = threadedTree.Root.Right.Right;
             n7.RemoveRight();
         }
-        [Test]
+        [TestMethod]
         public void ThreadedBinaryTreeNodeRemoveRightTest() {
             ThreadedBinaryTree<int> threadedTree = BuildTestBinaryTree().BuildThreadedTree();
             var root = threadedTree.Root;
@@ -215,7 +215,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsTrue(root.IsRightThreaded);
             Assert.AreSame(root.Right, dummy);
         }
-        [Test]
+        [TestMethod]
         public void BigThreadedBinaryTreeSimpleTest() {
             List<int> list = new List<int>();
             ThreadedBinaryTree<int> tree = BuildBigTestBinaryTree().BuildThreadedTree();
@@ -225,7 +225,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 8, 4, 9, 2, 5, 10, 1, 6, 3, 11, 7, 12 }, list);
         }
-        [Test]
+        [TestMethod]
         public void BigThreadedBinaryTreeInsertTest() {
             List<int> list = new List<int>();
             ThreadedBinaryTree<int> tree = BuildBigTestBinaryTree().BuildThreadedTree();
@@ -246,7 +246,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.InOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 8, 4, 9, 2, 5, 10, 1, 6, 3, 15, 11, 7, 12 }, list);
         }
-        [Test]
+        [TestMethod]
         public void BigThreadedBinaryTreeRemoveTest() {
             List<int> list = new List<int>();
             ThreadedBinaryTree<int> tree = BuildBigTestBinaryTree().BuildThreadedTree();

@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class ListTests {
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListNodeInitTest() {
             SinglyLinkedListNode<int> tailNode = new SinglyLinkedListNode<int>(11);
             Assert.IsNull(tailNode.Next);
@@ -18,12 +18,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(10, node.Value);
             Assert.AreSame(tailNode, node.Next);
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListSimpleTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             Assert.IsNull(linkedList.GetHead());
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListGetLenghtTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             Assert.AreEqual(0, linkedList.GetLenght());
@@ -32,7 +32,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Insert(0, 1);
             Assert.AreEqual(2, linkedList.GetLenght());
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListTraverseTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(5, 1);
@@ -44,7 +44,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4, 5 }, list);
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListClearTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(1, 1);
@@ -55,19 +55,19 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(linkedList.GetHead());
         }
 
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListGetValueGuardCase1Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             int value = linkedList.GetValue(-1);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListGetValueGuardCase2Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(2, 1);
             linkedList.Insert(1, 1);
             int value = linkedList.GetValue(3);
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListGetValueTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(30, 1);
@@ -77,18 +77,18 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetValue(2));
             Assert.AreEqual(30, linkedList.GetValue(3));
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListInsertGuardCase1Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 0);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListInsertGuardCase2Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
             linkedList.Insert(20, 3);
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListInsertTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -99,19 +99,19 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEqual(new int[] { 10, 20, 30 }, list);
         }
 
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListRemoveAtGuardCase1Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
             linkedList.RemoveAt(0);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListRemoveAtGuardCase2Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
             linkedList.RemoveAt(2);
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListRemoveAtTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -137,25 +137,25 @@ namespace Data_Structures_and_Algorithms.Tests {
             linkedList.Traverse(x => list.Add(x));
             CollectionAssert.AreEqual(new int[] { 20 }, list);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListGetLastValueGuardCase1Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
             int value = linkedList.GetLastValue(0);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListGetLastValueGuardCase2Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
             linkedList.Insert(20, 2);
             int value = linkedList.GetLastValue(3);
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SinglyLinkedListGetLastValueGuardCase3Test() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             int value = linkedList.GetLastValue(1);
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListGetLastValueTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -167,7 +167,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetLastValue(3));
             Assert.AreEqual(10, linkedList.GetLastValue(4));
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListReverseSimpleTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -175,7 +175,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(1, linkedList.GetLenght());
             Assert.AreEqual(10, linkedList.GetValue(1));
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListReverseTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -189,7 +189,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetValue(3));
             Assert.AreEqual(10, linkedList.GetValue(4));
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListReverseRecursiveSimpleTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -197,7 +197,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(1, linkedList.GetLenght());
             Assert.AreEqual(10, linkedList.GetValue(1));
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListReverseRecursiveTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);
@@ -211,7 +211,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(20, linkedList.GetValue(3));
             Assert.AreEqual(10, linkedList.GetValue(4));
         }
-        [Test]
+        [TestMethod]
         public void SinglyLinkedListTraverseReversiveTest() {
             SinglyLinkedList<int> linkedList = new SinglyLinkedList<int>();
             linkedList.Insert(10, 1);

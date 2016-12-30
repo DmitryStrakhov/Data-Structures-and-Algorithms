@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class AVLTreeTests {
-        [Test]
+        [TestMethod]
         public void AVLTreeNodeHeightTest1() {
             AVLTree<int> tree = new AVLTree<int>();
             List<int> heightList = new List<int>();
@@ -26,7 +26,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => heightList.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 1, 0, 0 }, heightList);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeNodeHeightTest2() {
             AVLTree<int> tree = new AVLTree<int>();
             List<int> heightList = new List<int>();
@@ -45,54 +45,54 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => heightList.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 1, 0, 0 }, heightList);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeGetHeightTest() {
             BinarySearchTreeNode<int> n = new BinarySearchTreeNode<int>(1);
             n.SetHeight(1);
             Assert.AreEqual(-1, AVLTree<int>.GetHeight(null));
             Assert.AreEqual(1, AVLTree<int>.GetHeight(n));
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeRotateLLTest() {
             BinarySearchTreeNode<int> root = BuildRoot(11, 8, 7, 10, 12);
             BinarySearchTreeNode<int> n = AVLTree<int>.RotateLL(root);
-            Assert.NotNull(n);
+            Assert.IsNotNull(n);
             List<int> list = new List<int>();
             AVLTree<int> resultTree = new AVLTree<int>(n);
             resultTree.PreOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 8, 7, 11, 10, 12 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeRotateRRTest() {
             BinarySearchTreeNode<int> root = BuildRoot(15, 7, 19, 16, 29);
             BinarySearchTreeNode<int> n = AVLTree<int>.RotateRR(root);
-            Assert.NotNull(n);
+            Assert.IsNotNull(n);
             List<int> list = new List<int>();
             AVLTree<int> resultTree = new AVLTree<int>(n);
             resultTree.PreOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 19, 15, 7, 16, 29 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeRotateLRTest() {
             BinarySearchTreeNode<int> root = BuildRoot(8, 11, 5, 3, 6, 7);
             BinarySearchTreeNode<int> n = AVLTree<int>.RotateLR(root);
-            Assert.NotNull(n);
+            Assert.IsNotNull(n);
             List<int> list = new List<int>();
             AVLTree<int> resultTree = new AVLTree<int>(n);
             resultTree.PreOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 6, 5, 3, 8, 7, 11 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeRotateRLTest() {
             BinarySearchTreeNode<int> root = BuildRoot(4, 2, 7, 6, 5, 8);
             BinarySearchTreeNode<int> n = AVLTree<int>.RotateRL(root);
-            Assert.NotNull(n);
+            Assert.IsNotNull(n);
             List<int> list = new List<int>();
             AVLTree<int> resultTree = new AVLTree<int>(n);
             resultTree.PreOrderTraverse(x => list.Add(x.Value));
             CollectionAssert.AreEqual(new int[] { 6, 4, 2, 5, 7, 8 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeInsertLLTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -108,7 +108,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 1, 0, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeInsertRRTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -124,7 +124,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 0, 1, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeInsertLRTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -139,7 +139,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 0, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeInsertRLTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -154,7 +154,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 0, 1, 0, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeInsertTest() {
             AVLTree<int> tree = new AVLTree<int>();
             for(int i = 40; i >= 21; i--) {
@@ -166,7 +166,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             List<int> list = new List<int>();
             tree.InOrderTraverse(x => list.Add(x.Value));
             Assert.AreEqual(40, list.Count);
-            CollectionAssert.IsOrdered(list);
+            CollectionAssertEx.IsCollectionAscOrdered(list);
             tree.InOrderTraverse(x => {
                 int hl = AVLTree<int>.GetHeight(x.Left);
                 int hr = AVLTree<int>.GetHeight(x.Right);
@@ -174,7 +174,7 @@ namespace Data_Structures_and_Algorithms.Tests {
                     Assert.Fail();
             });
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeDeleteLLTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -192,7 +192,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 1, 0, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeDeleteRRTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -210,7 +210,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 1, 0, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeDeleteLRTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -228,7 +228,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 1, 0, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeDeleteRLTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -246,7 +246,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 0, 1, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeDeleteRootTest() {
             AVLTree<int> tree = new AVLTree<int>();
             tree.Insert(11);
@@ -264,7 +264,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.PreOrderTraverse(x => list.Add(x.Height));
             CollectionAssert.AreEqual(new int[] { 2, 1, 0, 0, 1, 0 }, list);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeDeleteTest() {
             AVLTree<int> tree = new AVLTree<int>();
             for(int i = 1; i <= 40; i++) {
@@ -276,7 +276,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             List<int> list = new List<int>();
             tree.InOrderTraverse(x => list.Add(x.Value));
             Assert.AreEqual(20, list.Count);
-            CollectionAssert.IsOrdered(list);
+            CollectionAssertEx.IsCollectionAscOrdered(list);
             tree.InOrderTraverse(x => {
                 int hl = AVLTree<int>.GetHeight(x.Left);
                 int hr = AVLTree<int>.GetHeight(x.Right);
@@ -284,16 +284,16 @@ namespace Data_Structures_and_Algorithms.Tests {
                     Assert.Fail();
             });
         }
-        [Test, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void AVLTreeIsAVLTreeGuardTest() {
             bool result = AVLTree<int>.IsAVLTree(null);
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeIsAVLTreeTest1() {
             BinarySearchTree<int> tree = BuildTree(11, 9, 17, 5, 10, 14, 22, 19, 1);
             Assert.IsTrue(AVLTree<int>.IsAVLTree(tree));
         }
-        [Test]
+        [TestMethod]
         public void AVLTreeIsAVLTreeTest2() {
             BinarySearchTree<int> tree = BuildTree(11, 9, 17, 5, 10, 22, 19, 1);
             Assert.IsFalse(AVLTree<int>.IsAVLTree(tree));

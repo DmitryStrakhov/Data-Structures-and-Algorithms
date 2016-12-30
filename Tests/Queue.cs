@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class QueueTests {
-        [Test]
+        [TestMethod]
         public void QueueSizeTest() {
             Queue<int> queue = new Queue<int>();
             Assert.AreEqual(0, queue.Size);
@@ -29,7 +29,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             queue.EnQueue(9);
             Assert.AreEqual(7, queue.Size);
         }
-        [Test]
+        [TestMethod]
         public void QueueIsEmptyTest() {
             Queue<int> queue = new Queue<int>();
             Assert.IsTrue(queue.IsEmpty);
@@ -38,7 +38,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             queue.DeQueue();
             Assert.IsTrue(queue.IsEmpty);
         }
-        [Test]
+        [TestMethod]
         public void QueueIsFullTest() {
             Queue<int> queue = new Queue<int>();
             Assert.IsFalse(queue.IsFull);
@@ -46,7 +46,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             queue.EnQueue(1);
             Assert.IsFalse(queue.IsFull);
         }
-        [Test]
+        [TestMethod]
         public void QueueClearTest() {
             Queue<int> queue = new Queue<int>();
             queue.EnQueue(1);
@@ -57,7 +57,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(0, queue.Size);
             Assert.IsTrue(queue.IsEmpty);
         }
-        [Test]
+        [TestMethod]
         public void QueueEnQueueDeQueueTest() {
             Queue<int> queue = new Queue<int>();
             queue.EnQueue(1);
@@ -82,7 +82,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(10, queue.DeQueue());
             Assert.IsTrue(queue.IsEmpty);
         }
-        [Test]
+        [TestMethod]
         public void QueueEnQueueDeQueueHeavyTest() {
             Queue<int> queue = new Queue<int>();
             for(int i = 1; i <= 128; i++) {
@@ -95,7 +95,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsTrue(queue.IsEmpty);
             Assert.AreEqual(0, queue.Size);
         }
-        [Test]
+        [TestMethod]
         public void QueuePeekTest() {
             Queue<int> queue = new Queue<int>();
             queue.EnQueue(1);
@@ -106,12 +106,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(2, queue.Peek());
             Assert.AreEqual(2, queue.Peek());
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void QueueDeQueueGuardTest() {
             Queue<int> queue = new Queue<int>();
             queue.DeQueue();
         }
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void QueuePeekGuardTest() {
             Queue<int> queue = new Queue<int>();
             queue.Peek();

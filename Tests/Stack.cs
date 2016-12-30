@@ -5,18 +5,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    [TestFixture]
+    [TestClass]
     public class StackTests {
-        [Test]
+        [TestMethod]
         public void StackSimpleTest() {
             Stack<int> stack = new Stack<int>();
             Assert.IsNull(stack.GetHead());
             Assert.IsTrue(stack.IsEmpty);
         }
-        [Test]
+        [TestMethod]
         public void StackPushTest() {
             Stack<int> stack = new Stack<int>();
             Assert.IsTrue(stack.IsEmpty);
@@ -28,18 +28,18 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsFalse(stack.IsEmpty);
             Assert.AreEqual(2, stack.Size);
         }
-        [Test]
+        [TestMethod]
         public void StackIsFullTest() {
             Stack<int> stack = new Stack<int>();
             Assert.IsFalse(stack.IsFull);
         }
 
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void StackPopGuardTest() {
             Stack<int> stack = new Stack<int>();
             int value = stack.Pop();
         }
-        [Test]
+        [TestMethod]
         public void StackPopTest() {
             Stack<int> stack = new Stack<int>();
             Assert.IsTrue(stack.IsEmpty);
@@ -61,12 +61,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(stack.GetHead());
         }
 
-        [Test, ExpectedException(typeof(InvalidOperationException))]
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
         public void StackPeekGuardTest() {
             Stack<int> stack = new Stack<int>();
             int value = stack.Peek();
         }
-        [Test]
+        [TestMethod]
         public void StackPeekTest() {
             Stack<int> stack = new Stack<int>();
             stack.Push(11);
@@ -74,7 +74,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             stack.Push(12);
             Assert.AreEqual(12, stack.Peek());
         }
-        [Test]
+        [TestMethod]
         public void StackClearTest() {
             Stack<int> stack = new Stack<int>();
             stack.Push(1);
