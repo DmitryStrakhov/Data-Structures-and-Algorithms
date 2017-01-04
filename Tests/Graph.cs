@@ -160,7 +160,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             var vC = graph.CreateVertex('C');
             graph.CreateEdge(vA, vB);
             graph.CreateEdge(vB, vC);
-            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vC, vA);
             CollectionAssertEx.AreEquivalent(new char[] { 'B' }, graph.GetAdjacentVertextList(vA).Select(x => x.Value));
             CollectionAssertEx.AreEquivalent(new char[] { 'C' }, graph.GetAdjacentVertextList(vB).Select(x => x.Value));
             CollectionAssertEx.AreEquivalent(new char[] { 'A' }, graph.GetAdjacentVertextList(vC).Select(x => x.Value));
@@ -187,25 +187,22 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CreateEdgeSimpleTest() {
             AdjMatrixGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
-            Assert.AreEqual(0, graph.Matrix.GetUpperBound(0));
-            Assert.AreEqual(0, graph.Matrix.GetUpperBound(1));
-            CollectionAssertEx.AreEqual(new int[,] { { 0 } }, graph.Matrix);
+            Assert.AreEqual(1, graph.Matrix.Size);
+            Assert.IsFalse(graph.Matrix[0, 0]);
             var vB = graph.CreateVertex('B');
-            Assert.AreEqual(1, graph.Matrix.GetUpperBound(0));
-            Assert.AreEqual(1, graph.Matrix.GetUpperBound(1));
-            CollectionAssertEx.AreEqual(new int[,] { { 0, 0 }, { 0, 0 } }, graph.Matrix);
+            Assert.AreEqual(2, graph.Matrix.Size);
+            CollectionAssertEx.AreEqual(new int[,] { { 0, 0 }, { 0, 0 } }, graph.GetMatrixData());
             graph.CreateEdge(vA, vA);
-            CollectionAssertEx.AreEqual(new int[,] { { 1, 0 }, { 0, 0 } }, graph.Matrix);
+            CollectionAssertEx.AreEqual(new int[,] { { 1, 0 }, { 0, 0 } }, graph.GetMatrixData());
             graph.CreateEdge(vA, vB);
-            CollectionAssertEx.AreEqual(new int[,] { { 1, 1 }, { 1, 0 } }, graph.Matrix);
+            CollectionAssertEx.AreEqual(new int[,] { { 1, 1 }, { 1, 0 } }, graph.GetMatrixData());
         }
         [TestMethod]
         public void CreateEdgeTest() {
             AdjMatrixGraph<char> graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            Assert.AreEqual(3, graph.Matrix.GetUpperBound(0));
-            Assert.AreEqual(3, graph.Matrix.GetUpperBound(1));
-            CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 1, 1 }, { 1, 0, 1, 0 }, { 1, 1, 0, 1 }, { 1, 0, 1, 0 } }, graph.Matrix);
+            Assert.AreEqual(4, graph.Matrix.Size);
+            CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 1, 1 }, { 1, 0, 1, 0 }, { 1, 1, 0, 1 }, { 1, 0, 1, 0 } }, graph.GetMatrixData());
         }
 
         protected override AdjMatrixGraph<char> CreateGraph() {
@@ -331,25 +328,22 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CreateEdgeSimpleTest() {
             DirectedAdjMatrixGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
-            Assert.AreEqual(0, graph.Matrix.GetUpperBound(0));
-            Assert.AreEqual(0, graph.Matrix.GetUpperBound(1));
-            CollectionAssertEx.AreEqual(new int[,] { { 0 } }, graph.Matrix);
+            Assert.AreEqual(1, graph.Matrix.Size);
+            CollectionAssertEx.AreEqual(new int[,] { { 0 } }, graph.GetMatrixData());
             var vB = graph.CreateVertex('B');
-            Assert.AreEqual(1, graph.Matrix.GetUpperBound(0));
-            Assert.AreEqual(1, graph.Matrix.GetUpperBound(1));
-            CollectionAssertEx.AreEqual(new int[,] { { 0, 0 }, { 0, 0 } }, graph.Matrix);
+            Assert.AreEqual(2, graph.Matrix.Size);
+            CollectionAssertEx.AreEqual(new int[,] { { 0, 0 }, { 0, 0 } }, graph.GetMatrixData());
             graph.CreateEdge(vA, vA);
-            CollectionAssertEx.AreEqual(new int[,] { { 1, 0 }, { 0, 0 } }, graph.Matrix);
+            CollectionAssertEx.AreEqual(new int[,] { { 1, 0 }, { 0, 0 } }, graph.GetMatrixData());
             graph.CreateEdge(vA, vB);
-            CollectionAssertEx.AreEqual(new int[,] { { 1, 1 }, { 0, 0 } }, graph.Matrix);
+            CollectionAssertEx.AreEqual(new int[,] { { 1, 1 }, { 0, 0 } }, graph.GetMatrixData());
         }
         [TestMethod]
         public void CreateEdgeTest() {
             DirectedAdjMatrixGraph<char> graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            Assert.AreEqual(3, graph.Matrix.GetUpperBound(0));
-            Assert.AreEqual(3, graph.Matrix.GetUpperBound(1));
-            CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 0, 1 }, { 0, 0, 1, 0 }, { 1, 0, 0, 1 }, { 0, 0, 0, 0 } }, graph.Matrix);
+            Assert.AreEqual(4, graph.Matrix.Size);
+            CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 1, 1 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 }, { 0, 0, 0, 0 } }, graph.GetMatrixData());
         }
 
         protected override DirectedAdjMatrixGraph<char> CreateGraph() {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,8 +9,31 @@ using System.Threading.Tasks;
 namespace Data_Structures_and_Algorithms {
     public abstract class Vertex<T> {
         T value;
+        Guid? ownerID;
+        int? handle;
+
         internal Vertex(T value) {
             this.value = value;
+            this.ownerID = null;
+            this.handle = null;
+        }
+        internal Guid OwnerID {
+            get { return ownerID.Value; }
+            set {
+                if(ownerID.HasValue) {
+                    throw new InvalidOperationException();
+                }
+                ownerID = value;
+            }
+        }
+        internal int Handle {
+            get { return handle.Value; }
+            set {
+                if(handle.HasValue) {
+                    throw new InvalidOperationException();
+                }
+                handle = value;
+            }
         }
 
         public T Value { get { return value; } }
@@ -17,33 +41,66 @@ namespace Data_Structures_and_Algorithms {
 
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
         int capacity;
+        Guid id;
 
-        public Graph()
-            : this(4) {
+        public Graph() {
+            this.id = Guid.NewGuid();
         }
-        public Graph(int capacity) {
-            this.capacity = capacity;
-        }
-
         public TVertex CreateVertex(TValue value) {
-            throw new NotImplementedException();
+            TVertex vertex = CreateVertexCore(value);
+            vertex.OwnerID = this.id;
+            RegisterVertex(vertex);
+            return vertex;
         }
         public void CreateEdge(TVertex vertex1, TVertex vertex2) {
-            throw new NotImplementedException();
+            Guard.IsNotNull(vertex1, nameof(vertex1));
+            Guard.IsNotNull(vertex2, nameof(vertex2));
+            CheckVertexOwner(vertex1);
+            CheckVertexOwner(vertex2);
+            CreateEdgeCore(vertex1, vertex2);
         }
         public int Size {
-            get { throw new NotImplementedException(); }
+            get { return SizeCore; }
         }
         public ReadOnlyCollection<TVertex> GetVertexList() {
-            throw new NotImplementedException();
+            return GetVertexListCore();
         }
-        public bool AreVerticesAdjacent(TVertex vertext1, TVertex vertex2) {
-            throw new NotImplementedException();
+        public bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
+            Guard.IsNotNull(vertex1, nameof(vertex1));
+            Guard.IsNotNull(vertex2, nameof(vertex2));
+            CheckVertexOwner(vertex1);
+            CheckVertexOwner(vertex2);
+            return AreVerticesAdjacentCore(vertex1, vertex2);
         }
         public ReadOnlyCollection<TVertex> GetAdjacentVertextList(TVertex vertex) {
-            throw new NotImplementedException();
+            Guard.IsNotNull(vertex, nameof(vertex));
+            CheckVertexOwner(vertex);
+            return new ReadOnlyCollection<TVertex>(GetAdjacentVertextListCore(vertex));
         }
+        protected static readonly int DefaultCapacity = 4;
 
-        internal int Capacity { get { return capacity; } }
+        void CheckVertexOwner(TVertex vertex) {
+            if(!vertex.OwnerID.Equals(this.id)) {
+                throw new InvalidOperationException();
+            }
+        }
+        #region Vertex / Edge
+
+        protected abstract TVertex CreateVertexCore(TValue value);
+        protected abstract void CreateEdgeCore(TVertex vertex1, TVertex vertex2);
+        protected abstract void RegisterVertex(TVertex vertex);
+
+        protected abstract int SizeCore {
+            get;
+        }
+        #endregion
+
+        #region Metrics
+
+        protected abstract bool AreVerticesAdjacentCore(TVertex vertex1, TVertex vertex2);
+        protected abstract ReadOnlyCollection<TVertex> GetVertexListCore();
+        protected abstract IList<TVertex> GetAdjacentVertextListCore(TVertex vertex);
+
+        #endregion
     }
 }

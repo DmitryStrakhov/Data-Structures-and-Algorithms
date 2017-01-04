@@ -8,7 +8,34 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    public class CollectionAssertEx {
+    public static class AssertEx {
+        public static void Greater<T>(T value, T minValue) {
+            int result = Comparer<T>.Default.Compare(value, minValue);
+            if(result <= 0) {
+                throw new AssertFailedException();
+            }
+        }
+        public static void GreaterOrEquals<T>(T value, T minValue) {
+            int result = Comparer<T>.Default.Compare(value, minValue);
+            if(result < 0) {
+                throw new AssertFailedException();
+            }
+        }
+        public static void Less<T>(T value, T maxValue) {
+            int result = Comparer<T>.Default.Compare(value, maxValue);
+            if(result >= 0) {
+                throw new AssertFailedException();
+            }
+        }
+        public static void LessOrEquals<T>(T value, T maxValue) {
+            int result = Comparer<T>.Default.Compare(value, maxValue);
+            if(result > 0) {
+                throw new AssertFailedException();
+            }
+        }
+    }
+
+    public static class CollectionAssertEx {
         public static void AreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
             CollectionAssert.AreEqual(expected.ToList(), actual.ToList());
         }

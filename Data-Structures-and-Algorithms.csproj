@@ -46,6 +46,7 @@
     <Compile Include="Graph\AdjMatrixGraph.cs" />
     <Compile Include="Graph\AdjSetGraph.cs" />
     <Compile Include="Graph\Base.cs" />
+    <Compile Include="Graph\BitMatrix.cs" />
     <Compile Include="List\LinkedList.cs" />
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
+    <Compile Include="Tests\BitMatrix.cs" />
     <Compile Include="Tests\DisjointSet.cs" />
     <Compile Include="Tests\Graph.cs" />
     <Compile Include="Tests\Lists.cs" />
