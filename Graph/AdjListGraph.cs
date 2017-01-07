@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
-    [DebuggerDisplay("AdjListGraphVertex (Value: {Value})")]
+    [DebuggerDisplay("AdjListGraphVertex ({Value})")]
     public class AdjListGraphVertex<T> : Vertex<T> {
         internal AdjListGraphVertex(T value)
             : base(value) {
@@ -15,51 +15,101 @@ namespace Data_Structures_and_Algorithms {
     }
 
     public abstract class AdjListGraphBase<T> : Graph<T, AdjListGraphVertex<T>> {
+        int size;
+        int capacity;
+        ListNode[] list;
+
         public AdjListGraphBase()
             : this(DefaultCapacity) {
         }
         public AdjListGraphBase(int capacity) {
+            Guard.IsPositive(capacity, nameof(capacity));
+            this.size = 0;
+            this.capacity = capacity;
+            this.list = new ListNode[capacity];
         }
-
-        internal IEnumerable<T>[] GetData() {
-            throw new NotImplementedException();
-        }
-
         protected override void RegisterVertex(AdjListGraphVertex<T> vertex) {
-            throw new NotImplementedException();
+            int handle = Size;
+            int newSize = ++this.size;
+            EnsureListSize(newSize);
+            ListNode node = new ListNode(vertex);
+            node.Next = node;
+            List[handle] = node;
+            vertex.Handle = handle;
+        }
+
+        void EnsureListSize(int newSize) {
+            if(newSize > this.capacity) {
+                int _capacity = this.capacity * 2;
+                if(newSize > _capacity)
+                    _capacity = newSize * 2;
+                ListNode[] _list = new ListNode[_capacity];
+                Array.Copy(List, _list, List.Length);
+                this.list = _list;
+                this.capacity = _capacity;
+            }
         }
         protected override int SizeCore {
-            get { throw new NotImplementedException(); }
+            get { return size; }
         }
         protected override AdjListGraphVertex<T> CreateVertexCore(T value) {
             return new AdjListGraphVertex<T>(value);
         }
-        protected override ReadOnlyCollection<AdjListGraphVertex<T>> GetVertexListCore() {
-            throw new NotImplementedException();
-        }
-        protected override void CreateEdgeCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
-            throw new NotImplementedException();
+        protected override IList<AdjListGraphVertex<T>> GetVertexListCore() {
+            return List.Take(Size).Select(x => x.Vertex).ToList();
         }
         protected override IList<AdjListGraphVertex<T>> GetAdjacentVertextListCore(AdjListGraphVertex<T> vertex) {
-            throw new NotImplementedException();
+            ListNode head = List[vertex.Handle];
+            return GetList(head, false).Select(x => x.Vertex).ToList();
         }
         protected override bool AreVerticesAdjacentCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
-            throw new NotImplementedException();
+            ListNode head = List[vertex1.Handle];
+            return GetList(head).Any(x => ReferenceEquals(x.Vertex, vertex2));
         }
 
-        internal ListNode[] List { get { throw new NotImplementedException(); } }
+        internal IEnumerable<T>[] GetData() {
+            IEnumerable<T>[] result = new IEnumerable<T>[Size];
+            for(int i = 0; i < Size; i++) {
+                result[i] = GetList(List[i]).Select(x => x.Vertex.Value).ToList();
+            }
+            return result;
+        }
+
+        internal ListNode[] List { get { return list; } }
 
         #region ListNode
-        [DebuggerDisplay("Value: {Value}")]
+        [DebuggerDisplay("ListNode: ({Vertex.Value})")]
         internal class ListNode {
-            T value;
+            readonly AdjListGraphVertex<T> vertex;
             ListNode next;
 
-            public ListNode(T value) {
-                this.value = value;
+            public ListNode(AdjListGraphVertex<T> value) {
+                this.vertex = value;
+                this.next = null;
             }
-            public T Value { get { return value; } }
-            public ListNode Next { get { return next; } }
+            public ListNode Next {
+                get { return next; }
+                set { next = value; }
+            }
+            public AdjListGraphVertex<T> Vertex { get { return vertex; } }
+        }
+
+        internal static IEnumerable<ListNode> GetList(ListNode head, bool includeHead = true) {
+            ListNode next = head.Next;
+            if(includeHead)
+                yield return head;
+            while(next != head) {
+                yield return next;
+                next = next.Next;
+            }
+        }
+        internal static ListNode GetListTail(ListNode head) {
+            return GetList(head).First(x => ReferenceEquals(x.Next, head));
+        }
+        internal static void InsertListNode(ListNode head, ListNode node) {
+            ListNode tail = GetListTail(head);
+            tail.Next = node;
+            node.Next = head;
         }
         #endregion
     }
@@ -70,6 +120,12 @@ namespace Data_Structures_and_Algorithms {
         public AdjListGraph(int capacity)
             : base(capacity) {
         }
+        protected override void CreateEdgeCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
+            InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
+            if(!ReferenceEquals(vertex1, vertex2)) {
+                InsertListNode(List[vertex2.Handle], new ListNode(vertex1));
+            }
+        }
     }
 
     public class DirectedAdjListGraph<T> : AdjListGraphBase<T> {
@@ -77,6 +133,9 @@ namespace Data_Structures_and_Algorithms {
         }
         public DirectedAdjListGraph(int capacity)
             : base(capacity) {
+        }
+        protected override void CreateEdgeCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
+            InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
         }
     }
 }

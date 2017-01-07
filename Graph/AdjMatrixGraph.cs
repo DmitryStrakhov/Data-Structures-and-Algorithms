@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
-    [DebuggerDisplay("AdjMatrixGraphVertex (Value: {Value})")]
+    [DebuggerDisplay("AdjMatrixGraphVertex ({Value})")]
     public class AdjMatrixGraphVertex<T> : Vertex<T> {
         internal AdjMatrixGraphVertex(T value)
             : base(value) {
@@ -24,6 +24,7 @@ namespace Data_Structures_and_Algorithms {
             : this(DefaultCapacity) {
         }
         public AdjMatrixGraphBase(int capacity) {
+            Guard.IsPositive(capacity, nameof(capacity));
             this.size = 0;
             this.capacity = capacity;
             this.vertexList = new AdjMatrixGraphVertex<T>[capacity];
@@ -44,9 +45,8 @@ namespace Data_Structures_and_Algorithms {
         protected override AdjMatrixGraphVertex<T> CreateVertexCore(T value) {
             return new AdjMatrixGraphVertex<T>(value);
         }
-        protected override ReadOnlyCollection<AdjMatrixGraphVertex<T>> GetVertexListCore() {
-            var list = VertexList.Take(Size).ToList();
-            return new ReadOnlyCollection<AdjMatrixGraphVertex<T>>(list);
+        protected override IList<AdjMatrixGraphVertex<T>> GetVertexListCore() {
+            return VertexList.Take(Size).ToList();
         }
         protected override IList<AdjMatrixGraphVertex<T>> GetAdjacentVertextListCore(AdjMatrixGraphVertex<T> vertex) {
             List<AdjMatrixGraphVertex<T>> list = new List<AdjMatrixGraphVertex<T>>();
@@ -62,8 +62,8 @@ namespace Data_Structures_and_Algorithms {
         void EnsureVertexListSize(int newSize) {
             if(newSize > this.capacity) {
                 int _capacity = this.capacity * 2;
-                if(size > _capacity)
-                    _capacity = size * 2;
+                if(newSize > _capacity)
+                    _capacity = newSize * 2;
                 AdjMatrixGraphVertex<T>[] _list = new AdjMatrixGraphVertex<T>[_capacity];
                 Array.Copy(VertexList, _list, VertexList.Length);
                 this.vertexList = _list;

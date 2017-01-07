@@ -108,6 +108,9 @@ namespace Data_Structures_and_Algorithms {
             var itemList = Items.Where(x => Find(x).Equals(setId)).ToList();
             itemList.ForEach(x => Values.Remove(x));
         }
+        public bool Exists(T item) {
+            return Values.ContainsKey(item);
+        }
 
         Dictionary<T, SetItem> Values { get { return values; } }
 

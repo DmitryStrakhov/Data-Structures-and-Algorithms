@@ -63,7 +63,8 @@ namespace Data_Structures_and_Algorithms {
             get { return SizeCore; }
         }
         public ReadOnlyCollection<TVertex> GetVertexList() {
-            return GetVertexListCore();
+            var list = GetVertexListCore();
+            return new ReadOnlyCollection<TVertex>(list);
         }
         public bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
             Guard.IsNotNull(vertex1, nameof(vertex1));
@@ -75,7 +76,8 @@ namespace Data_Structures_and_Algorithms {
         public ReadOnlyCollection<TVertex> GetAdjacentVertextList(TVertex vertex) {
             Guard.IsNotNull(vertex, nameof(vertex));
             CheckVertexOwner(vertex);
-            return new ReadOnlyCollection<TVertex>(GetAdjacentVertextListCore(vertex));
+            var list = GetAdjacentVertextListCore(vertex);
+            return new ReadOnlyCollection<TVertex>(list);
         }
         protected static readonly int DefaultCapacity = 4;
 
@@ -98,7 +100,7 @@ namespace Data_Structures_and_Algorithms {
         #region Metrics
 
         protected abstract bool AreVerticesAdjacentCore(TVertex vertex1, TVertex vertex2);
-        protected abstract ReadOnlyCollection<TVertex> GetVertexListCore();
+        protected abstract IList<TVertex> GetVertexListCore();
         protected abstract IList<TVertex> GetAdjacentVertextListCore(TVertex vertex);
 
         #endregion

@@ -204,6 +204,14 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(4, graph.Matrix.Size);
             CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 1, 1 }, { 1, 0, 1, 0 }, { 1, 1, 0, 1 }, { 1, 0, 1, 0 } }, graph.GetMatrixData());
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase1Test() {
+            AdjMatrixGraph<char> graph = new AdjMatrixGraph<char>(-1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase2Test() {
+            AdjMatrixGraph<char> graph = new AdjMatrixGraph<char>(0);
+        }
 
         protected override AdjMatrixGraph<char> CreateGraph() {
             return new AdjMatrixGraph<char>();
@@ -232,25 +240,33 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CreateEdgeSimpleTest() {
             AdjListGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
-            Assert.AreEqual(1, graph.List.Length);
+            Assert.AreEqual(1, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A' } }, graph.GetData());
             var vB = graph.CreateVertex('B');
-            Assert.AreEqual(2, graph.List.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vA);
-            Assert.AreEqual(2, graph.List.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vB);
-            Assert.AreEqual(2, graph.List.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'A', 'B' }, new char[] { 'B', 'A' } } , graph.GetData());
         }
         [TestMethod]
         public void CreateEdgeTest() {
             AdjListGraph<char> graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            Assert.AreEqual(4, graph.List.Length);
-            Assert.AreEqual(4, graph.List.Length);
+            Assert.AreEqual(4, graph.GetData().Length);
+            Assert.AreEqual(4, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'B', 'C', 'D' }, new char[] { 'B', 'A', 'C' }, new char[] { 'C', 'A', 'B', 'D' }, new char[] { 'D', 'A', 'C' } }, graph.GetData());
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase1Test() {
+            AdjListGraph<char> graph = new AdjListGraph<char>(-1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase2Test() {
+            AdjListGraph<char> graph = new AdjListGraph<char>(0);
         }
 
         protected override AdjListGraph<char> CreateGraph() {
@@ -280,25 +296,33 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CreateEdgeSimpleTest() {
             AdjSetGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
-            Assert.AreEqual(1, graph.Sets.Length);
+            Assert.AreEqual(1, graph.GetData().Length);
             CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'A' } }, graph.GetData());
             var vB = graph.CreateVertex('B');
-            Assert.AreEqual(2, graph.Sets.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vA);
-            Assert.AreEqual(2, graph.Sets.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'A', 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vB);
-            Assert.AreEqual(2, graph.Sets.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'A', 'B', 'A' }, new char[] { 'A', 'B' } }, graph.GetData());
         }
         [TestMethod]
         public void CreateEdgeTest() {
             AdjSetGraph<char> graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            Assert.AreEqual(4, graph.Sets.Length);
-            Assert.AreEqual(4, graph.Sets.Length);
+            Assert.AreEqual(4, graph.GetData().Length);
+            Assert.AreEqual(4, graph.GetData().Length);
             CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'B', 'C', 'A', 'D' }, new char[] { 'C', 'B', 'A' }, new char[] { 'A', 'B', 'D', 'C' }, new char[] { 'D', 'A', 'C' } }, graph.GetData());
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase1Test() {
+            AdjSetGraph<char> graph = new AdjSetGraph<char>(-1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase2Test() {
+            AdjSetGraph<char> graph = new AdjSetGraph<char>(0);
         }
 
         protected override AdjSetGraph<char> CreateGraph() {
@@ -345,6 +369,14 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(4, graph.Matrix.Size);
             CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 1, 1 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 }, { 0, 0, 0, 0 } }, graph.GetMatrixData());
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase1Test() {
+            DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>(-1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase2Test() {
+            DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>(0);
+        }
 
         protected override DirectedAdjMatrixGraph<char> CreateGraph() {
             return new DirectedAdjMatrixGraph<char>();
@@ -373,25 +405,33 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CreateEdgeSimpleTest() {
             DirectedAdjListGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
-            Assert.AreEqual(1, graph.List.Length);
+            Assert.AreEqual(1, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A' } }, graph.GetData());
             var vB = graph.CreateVertex('B');
-            Assert.AreEqual(2, graph.List.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vA);
-            Assert.AreEqual(2, graph.List.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vB);
-            Assert.AreEqual(2, graph.List.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'A', 'B' }, new char[] { 'B' } }, graph.GetData());
         }
         [TestMethod]
         public void CreateEdgeTest() {
             DirectedAdjListGraph<char> graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            Assert.AreEqual(4, graph.List.Length);
-            Assert.AreEqual(4, graph.List.Length);
-            CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'B', 'D' }, new char[] { 'B', 'C' }, new char[] { 'C', 'A', 'D' }, new char[] { 'D' } }, graph.GetData());
+            Assert.AreEqual(4, graph.GetData().Length);
+            Assert.AreEqual(4, graph.GetData().Length);
+            CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'B', 'C', 'D' }, new char[] { 'B', 'C' }, new char[] { 'C', 'D' }, new char[] { 'D' } }, graph.GetData());
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase1Test() {
+            DirectedAdjListGraph<char> graph = new DirectedAdjListGraph<char>(-1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase2Test() {
+            DirectedAdjListGraph<char> graph = new DirectedAdjListGraph<char>(0);
         }
 
         protected override DirectedAdjListGraph<char> CreateGraph() {
@@ -421,26 +461,35 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CreateEdgeSimpleTest() {
             DirectedAdjSetGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
-            Assert.AreEqual(1, graph.Sets.Length);
+            Assert.AreEqual(1, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A' } }, graph.GetData());
             var vB = graph.CreateVertex('B');
-            Assert.AreEqual(2, graph.Sets.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vA);
-            Assert.AreEqual(2, graph.Sets.Length);
+            Assert.AreEqual(2, graph.GetData().Length);
             CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'A' }, new char[] { 'B' } }, graph.GetData());
             graph.CreateEdge(vA, vB);
-            Assert.AreEqual(2, graph.Sets.Length);
-            CollectionAssertEx.AreEqual(new char[][] { new char[] { 'A', 'B', 'A' }, new char[] { 'B' } }, graph.GetData());
+            Assert.AreEqual(2, graph.GetData().Length);
+            CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'A', 'B', 'A' }, new char[] { 'B' } }, graph.GetData());
         }
         [TestMethod]
         public void CreateEdgeTest() {
             DirectedAdjSetGraph<char> graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            Assert.AreEqual(4, graph.Sets.Length);
-            Assert.AreEqual(4, graph.Sets.Length);
-            CollectionAssertEx.AreEqual(new char[][] { new char[] { 'D', 'B', 'A' }, new char[] { 'C', 'B' }, new char[] { 'D', 'A', 'C' }, new char[] { 'D' } }, graph.GetData());
+            Assert.AreEqual(4, graph.GetData().Length);
+            Assert.AreEqual(4, graph.GetData().Length);
+            CollectionAssertEx.AreEquivalent(new char[][] { new char[] { 'D', 'C', 'B', 'A' }, new char[] { 'C', 'B' }, new char[] { 'D', 'C' }, new char[] { 'D' } }, graph.GetData());
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase1Test() {
+            DirectedAdjSetGraph<char> graph = new DirectedAdjSetGraph<char>(-1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CtorGuardCase2Test() {
+            DirectedAdjSetGraph<char> graph = new DirectedAdjSetGraph<char>(0);
+        }
+
         protected override DirectedAdjSetGraph<char> CreateGraph() {
             return new DirectedAdjSetGraph<char>();
         }
@@ -461,17 +510,6 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.CreateEdge(vA, vC);
             graph.CreateEdge(vA, vD);
             graph.CreateEdge(vB, vC);
-            graph.CreateEdge(vC, vD);
-        }
-        internal static void InitializeDirectedGraph<TVertex>(Graph<char, TVertex> graph) where TVertex : Vertex<char> {
-            var vA = graph.CreateVertex('A');
-            var vB = graph.CreateVertex('B');
-            var vC = graph.CreateVertex('C');
-            var vD = graph.CreateVertex('D');
-            graph.CreateEdge(vA, vB);
-            graph.CreateEdge(vA, vD);
-            graph.CreateEdge(vB, vC);
-            graph.CreateEdge(vC, vA);
             graph.CreateEdge(vC, vD);
         }
         #endregion

@@ -268,6 +268,19 @@ namespace Data_Structures_and_Algorithms.Tests {
             var coreItems = disjointSet.Items.OrderBy(x => x).Select(x => disjointSet.GetItemCore(x).Rank);
             CollectionAssertEx.AreEqual(new int[] { 3, 0, 1, 0, 2, 0, 1, 0 }, coreItems);
         }
+        [TestMethod]
+        public void DisjointSetExistsTest() {
+            DisjointSet<int> disjointSet = new DisjointSet<int>();
+            disjointSet.MakeSet(1);
+            disjointSet.MakeSet(2);
+            disjointSet.MakeSet(3);
+            disjointSet.Union(2, 3);
+            Assert.IsTrue(disjointSet.Exists(1));
+            Assert.IsTrue(disjointSet.Exists(2));
+            Assert.IsTrue(disjointSet.Exists(3));
+            Assert.IsFalse(disjointSet.Exists(0));
+            Assert.IsFalse(disjointSet.Exists(4));
+        }
     }
 }
 #endif
