@@ -67,6 +67,10 @@ namespace Data_Structures_and_Algorithms {
         protected override bool AreVerticesAdjacentCore(AdjSetGraphVertex<T> vertex1, AdjSetGraphVertex<T> vertex2) {
             return List[vertex1.Handle].IsVertexAdjacent(vertex2);
         }
+        protected override AdjSetGraphVertex<T> GetVertexCore(int handle) {
+            Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
+            return List[handle].Vertex;
+        }
 
         #region VertexDisjointSet
         [DebuggerDisplay("VertexDisjointSet ({Vertex.Value})")]

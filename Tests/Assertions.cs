@@ -85,6 +85,14 @@ namespace Data_Structures_and_Algorithms.Tests {
                 doMatch(expected[i], actual[i]);
             }
         }
+        public static void TrueForAllItems<T>(IEnumerable<T> itemList, Predicate<T> predicate) {
+            Assert.IsNotNull(itemList);
+            Assert.IsNotNull(predicate);
+            foreach(var item in itemList) {
+                if(!predicate(item))
+                    throw new AssertFailedException();
+            }
+        }
     }
 }
 #endif

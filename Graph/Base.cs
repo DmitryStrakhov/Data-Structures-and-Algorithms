@@ -11,10 +11,12 @@ namespace Data_Structures_and_Algorithms {
         T value;
         Guid? ownerID;
         int? handle;
+        VertexColor color;
 
         internal Vertex(T value) {
             this.value = value;
             this.ownerID = null;
+            this.color = VertexColor.None;
             this.handle = null;
         }
         internal Guid OwnerID {
@@ -35,8 +37,15 @@ namespace Data_Structures_and_Algorithms {
                 handle = value;
             }
         }
-
+        internal VertexColor Color {
+            get { return color; }
+            set { color = value; }
+        }
         public T Value { get { return value; } }
+    }
+
+    internal enum VertexColor {
+        None, Gray
     }
 
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
@@ -81,6 +90,99 @@ namespace Data_Structures_and_Algorithms {
         }
         protected static readonly int DefaultCapacity = 4;
 
+        public void DFSearch(Action<TVertex> action) {
+            Guard.IsNotNull(action, nameof(action));
+            DoSearch(null, x => { action(x); return true; }, DFSearchCore);
+        }
+        public void DFSearch(Func<TVertex, bool> action) {
+            Guard.IsNotNull(action, nameof(action));
+            DoSearch(null, action, DFSearchCore);
+        }
+        public void DFSearch(TVertex vertex, Action<TVertex> action) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(action, nameof(action));
+            CheckVertexOwner(vertex);
+            DoSearch(vertex, x => { action(x); return true; }, DFSearchCore);
+        }
+        public void DFSearch(TVertex vertex, Func<TVertex, bool> action) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(action, nameof(action));
+            CheckVertexOwner(vertex);
+            DoSearch(vertex, action, DFSearchCore);
+        }
+
+        public void BFSearch(Action<TVertex> action) {
+            Guard.IsNotNull(action, nameof(action));
+            DoSearch(null, x => { action(x); return true; }, BFSearchCore);
+        }
+        public void BFSearch(Func<TVertex, bool> action) {
+            Guard.IsNotNull(action, nameof(action));
+            DoSearch(null, action, BFSearchCore);
+        }
+        public void BFSearch(TVertex vertex, Action<TVertex> action) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(action, nameof(action));
+            CheckVertexOwner(vertex);
+            DoSearch(vertex, x => { action(x); return true; }, BFSearchCore);
+        }
+        public void BFSearch(TVertex vertex, Func<TVertex, bool> action) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(action, nameof(action));
+            CheckVertexOwner(vertex);
+            DoSearch(vertex, action, BFSearchCore);
+        }
+
+        void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, bool> searchProc) {
+            if(Size == 0) return;
+            int handle = vertex != null ? vertex.Handle : 0;
+            for(int i = 0; i < Size; i++) {
+                var graphVertex = GetVertex((handle + i) % Size);
+                if(graphVertex.Color == VertexColor.None) {
+                    if(!searchProc(graphVertex, action)) break;
+                }
+            }
+            for(int i = 0; i < Size; i++) {
+                GetVertexCore(i).Color = VertexColor.None;
+            }
+        }
+
+        bool DFSearchCore(TVertex vertex, Func<TVertex, bool> action) {
+            bool @continue = action(vertex);
+            if(!@continue)
+                return false;
+            vertex.Color = VertexColor.Gray;
+            var adjacentList = GetAdjacentVertextList(vertex);
+            for(int i = 0; i < adjacentList.Count; i++) {
+                if(adjacentList[i].Color == VertexColor.None) {
+                    if(!DFSearchCore(adjacentList[i], action)) return false;
+                }
+            }
+            return true;
+        }
+        bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action) {
+            Queue<TVertex> queue = new Queue<TVertex>();
+            queue.EnQueue(vertex);
+            vertex.Color = VertexColor.Gray;
+            while(!queue.IsEmpty) {
+                var graphVertex = queue.DeQueue();
+                if(!action(graphVertex))
+                    return false;
+                var adjacentList = GetAdjacentVertextList(graphVertex);
+                for(int i = 0; i < adjacentList.Count; i++) {
+                    if(adjacentList[i].Color == VertexColor.None) {
+                        adjacentList[i].Color = VertexColor.Gray;
+                        queue.EnQueue(adjacentList[i]);
+                    }
+                }
+            }
+            return true;
+        }
+
+        protected internal TVertex GetVertex(int handle) {
+            Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
+            return GetVertexCore(handle);
+        }
+
         void CheckVertexOwner(TVertex vertex) {
             if(!vertex.OwnerID.Equals(this.id)) {
                 throw new InvalidOperationException();
@@ -91,6 +193,7 @@ namespace Data_Structures_and_Algorithms {
         protected abstract TVertex CreateVertexCore(TValue value);
         protected abstract void CreateEdgeCore(TVertex vertex1, TVertex vertex2);
         protected abstract void RegisterVertex(TVertex vertex);
+        protected abstract TVertex GetVertexCore(int handle);
 
         protected abstract int SizeCore {
             get;

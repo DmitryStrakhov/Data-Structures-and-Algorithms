@@ -58,6 +58,10 @@ namespace Data_Structures_and_Algorithms {
         protected override bool AreVerticesAdjacentCore(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2) {
             return Matrix[vertex1.Handle, vertex2.Handle];
         }
+        protected override AdjMatrixGraphVertex<T> GetVertexCore(int handle) {
+            Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
+            return VertexList[handle];
+        }
 
         void EnsureVertexListSize(int newSize) {
             if(newSize > this.capacity) {

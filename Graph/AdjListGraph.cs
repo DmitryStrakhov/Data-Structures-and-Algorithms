@@ -66,6 +66,10 @@ namespace Data_Structures_and_Algorithms {
             ListNode head = List[vertex1.Handle];
             return GetList(head).Any(x => ReferenceEquals(x.Vertex, vertex2));
         }
+        protected override AdjListGraphVertex<T> GetVertexCore(int handle) {
+            Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
+            return List[handle].Vertex;
+        }
 
         internal IEnumerable<T>[] GetData() {
             IEnumerable<T>[] result = new IEnumerable<T>[Size];
