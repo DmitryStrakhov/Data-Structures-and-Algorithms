@@ -48,17 +48,31 @@ namespace Data_Structures_and_Algorithms {
         None, Gray
     }
 
-    public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
-        int capacity;
-        Guid id;
+    abstract class GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
+        public GraphDataBase(int capacity) {
+        }
+        internal abstract void CreateEdge(TVertex vertex1, TVertex vertex2);
+        internal abstract int GetSize();
+        internal abstract void RegisterVertex(TVertex vertex);
+        internal abstract bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2);
+        internal abstract IList<TVertex> GetAdjacentVertextList(TVertex vertex);
+        internal abstract IList<TVertex> GetVertexList();
+        internal abstract TVertex GetVertex(int handle);
+    }
 
-        public Graph() {
+    public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
+        readonly Guid id;
+        readonly GraphDataBase<TValue, TVertex> _data;
+
+        public Graph(int capacity) {
+            Guard.IsPositive(capacity, nameof(capacity));
             this.id = Guid.NewGuid();
+            this._data = CreateDataCore(capacity);
         }
         public TVertex CreateVertex(TValue value) {
             TVertex vertex = CreateVertexCore(value);
             vertex.OwnerID = this.id;
-            RegisterVertex(vertex);
+            Data.RegisterVertex(vertex);
             return vertex;
         }
         public void CreateEdge(TVertex vertex1, TVertex vertex2) {
@@ -66,13 +80,13 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex2, nameof(vertex2));
             CheckVertexOwner(vertex1);
             CheckVertexOwner(vertex2);
-            CreateEdgeCore(vertex1, vertex2);
+            Data.CreateEdge(vertex1, vertex2);
         }
         public int Size {
-            get { return SizeCore; }
+            get { return Data.GetSize(); }
         }
         public ReadOnlyCollection<TVertex> GetVertexList() {
-            var list = GetVertexListCore();
+            var list = Data.GetVertexList();
             return new ReadOnlyCollection<TVertex>(list);
         }
         public bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
@@ -80,12 +94,12 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex2, nameof(vertex2));
             CheckVertexOwner(vertex1);
             CheckVertexOwner(vertex2);
-            return AreVerticesAdjacentCore(vertex1, vertex2);
+            return Data.AreVerticesAdjacent(vertex1, vertex2);
         }
         public ReadOnlyCollection<TVertex> GetAdjacentVertextList(TVertex vertex) {
             Guard.IsNotNull(vertex, nameof(vertex));
             CheckVertexOwner(vertex);
-            var list = GetAdjacentVertextListCore(vertex);
+            var list = Data.GetAdjacentVertextList(vertex);
             return new ReadOnlyCollection<TVertex>(list);
         }
         protected static readonly int DefaultCapacity = 4;
@@ -142,7 +156,7 @@ namespace Data_Structures_and_Algorithms {
                 }
             }
             for(int i = 0; i < Size; i++) {
-                GetVertexCore(i).Color = VertexColor.None;
+                GetVertex(i).Color = VertexColor.None;
             }
         }
 
@@ -180,7 +194,7 @@ namespace Data_Structures_and_Algorithms {
 
         protected internal TVertex GetVertex(int handle) {
             Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
-            return GetVertexCore(handle);
+            return Data.GetVertex(handle);
         }
 
         void CheckVertexOwner(TVertex vertex) {
@@ -188,24 +202,28 @@ namespace Data_Structures_and_Algorithms {
                 throw new InvalidOperationException();
             }
         }
-        #region Vertex / Edge
 
-        protected abstract TVertex CreateVertexCore(TValue value);
-        protected abstract void CreateEdgeCore(TVertex vertex1, TVertex vertex2);
-        protected abstract void RegisterVertex(TVertex vertex);
-        protected abstract TVertex GetVertexCore(int handle);
+        internal GraphDataBase<TValue, TVertex> Data { get { return _data; } }
 
-        protected abstract int SizeCore {
-            get;
+        #region Data & Vertex
+
+        internal abstract GraphDataBase<TValue, TVertex> CreateDataCore(int capacity);
+        internal abstract TVertex CreateVertexCore(TValue value);
+
+        #endregion
+    }
+
+    public abstract class UndirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
+        public UndirectedGraph(int capacity)
+            : base(capacity) {
         }
-        #endregion
 
-        #region Metrics
+        public void SpecificMethod() { }
+    }
 
-        protected abstract bool AreVerticesAdjacentCore(TVertex vertex1, TVertex vertex2);
-        protected abstract IList<TVertex> GetVertexListCore();
-        protected abstract IList<TVertex> GetAdjacentVertextListCore(TVertex vertex);
-
-        #endregion
+    public abstract class DirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
+        public DirectedGraph(int capacity) 
+            : base(capacity) {
+        }
     }
 }

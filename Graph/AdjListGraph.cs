@@ -14,21 +14,21 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    public abstract class AdjListGraphBase<T> : Graph<T, AdjListGraphVertex<T>> {
+    abstract class AdjListGraphDataBase<TValue, TVertex> : GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
         int size;
         int capacity;
         ListNode[] list;
 
-        public AdjListGraphBase()
-            : this(DefaultCapacity) {
-        }
-        public AdjListGraphBase(int capacity) {
-            Guard.IsPositive(capacity, nameof(capacity));
+        public AdjListGraphDataBase(int capacity) : base(capacity) {
             this.size = 0;
             this.capacity = capacity;
             this.list = new ListNode[capacity];
         }
-        protected override void RegisterVertex(AdjListGraphVertex<T> vertex) {
+
+        public int Size { get { return size; } }
+        public int Capacity { get { return capacity; } }
+
+        internal override void RegisterVertex(TVertex vertex) {
             int handle = Size;
             int newSize = ++this.size;
             EnsureListSize(newSize);
@@ -36,6 +36,32 @@ namespace Data_Structures_and_Algorithms {
             node.Next = node;
             List[handle] = node;
             vertex.Handle = handle;
+        }
+        internal override IList<TVertex> GetVertexList() {
+            return List.Take(Size).Select(x => x.Vertex).ToList();
+        }
+        internal override IList<TVertex> GetAdjacentVertextList(TVertex vertex) {
+            ListNode head = List[vertex.Handle];
+            return GetList(head, false).Select(x => x.Vertex).ToList();
+        }
+        internal override bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
+            ListNode head = List[vertex1.Handle];
+            return GetList(head).Any(x => ReferenceEquals(x.Vertex, vertex2));
+        }
+        internal override TVertex GetVertex(int handle) {
+            Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
+            return List[handle].Vertex;
+        }
+        internal override int GetSize() {
+            return Size;
+        }
+
+        internal IEnumerable<TValue>[] GetData() {
+            IEnumerable<TValue>[] result = new IEnumerable<TValue>[Size];
+            for(int i = 0; i < Size; i++) {
+                result[i] = GetList(List[i]).Select(x => x.Vertex.Value).ToList();
+            }
+            return result;
         }
 
         void EnsureListSize(int newSize) {
@@ -49,45 +75,16 @@ namespace Data_Structures_and_Algorithms {
                 this.capacity = _capacity;
             }
         }
-        protected override int SizeCore {
-            get { return size; }
-        }
-        protected override AdjListGraphVertex<T> CreateVertexCore(T value) {
-            return new AdjListGraphVertex<T>(value);
-        }
-        protected override IList<AdjListGraphVertex<T>> GetVertexListCore() {
-            return List.Take(Size).Select(x => x.Vertex).ToList();
-        }
-        protected override IList<AdjListGraphVertex<T>> GetAdjacentVertextListCore(AdjListGraphVertex<T> vertex) {
-            ListNode head = List[vertex.Handle];
-            return GetList(head, false).Select(x => x.Vertex).ToList();
-        }
-        protected override bool AreVerticesAdjacentCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
-            ListNode head = List[vertex1.Handle];
-            return GetList(head).Any(x => ReferenceEquals(x.Vertex, vertex2));
-        }
-        protected override AdjListGraphVertex<T> GetVertexCore(int handle) {
-            Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
-            return List[handle].Vertex;
-        }
-
-        internal IEnumerable<T>[] GetData() {
-            IEnumerable<T>[] result = new IEnumerable<T>[Size];
-            for(int i = 0; i < Size; i++) {
-                result[i] = GetList(List[i]).Select(x => x.Vertex.Value).ToList();
-            }
-            return result;
-        }
 
         internal ListNode[] List { get { return list; } }
 
         #region ListNode
         [DebuggerDisplay("ListNode: ({Vertex.Value})")]
         internal class ListNode {
-            readonly AdjListGraphVertex<T> vertex;
+            readonly TVertex vertex;
             ListNode next;
 
-            public ListNode(AdjListGraphVertex<T> value) {
+            public ListNode(TVertex value) {
                 this.vertex = value;
                 this.next = null;
             }
@@ -95,7 +92,7 @@ namespace Data_Structures_and_Algorithms {
                 get { return next; }
                 set { next = value; }
             }
-            public AdjListGraphVertex<T> Vertex { get { return vertex; } }
+            public TVertex Vertex { get { return vertex; } }
         }
 
         internal static IEnumerable<ListNode> GetList(ListNode head, bool includeHead = true) {
@@ -118,13 +115,11 @@ namespace Data_Structures_and_Algorithms {
         #endregion
     }
 
-    public class AdjListGraph<T> : AdjListGraphBase<T> {
-        public AdjListGraph() {
-        }
-        public AdjListGraph(int capacity)
+    class UndirectedAdjListGraphData<T> : AdjListGraphDataBase<T, AdjListGraphVertex<T>> {
+        public UndirectedAdjListGraphData(int capacity)
             : base(capacity) {
         }
-        protected override void CreateEdgeCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
+        internal override void CreateEdge(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
             InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
             if(!ReferenceEquals(vertex1, vertex2)) {
                 InsertListNode(List[vertex2.Handle], new ListNode(vertex1));
@@ -132,14 +127,45 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    public class DirectedAdjListGraph<T> : AdjListGraphBase<T> {
-        public DirectedAdjListGraph() {
+    class DirectedAdjListGraphData<T> : AdjListGraphDataBase<T, AdjListGraphVertex<T>> {
+        public DirectedAdjListGraphData(int capacity)
+            : base(capacity) {
+        }
+        internal override void CreateEdge(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
+            InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
+        }
+    }
+
+
+    public class AdjListGraph<T> : UndirectedGraph<T, AdjListGraphVertex<T>> {
+        public AdjListGraph()
+            : this(DefaultCapacity) {
+        }
+        public AdjListGraph(int capacity)
+            : base(capacity) {
+        }
+        internal override GraphDataBase<T, AdjListGraphVertex<T>> CreateDataCore(int capacity) {
+            return new UndirectedAdjListGraphData<T>(capacity);
+        }
+        internal override AdjListGraphVertex<T> CreateVertexCore(T value) {
+            return new AdjListGraphVertex<T>(value);
+        }
+        internal new UndirectedAdjListGraphData<T> Data { get { return (UndirectedAdjListGraphData<T>)base.Data; } }
+    }
+
+    public class DirectedAdjListGraph<T> : DirectedGraph<T, AdjListGraphVertex<T>> {
+        public DirectedAdjListGraph()
+            : this(DefaultCapacity) {
         }
         public DirectedAdjListGraph(int capacity)
             : base(capacity) {
         }
-        protected override void CreateEdgeCore(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
-            InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
+        internal override GraphDataBase<T, AdjListGraphVertex<T>> CreateDataCore(int capacity) {
+            return new DirectedAdjListGraphData<T>(capacity);
         }
+        internal override AdjListGraphVertex<T> CreateVertexCore(T value) {
+            return new AdjListGraphVertex<T>(value);
+        }
+        internal new DirectedAdjListGraphData<T> Data { get { return (DirectedAdjListGraphData<T>)base.Data; } }
     }
 }
