@@ -8,11 +8,19 @@ using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
     [DebuggerDisplay("AdjMatrixGraphVertex ({Value})")]
-    public class AdjMatrixGraphVertex<T> : Vertex<T> {
+    public class AdjMatrixGraphVertex<T> : UndirectedVertex<T> {
         internal AdjMatrixGraphVertex(T value)
             : base(value) {
         }
     }
+
+    [DebuggerDisplay("DirectedAdjMatrixGraphVertex ({Value})")]
+    public class DirectedAdjMatrixGraphVertex<T> : DirectedVertex<T> {
+        internal DirectedAdjMatrixGraphVertex(T value)
+            : base(value) {
+        }
+    }
+
 
     abstract class AdjMatrixGraphDataBase<TValue, TVertex> : GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
         int size;
@@ -96,11 +104,11 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    class DirectedAdjMatrixGraphData<T> : AdjMatrixGraphDataBase<T, AdjMatrixGraphVertex<T>> {
+    class DirectedAdjMatrixGraphData<T> : AdjMatrixGraphDataBase<T, DirectedAdjMatrixGraphVertex<T>> {
         public DirectedAdjMatrixGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2) {
+        internal override void CreateEdge(DirectedAdjMatrixGraphVertex<T> vertex1, DirectedAdjMatrixGraphVertex<T> vertex2) {
             Matrix[vertex1.Handle, vertex2.Handle] = true;
         }
     }
@@ -123,7 +131,7 @@ namespace Data_Structures_and_Algorithms {
         internal new UndirectedAdjMatrixGraphData<T> Data { get { return (UndirectedAdjMatrixGraphData<T>)base.Data; } }
     }
 
-    public class DirectedAdjMatrixGraph<T> : DirectedGraph<T, AdjMatrixGraphVertex<T>> {
+    public class DirectedAdjMatrixGraph<T> : DirectedGraph<T, DirectedAdjMatrixGraphVertex<T>> {
         public DirectedAdjMatrixGraph()
             : this(DefaultCapacity) {
         }
@@ -131,11 +139,11 @@ namespace Data_Structures_and_Algorithms {
             : base(capacity) {
         }
 
-        internal override GraphDataBase<T, AdjMatrixGraphVertex<T>> CreateDataCore(int capacity) {
+        internal override GraphDataBase<T, DirectedAdjMatrixGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjMatrixGraphData<T>(capacity);
         }
-        internal override AdjMatrixGraphVertex<T> CreateVertexCore(T value) {
-            return new AdjMatrixGraphVertex<T>(value);
+        internal override DirectedAdjMatrixGraphVertex<T> CreateVertexCore(T value) {
+            return new DirectedAdjMatrixGraphVertex<T>(value);
         }
         internal new DirectedAdjMatrixGraphData<T> Data { get { return (DirectedAdjMatrixGraphData<T>)base.Data; } }
     }

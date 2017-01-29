@@ -7,25 +7,21 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
-    public abstract class AdjSetGraphVertexBase<T> : Vertex<T> {
-        bool isSelfLooped;
-        internal AdjSetGraphVertexBase(T value)
-            : base(value) {
-        }
-        internal bool IsSelfLooped {
-            get { return isSelfLooped; }
-            set { isSelfLooped = value; }
-        }
-    }
-
     [DebuggerDisplay("AdjSetGraphVertex ({Value})")]
-    public class AdjSetGraphVertex<T> : AdjSetGraphVertexBase<T> {
+    public class AdjSetGraphVertex<T> : UndirectedVertex<T> {
         internal AdjSetGraphVertex(T value)
             : base(value) {
         }
     }
 
-    abstract class AdjSetGraphDataBase<TValue, TVertex> : GraphDataBase<TValue, TVertex> where TVertex : AdjSetGraphVertexBase<TValue> {
+    [DebuggerDisplay("DirectedAdjSetGraphVertex ({Value})")]
+    public class DirectedAdjSetGraphVertex<T> : DirectedVertex<T> {
+        internal DirectedAdjSetGraphVertex(T value)
+            : base(value) {
+        }
+    }
+
+    abstract class AdjSetGraphDataBase<TValue, TVertex> : GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
         int size;
         int capacity;
         VertexDisjointSet[] list;
@@ -131,11 +127,11 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    class DirectedAdjSetGraphData<T> : AdjSetGraphDataBase<T, AdjSetGraphVertex<T>> {
+    class DirectedAdjSetGraphData<T> : AdjSetGraphDataBase<T, DirectedAdjSetGraphVertex<T>> {
         public DirectedAdjSetGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(AdjSetGraphVertex<T> vertex1, AdjSetGraphVertex<T> vertex2) {
+        internal override void CreateEdge(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2) {
             if(ReferenceEquals(vertex1, vertex2)) {
                 vertex1.IsSelfLooped = true;
             }
@@ -162,18 +158,18 @@ namespace Data_Structures_and_Algorithms {
         internal new UndirectedAdjSetGraphData<T> Data { get { return (UndirectedAdjSetGraphData<T>)base.Data; } }
     }
 
-    public class DirectedAdjSetGraph<T> : DirectedGraph<T, AdjSetGraphVertex<T>> {
+    public class DirectedAdjSetGraph<T> : DirectedGraph<T, DirectedAdjSetGraphVertex<T>> {
         public DirectedAdjSetGraph()
             : this(DefaultCapacity) {
         }
         public DirectedAdjSetGraph(int capacity)
             : base(capacity) {
         }
-        internal override GraphDataBase<T, AdjSetGraphVertex<T>> CreateDataCore(int capacity) {
+        internal override GraphDataBase<T, DirectedAdjSetGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjSetGraphData<T>(capacity);
         }
-        internal override AdjSetGraphVertex<T> CreateVertexCore(T value) {
-            return new AdjSetGraphVertex<T>(value);
+        internal override DirectedAdjSetGraphVertex<T> CreateVertexCore(T value) {
+            return new DirectedAdjSetGraphVertex<T>(value);
         }
         internal new DirectedAdjSetGraphData<T> Data { get { return (DirectedAdjSetGraphData<T>)base.Data; } }
     }

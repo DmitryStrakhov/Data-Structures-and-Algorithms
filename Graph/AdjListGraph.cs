@@ -8,8 +8,15 @@ using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
     [DebuggerDisplay("AdjListGraphVertex ({Value})")]
-    public class AdjListGraphVertex<T> : Vertex<T> {
+    public class AdjListGraphVertex<T> : UndirectedVertex<T> {
         internal AdjListGraphVertex(T value)
+            : base(value) {
+        }
+    }
+
+    [DebuggerDisplay("DirectedAdjListGraphVertex ({Value})")]
+    public class DirectedAdjListGraphVertex<T> : DirectedVertex<T> {
+        internal DirectedAdjListGraphVertex(T value)
             : base(value) {
         }
     }
@@ -127,11 +134,11 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    class DirectedAdjListGraphData<T> : AdjListGraphDataBase<T, AdjListGraphVertex<T>> {
+    class DirectedAdjListGraphData<T> : AdjListGraphDataBase<T, DirectedAdjListGraphVertex<T>> {
         public DirectedAdjListGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
+        internal override void CreateEdge(DirectedAdjListGraphVertex<T> vertex1, DirectedAdjListGraphVertex<T> vertex2) {
             InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
         }
     }
@@ -153,18 +160,18 @@ namespace Data_Structures_and_Algorithms {
         internal new UndirectedAdjListGraphData<T> Data { get { return (UndirectedAdjListGraphData<T>)base.Data; } }
     }
 
-    public class DirectedAdjListGraph<T> : DirectedGraph<T, AdjListGraphVertex<T>> {
+    public class DirectedAdjListGraph<T> : DirectedGraph<T, DirectedAdjListGraphVertex<T>> {
         public DirectedAdjListGraph()
             : this(DefaultCapacity) {
         }
         public DirectedAdjListGraph(int capacity)
             : base(capacity) {
         }
-        internal override GraphDataBase<T, AdjListGraphVertex<T>> CreateDataCore(int capacity) {
+        internal override GraphDataBase<T, DirectedAdjListGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjListGraphData<T>(capacity);
         }
-        internal override AdjListGraphVertex<T> CreateVertexCore(T value) {
-            return new AdjListGraphVertex<T>(value);
+        internal override DirectedAdjListGraphVertex<T> CreateVertexCore(T value) {
+            return new DirectedAdjListGraphVertex<T>(value);
         }
         internal new DirectedAdjListGraphData<T> Data { get { return (DirectedAdjListGraphData<T>)base.Data; } }
     }

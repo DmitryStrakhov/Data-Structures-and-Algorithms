@@ -262,12 +262,27 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreSame(vB, graph.GetVertex(1));
             Assert.AreSame(vC, graph.GetVertex(2));
         }
+        [TestMethod]
+        public void VertexSelfLoopTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            Assert.IsFalse(vA.IsSelfLooped);
+            Assert.IsFalse(vB.IsSelfLooped);
+            graph.CreateEdge(vA, vA);
+            Assert.IsTrue(vA.IsSelfLooped);
+            Assert.IsFalse(vB.IsSelfLooped);
+            graph.CreateEdge(vB, vB);
+            Assert.IsTrue(vA.IsSelfLooped);
+            Assert.IsTrue(vB.IsSelfLooped);
+        }
 
         protected abstract TGraph CreateGraph();
         protected abstract TVertex CreateVertex(char value);
     }
 
-    public abstract class UndirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : Vertex<char> where TGraph : Graph<char, TVertex> {
+    public abstract class UndirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : UndirectedVertex<char> where TGraph : Graph<char, TVertex> {
         [TestMethod]
         public void AreVerticesAdjacentTest() {
             var graph = CreateGraph();
@@ -380,9 +395,28 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'G', 'H', }, vertexList);
             CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
         }
+        [TestMethod]
+        public void VertexDegreeTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            Assert.AreEqual(0, vA.Degree);
+            Assert.AreEqual(0, vB.Degree);
+            Assert.AreEqual(0, vC.Degree);
+            Assert.AreEqual(0, vD.Degree);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vA, vD);
+            Assert.AreEqual(3, vA.Degree);
+            Assert.AreEqual(1, vB.Degree);
+            Assert.AreEqual(1, vC.Degree);
+            Assert.AreEqual(1, vD.Degree);
+        }
     }
 
-    public abstract class DirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : Vertex<char> where TGraph : Graph<char, TVertex> {
+    public abstract class DirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : DirectedVertex<char> where TGraph : Graph<char, TVertex> {
         [TestMethod]
         public void AreVerticesAdjacentTest() {
             var graph = CreateGraph();
@@ -494,6 +528,48 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.BFSearch(vF, x => { vertexList.Add(x.Value); return x.Value != 'D'; });
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'G', 'D' }, vertexList);
             CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+        }
+        [TestMethod]
+        public void VertextInDegreeTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            Assert.AreEqual(0, vA.InDegree);
+            Assert.AreEqual(0, vB.InDegree);
+            Assert.AreEqual(0, vC.InDegree);
+            Assert.AreEqual(0, vD.InDegree);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vA);
+            Assert.AreEqual(1, vA.InDegree);
+            Assert.AreEqual(1, vB.InDegree);
+            Assert.AreEqual(2, vC.InDegree);
+            Assert.AreEqual(1, vD.InDegree);
+        }
+        [TestMethod]
+        public void VertextOutDegreeTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            Assert.AreEqual(0, vA.OutDegree);
+            Assert.AreEqual(0, vB.OutDegree);
+            Assert.AreEqual(0, vC.OutDegree);
+            Assert.AreEqual(0, vD.OutDegree);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vA);
+            Assert.AreEqual(2, vA.OutDegree);
+            Assert.AreEqual(1, vB.OutDegree);
+            Assert.AreEqual(1, vC.OutDegree);
+            Assert.AreEqual(1, vD.OutDegree);
         }
     }
 
@@ -664,7 +740,7 @@ namespace Data_Structures_and_Algorithms.Tests {
     }
 
     [TestClass]
-    public class DirectedAdjMatrixGraphTests : DirectedGraphBaseTests<AdjMatrixGraphVertex<char>, DirectedAdjMatrixGraph<char>> {
+    public class DirectedAdjMatrixGraphTests : DirectedGraphBaseTests<DirectedAdjMatrixGraphVertex<char>, DirectedAdjMatrixGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             DirectedAdjMatrixGraph<char> graph = CreateGraph();
@@ -711,13 +787,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override DirectedAdjMatrixGraph<char> CreateGraph() {
             return new DirectedAdjMatrixGraph<char>();
         }
-        protected override AdjMatrixGraphVertex<char> CreateVertex(char value) {
-            return new AdjMatrixGraphVertex<char>(value);
+        protected override DirectedAdjMatrixGraphVertex<char> CreateVertex(char value) {
+            return new DirectedAdjMatrixGraphVertex<char>(value);
         }
     }
 
     [TestClass]
-    public class DirectedAdjListGraphTests : DirectedGraphBaseTests<AdjListGraphVertex<char>, DirectedAdjListGraph<char>> {
+    public class DirectedAdjListGraphTests : DirectedGraphBaseTests<DirectedAdjListGraphVertex<char>, DirectedAdjListGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             DirectedAdjListGraph<char> graph = CreateGraph();
@@ -767,13 +843,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override DirectedAdjListGraph<char> CreateGraph() {
             return new DirectedAdjListGraph<char>();
         }
-        protected override AdjListGraphVertex<char> CreateVertex(char value) {
-            return new AdjListGraphVertex<char>(value);
+        protected override DirectedAdjListGraphVertex<char> CreateVertex(char value) {
+            return new DirectedAdjListGraphVertex<char>(value);
         }
     }
 
     [TestClass]
-    public class DirectedAdjSetGraphTests : DirectedGraphBaseTests<AdjSetGraphVertex<char>, DirectedAdjSetGraph<char>> {
+    public class DirectedAdjSetGraphTests : DirectedGraphBaseTests<DirectedAdjSetGraphVertex<char>, DirectedAdjSetGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             DirectedAdjSetGraph<char> graph = CreateGraph();
@@ -823,8 +899,8 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override DirectedAdjSetGraph<char> CreateGraph() {
             return new DirectedAdjSetGraph<char>();
         }
-        protected override AdjSetGraphVertex<char> CreateVertex(char value) {
-            return new AdjSetGraphVertex<char>(value);
+        protected override DirectedAdjSetGraphVertex<char> CreateVertex(char value) {
+            return new DirectedAdjSetGraphVertex<char>(value);
         }
     }
 

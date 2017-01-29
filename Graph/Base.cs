@@ -12,6 +12,7 @@ namespace Data_Structures_and_Algorithms {
         Guid? ownerID;
         int? handle;
         VertexColor color;
+        bool isSelfLooped;
 
         internal Vertex(T value) {
             this.value = value;
@@ -41,7 +42,38 @@ namespace Data_Structures_and_Algorithms {
             get { return color; }
             set { color = value; }
         }
+        internal bool IsSelfLooped {
+            get { return isSelfLooped; }
+            set { isSelfLooped = value; }
+        }
         public T Value { get { return value; } }
+    }
+
+    public abstract class UndirectedVertex<T> : Vertex<T> {
+        int degree;
+        internal UndirectedVertex(T value) : base(value) {
+            this.degree = 0;
+        }
+        public int Degree {
+            get { return degree; }
+            internal set { degree = value; }
+        }
+    }
+
+    public abstract class DirectedVertex<T> : Vertex<T> {
+        int inDegree;
+        int outDegree;
+        internal DirectedVertex(T value) : base(value) {
+            this.inDegree = this.outDegree = 0;
+        }
+        public int InDegree {
+            get { return inDegree; }
+            internal set { inDegree = value; }
+        }
+        public int OutDegree {
+            get { return outDegree; }
+            internal set { outDegree = value; }
+        }
     }
 
     internal enum VertexColor {
@@ -80,8 +112,15 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex2, nameof(vertex2));
             CheckVertexOwner(vertex1);
             CheckVertexOwner(vertex2);
-            Data.CreateEdge(vertex1, vertex2);
+            CreateEdgeCore(vertex1, vertex2);
         }
+        protected virtual void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
+            Data.CreateEdge(vertex1, vertex2);
+            if(ReferenceEquals(vertex1, vertex2)) {
+                vertex1.IsSelfLooped = true;
+            }
+        }
+
         public int Size {
             get { return Data.GetSize(); }
         }
@@ -213,17 +252,25 @@ namespace Data_Structures_and_Algorithms {
         #endregion
     }
 
-    public abstract class UndirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
+    public abstract class UndirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : UndirectedVertex<TValue> {
         public UndirectedGraph(int capacity)
             : base(capacity) {
         }
-
-        public void SpecificMethod() { }
+        protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
+            base.CreateEdgeCore(vertex1, vertex2);
+            vertex1.Degree++;
+            vertex2.Degree++;
+        }
     }
 
-    public abstract class DirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
-        public DirectedGraph(int capacity) 
+    public abstract class DirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : DirectedVertex<TValue> {
+        public DirectedGraph(int capacity)
             : base(capacity) {
+        }
+        protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
+            base.CreateEdgeCore(vertex1, vertex2);
+            vertex1.OutDegree++;
+            vertex2.InDegree++;
         }
     }
 }
