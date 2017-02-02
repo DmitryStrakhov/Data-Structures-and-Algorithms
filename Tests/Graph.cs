@@ -282,7 +282,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected abstract TVertex CreateVertex(char value);
     }
 
-    public abstract class UndirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : UndirectedVertex<char> where TGraph : Graph<char, TVertex> {
+    public abstract class UndirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : UndirectedVertex<char> where TGraph : UndirectedGraph<char, TVertex> {
         [TestMethod]
         public void AreVerticesAdjacentTest() {
             var graph = CreateGraph();
@@ -316,84 +316,84 @@ namespace Data_Structures_and_Algorithms.Tests {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.DFSearch(x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void DFSearchCase2Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.DFSearch(x => { vertexList.Add(x.Value); return x.Value != 'E'; });
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'D', 'E' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void DFSearchCase3Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.DFSearch(vF, x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'B', 'A', 'H', 'D', 'G' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void DFSearchCase4Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.DFSearch(vF, x => { vertexList.Add(x.Value); return x.Value != 'A'; });
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'B', 'A' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase1Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.BFSearch(x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'H', 'D', 'E', 'F', 'G' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase2Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.BFSearch(x => { vertexList.Add(x.Value); return x.Value != 'D'; });
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'H', 'D' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase3Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.BFSearch(vF, x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'G', 'H', 'B', 'D', 'A' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase4Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.BFSearch(vF, x => { vertexList.Add(x.Value); return x.Value != 'H'; });
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'G', 'H', }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void VertexDegreeTest() {
@@ -416,7 +416,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
     }
 
-    public abstract class DirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : DirectedVertex<char> where TGraph : Graph<char, TVertex> {
+    public abstract class DirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : DirectedVertex<char> where TGraph : DirectedGraph<char, TVertex> {
         [TestMethod]
         public void AreVerticesAdjacentTest() {
             var graph = CreateGraph();
@@ -450,84 +450,84 @@ namespace Data_Structures_and_Algorithms.Tests {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.DFSearch(x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'D', 'H', 'E', 'G', 'F' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void DFSearchCase2Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.DFSearch(x => { vertexList.Add(x.Value); return x.Value != 'H'; });
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'D', 'H' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void DFSearchCase3Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.DFSearch(vF, x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'D', 'G', 'H', 'A', 'B' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void DFSearchCase4Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.DFSearch(vF, x => { vertexList.Add(x.Value); return x.Value != 'G'; });
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'D', 'G' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase1Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.BFSearch(x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'H', 'D', 'E', 'G', 'F' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase2Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             graph.BFSearch(x => { vertexList.Add(x.Value); return x.Value != 'D'; });
             CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C', 'H', 'D' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase3Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.BFSearch(vF, x => vertexList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'G', 'D', 'H', 'A', 'B' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void BFSearchCase4Test() {
             List<char> vertexList = new List<char>();
             var graph = CreateGraph();
             GraphTestUtils.InitializeGraph(graph);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
             var vF = graph.GetVertexList().First(x => x.Value == 'F');
             graph.BFSearch(vF, x => { vertexList.Add(x.Value); return x.Value != 'D'; });
             CollectionAssert.AreEqual(new char[] { 'F', 'E', 'C', 'G', 'D' }, vertexList);
-            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Color == VertexColor.None);
+            CollectionAssertEx.TrueForAllItems(graph.GetVertexList(), x => x.Tag.Color == VertexColor.None);
         }
         [TestMethod]
         public void VertextInDegreeTest() {
@@ -570,6 +570,60 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(1, vB.OutDegree);
             Assert.AreEqual(1, vC.OutDegree);
             Assert.AreEqual(1, vD.OutDegree);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void TopologicalSortGuardCase1Test() {
+            var graph = CreateGraph();
+            Action<TVertex> action = null;
+            graph.TopologicalSort(action);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void TopologicalSortGuardCase2Test() {
+            var graph = CreateGraph();
+            var v7 = graph.CreateVertex('7');
+            var v5 = graph.CreateVertex('5');
+            var v3 = graph.CreateVertex('3');
+            var v1 = graph.CreateVertex('1');
+            var v8 = graph.CreateVertex('8');
+            var v2 = graph.CreateVertex('2');
+            var v9 = graph.CreateVertex('9');
+            var v4 = graph.CreateVertex('4');
+            graph.CreateEdge(v7, v1);
+            graph.CreateEdge(v7, v8);
+            graph.CreateEdge(v5, v1);
+            graph.CreateEdge(v3, v8);
+            graph.CreateEdge(v3, v4);
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v1, v9);
+            graph.CreateEdge(v1, v4);
+            graph.CreateEdge(v8, v9);
+            graph.CreateEdge(v2, v7);
+            var valueList = new List<char>();
+            graph.TopologicalSort(x => valueList.Add(x.Value));
+        }
+        [TestMethod]
+        public void TopologicalSortTest() {
+            var graph = CreateGraph();
+            var v7 = graph.CreateVertex('7');
+            var v5 = graph.CreateVertex('5');
+            var v3 = graph.CreateVertex('3');
+            var v1 = graph.CreateVertex('1');
+            var v8 = graph.CreateVertex('8');
+            var v2 = graph.CreateVertex('2');
+            var v9 = graph.CreateVertex('9');
+            var v4 = graph.CreateVertex('4');
+            graph.CreateEdge(v7, v1);
+            graph.CreateEdge(v7, v8);
+            graph.CreateEdge(v5, v1);
+            graph.CreateEdge(v3, v8);
+            graph.CreateEdge(v3, v4);
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v1, v9);
+            graph.CreateEdge(v1, v4);
+            graph.CreateEdge(v8, v9);
+            var valueList = new List<char>();
+            graph.TopologicalSort(x => valueList.Add(x.Value));
+            CollectionAssert.AreEqual(new char[] { '7', '5', '3', '1', '8', '2', '4', '9'  }, valueList);
         }
     }
 

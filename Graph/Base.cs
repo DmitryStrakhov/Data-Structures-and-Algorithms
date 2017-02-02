@@ -11,14 +11,14 @@ namespace Data_Structures_and_Algorithms {
         T value;
         Guid? ownerID;
         int? handle;
-        VertexColor color;
         bool isSelfLooped;
+        VertexTag tag;
 
         internal Vertex(T value) {
             this.value = value;
             this.ownerID = null;
-            this.color = VertexColor.None;
             this.handle = null;
+            this.tag = new VertexTag(0, VertexColor.None);
         }
         internal Guid OwnerID {
             get { return ownerID.Value; }
@@ -38,9 +38,8 @@ namespace Data_Structures_and_Algorithms {
                 handle = value;
             }
         }
-        internal VertexColor Color {
-            get { return color; }
-            set { color = value; }
+        internal VertexTag Tag {
+            get { return tag; }
         }
         internal bool IsSelfLooped {
             get { return isSelfLooped; }
@@ -78,6 +77,24 @@ namespace Data_Structures_and_Algorithms {
 
     internal enum VertexColor {
         None, Gray
+    }
+
+    internal class VertexTag {
+        int nValue;
+        VertexColor color;
+
+        public VertexTag(int nValue, VertexColor color) {
+            this.nValue = nValue;
+            this.color = color;
+        }
+        internal VertexColor Color {
+            get { return color; }
+            set { color = value; }
+        }
+        public int NValue {
+            get { return nValue; }
+            set { nValue = value; }
+        }
     }
 
     abstract class GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
@@ -190,12 +207,12 @@ namespace Data_Structures_and_Algorithms {
             int handle = vertex != null ? vertex.Handle : 0;
             for(int i = 0; i < Size; i++) {
                 var graphVertex = GetVertex((handle + i) % Size);
-                if(graphVertex.Color == VertexColor.None) {
+                if(graphVertex.Tag.Color == VertexColor.None) {
                     if(!searchProc(graphVertex, action)) break;
                 }
             }
             for(int i = 0; i < Size; i++) {
-                GetVertex(i).Color = VertexColor.None;
+                GetVertex(i).Tag.Color = VertexColor.None;
             }
         }
 
@@ -203,10 +220,10 @@ namespace Data_Structures_and_Algorithms {
             bool @continue = action(vertex);
             if(!@continue)
                 return false;
-            vertex.Color = VertexColor.Gray;
+            vertex.Tag.Color = VertexColor.Gray;
             var adjacentList = GetAdjacentVertextList(vertex);
             for(int i = 0; i < adjacentList.Count; i++) {
-                if(adjacentList[i].Color == VertexColor.None) {
+                if(adjacentList[i].Tag.Color == VertexColor.None) {
                     if(!DFSearchCore(adjacentList[i], action)) return false;
                 }
             }
@@ -215,15 +232,15 @@ namespace Data_Structures_and_Algorithms {
         bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action) {
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(vertex);
-            vertex.Color = VertexColor.Gray;
+            vertex.Tag.Color = VertexColor.Gray;
             while(!queue.IsEmpty) {
                 var graphVertex = queue.DeQueue();
                 if(!action(graphVertex))
                     return false;
                 var adjacentList = GetAdjacentVertextList(graphVertex);
                 for(int i = 0; i < adjacentList.Count; i++) {
-                    if(adjacentList[i].Color == VertexColor.None) {
-                        adjacentList[i].Color = VertexColor.Gray;
+                    if(adjacentList[i].Tag.Color == VertexColor.None) {
+                        adjacentList[i].Tag.Color = VertexColor.Gray;
                         queue.EnQueue(adjacentList[i]);
                     }
                 }
@@ -266,6 +283,27 @@ namespace Data_Structures_and_Algorithms {
     public abstract class DirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : DirectedVertex<TValue> {
         public DirectedGraph(int capacity)
             : base(capacity) {
+        }
+        public void TopologicalSort(Action<TVertex> action) {
+            Guard.IsNotNull(action, nameof(action));
+            int vertexCount = 0;
+            Queue<TVertex> queue = new Queue<TVertex>();
+            foreach(var vertex in GetVertexList()) {
+                if(vertex.InDegree == 0)
+                    queue.EnQueue(vertex);
+                vertex.Tag.NValue = vertex.InDegree;
+            }
+            while(!queue.IsEmpty) {
+                TVertex vertex = queue.DeQueue();
+                action(vertex);
+                vertexCount++;
+                var adjacentList = GetAdjacentVertextList(vertex);
+                foreach(var adjacentVertex in adjacentList) {
+                    if(--adjacentVertex.Tag.NValue == 0) queue.EnQueue(adjacentVertex);
+                }
+            }
+            if(Size != vertexCount)
+                throw new InvalidOperationException();
         }
         protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
             base.CreateEdgeCore(vertex1, vertex2);
