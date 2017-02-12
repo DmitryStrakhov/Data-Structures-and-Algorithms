@@ -62,6 +62,10 @@ namespace Data_Structures_and_Algorithms {
         internal override int GetSize() {
             return Size;
         }
+        internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
+            ListNode head = List[vertex1.Handle];
+            return FindNode(head, x => ReferenceEquals(x.Next.Vertex, vertex2)).Weight;
+        }
 
         internal IEnumerable<TValue>[] GetData() {
             IEnumerable<TValue>[] result = new IEnumerable<TValue>[Size];
@@ -89,6 +93,7 @@ namespace Data_Structures_and_Algorithms {
         [DebuggerDisplay("ListNode: ({Vertex.Value})")]
         internal class ListNode {
             readonly TVertex vertex;
+            double weight;
             ListNode next;
 
             public ListNode(TVertex value) {
@@ -98,6 +103,10 @@ namespace Data_Structures_and_Algorithms {
             public ListNode Next {
                 get { return next; }
                 set { next = value; }
+            }
+            public double Weight {
+                get { return weight; }
+                set { weight = value; }
             }
             public TVertex Vertex { get { return vertex; } }
         }
@@ -114,10 +123,21 @@ namespace Data_Structures_and_Algorithms {
         internal static ListNode GetListTail(ListNode head) {
             return GetList(head).First(x => ReferenceEquals(x.Next, head));
         }
-        internal static void InsertListNode(ListNode head, ListNode node) {
+        internal static void InsertListNode(ListNode head, ListNode node, double weight) {
             ListNode tail = GetListTail(head);
             tail.Next = node;
+            tail.Weight = weight;
             node.Next = head;
+        }
+        internal static ListNode FindNode(ListNode head, Predicate<ListNode> findCondition) {
+            ListNode node = head;
+            do {
+                if(findCondition(node))
+                    return node;
+                node = node.Next;
+            }
+            while(!ReferenceEquals(node, head));
+            return null;
         }
         #endregion
     }
@@ -126,10 +146,10 @@ namespace Data_Structures_and_Algorithms {
         public UndirectedAdjListGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2) {
-            InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
+        internal override void CreateEdge(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2, double weight) {
+            InsertListNode(List[vertex1.Handle], new ListNode(vertex2), weight);
             if(!ReferenceEquals(vertex1, vertex2)) {
-                InsertListNode(List[vertex2.Handle], new ListNode(vertex1));
+                InsertListNode(List[vertex2.Handle], new ListNode(vertex1), weight);
             }
         }
     }
@@ -138,8 +158,8 @@ namespace Data_Structures_and_Algorithms {
         public DirectedAdjListGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(DirectedAdjListGraphVertex<T> vertex1, DirectedAdjListGraphVertex<T> vertex2) {
-            InsertListNode(List[vertex1.Handle], new ListNode(vertex2));
+        internal override void CreateEdge(DirectedAdjListGraphVertex<T> vertex1, DirectedAdjListGraphVertex<T> vertex2, double weight) {
+            InsertListNode(List[vertex1.Handle], new ListNode(vertex2), weight);
         }
     }
 

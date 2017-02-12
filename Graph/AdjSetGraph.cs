@@ -59,6 +59,9 @@ namespace Data_Structures_and_Algorithms {
         internal override int GetSize() {
             return Size;
         }
+        internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
+            return List[vertex1.Handle].GetItemWeight(vertex2);
+        }
 
         void EnsureListSize(int newSize) {
             if(newSize > this.capacity) {
@@ -75,14 +78,21 @@ namespace Data_Structures_and_Algorithms {
         #region VertexDisjointSet
         [DebuggerDisplay("VertexDisjointSet ({Vertex.Value})")]
         internal class VertexDisjointSet : DisjointSet<TVertex> {
+            bool selfLooped;
             readonly TVertex vertex;
 
             public VertexDisjointSet(TVertex vertex) {
                 this.vertex = MakeSet(vertex);
             }
-            public void AddVertex(TVertex other) {
-                MakeSet(other);
-                Union(Vertex, other);
+            public void AddVertex(TVertex other, double weight) {
+                if(ReferenceEquals(other, Vertex)) {
+                    this.selfLooped = true;
+                }
+                else {
+                    MakeSet(other);
+                    Union(Vertex, other);
+                }
+                GetItemCore(other).Weight = weight;
             }
             public bool IsVertexAdjacent(TVertex other) {
                 return Exists(other) && AreEquivalent(Vertex, other);
@@ -90,13 +100,37 @@ namespace Data_Structures_and_Algorithms {
             public IEnumerable<TVertex> GetVertices(bool includeBaseVertex = true) {
                 if(includeBaseVertex) {
                     yield return Vertex;
-                    if(Vertex.IsSelfLooped) yield return Vertex;
+                    if(this.selfLooped) yield return Vertex;
                 }
                 foreach(var item in Items) {
                     if(!ReferenceEquals(item, Vertex)) yield return item;
                 }
             }
+            internal double GetItemWeight(TVertex vertex) {
+                return GetItemCore(vertex).Weight;
+            }
+
+            protected override DisjointSet<TVertex>.SetItem CreateSetItem(TVertex item, int rank) {
+                return new SetItem(item, rank);
+            }
             public TVertex Vertex { get { return vertex; } }
+
+            #region SetItem
+            new class SetItem : DisjointSet<TVertex>.SetItem {
+                double weight;
+                public SetItem(TVertex parent, int rank)
+                    : base(parent, rank) {
+                }
+                public double Weight {
+                    get { return weight; }
+                    set { weight = value; }
+                }
+            }
+            #endregion
+
+            new SetItem GetItemCore(TVertex item) {
+                return (SetItem)base.GetItemCore(item);
+            }
         }
         #endregion
 
@@ -116,13 +150,10 @@ namespace Data_Structures_and_Algorithms {
         public UndirectedAdjSetGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(AdjSetGraphVertex<T> vertex1, AdjSetGraphVertex<T> vertex2) {
-            if(ReferenceEquals(vertex1, vertex2)) {
-                vertex1.IsSelfLooped = true;
-            }
-            else {
-                List[vertex1.Handle].AddVertex(vertex2);
-                List[vertex2.Handle].AddVertex(vertex1);
+        internal override void CreateEdge(AdjSetGraphVertex<T> vertex1, AdjSetGraphVertex<T> vertex2, double weight) {
+            List[vertex1.Handle].AddVertex(vertex2, weight);
+            if(!ReferenceEquals(vertex1, vertex2)) {
+                List[vertex2.Handle].AddVertex(vertex1, weight);
             }
         }
     }
@@ -131,13 +162,8 @@ namespace Data_Structures_and_Algorithms {
         public DirectedAdjSetGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2) {
-            if(ReferenceEquals(vertex1, vertex2)) {
-                vertex1.IsSelfLooped = true;
-            }
-            else {
-                List[vertex1.Handle].AddVertex(vertex2);
-            }
+        internal override void CreateEdge(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2, double weight) {
+            List[vertex1.Handle].AddVertex(vertex2, weight);
         }
     }
 

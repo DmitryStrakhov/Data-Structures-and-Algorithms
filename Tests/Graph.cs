@@ -262,20 +262,108 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreSame(vB, graph.GetVertex(1));
             Assert.AreSame(vC, graph.GetVertex(2));
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetWeightGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB, 2);
+            graph.GetWeight(null, vB);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetWeightGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB, 2);
+            graph.GetWeight(vA, null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetWeightGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB, 2);
+            graph.GetWeight(CreateVertex('A'), vB);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetWeightGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB, 2);
+            graph.GetWeight(vA, CreateVertex('B'));
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetWeightGuardCase5Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var result = graph.GetWeight(vA, vB);
+        }
         [TestMethod]
-        public void VertexSelfLoopTest() {
+        public void GetWeightTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB, 2);
+            graph.CreateEdge(vB, vC, 3);
+            graph.CreateEdge(vC, vA, 4);
+            AssertEx.AreDoublesEqual(2, graph.GetWeight(vA, vB));
+            AssertEx.AreDoublesEqual(3, graph.GetWeight(vB, vC));
+            AssertEx.AreDoublesEqual(4, graph.GetWeight(vC, vA));
+        }
+        [TestMethod]
+        public void SelfLoopWeightTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            graph.CreateEdge(vA, vA, 11);
+            AssertEx.AreDoublesEqual(11, graph.GetWeight(vA, vA));
+        }
+        [TestMethod]
+        public void CreateEdgeDefaultWeightTest() {
             var graph = CreateGraph();
             var vA = graph.CreateVertex('A');
             var vB = graph.CreateVertex('B');
             graph.CreateEdge(vA, vB);
-            Assert.IsFalse(vA.IsSelfLooped);
-            Assert.IsFalse(vB.IsSelfLooped);
-            graph.CreateEdge(vA, vA);
-            Assert.IsTrue(vA.IsSelfLooped);
-            Assert.IsFalse(vB.IsSelfLooped);
-            graph.CreateEdge(vB, vB);
-            Assert.IsTrue(vA.IsSelfLooped);
-            Assert.IsTrue(vB.IsSelfLooped);
+            AssertEx.AreDoublesEqual(1, graph.GetWeight(vA, vB));
+        }
+        [TestMethod]
+        public void UnweightedGraphTest() {
+            var graph = CreateGraph();
+            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+        }
+        [TestMethod]
+        public void WeightedGraphTest() {
+            var graph = CreateGraph();
+            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC, 2);
+            graph.CreateEdge(vC, vA, 3);
+            Assert.AreEqual(GraphProperties.Weighted, graph.Properties);
+        }
+        [TestMethod]
+        public void NegativeWeightedGraphTest() {
+            var graph = CreateGraph();
+            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC, -2);
+            graph.CreateEdge(vC, vA, -3);
+            Assert.AreEqual(GraphProperties.Weighted | GraphProperties.NegativeWeighted, graph.Properties);
         }
 
         protected abstract TGraph CreateGraph();
@@ -648,7 +736,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             AdjMatrixGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
             Assert.AreEqual(1, graph.Data.Matrix.Size);
-            Assert.IsFalse(graph.Data.Matrix[0, 0]);
+            Assert.IsFalse(graph.Data.Matrix[0, 0].HasValue);
             var vB = graph.CreateVertex('B');
             Assert.AreEqual(2, graph.Data.Matrix.Size);
             CollectionAssertEx.AreEqual(new int[,] { { 0, 0 }, { 0, 0 } }, graph.Data.GetMatrixData());

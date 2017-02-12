@@ -33,6 +33,10 @@ namespace Data_Structures_and_Algorithms.Tests {
                 throw new AssertFailedException();
             }
         }
+        public static void AreDoublesEqual(double expected, double actual) {
+            if(!MathUtils.AreDoubleEquals(expected, actual))
+                throw new AssertFailedException();
+        }
     }
 
     public static class CollectionAssertEx {

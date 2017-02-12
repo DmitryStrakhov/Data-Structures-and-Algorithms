@@ -65,4 +65,11 @@ namespace Data_Structures_and_Algorithms {
             yield return item;
         }
     }
+
+    public static class MathUtils {
+        public static bool AreDoubleEquals(double x, double y) {
+            return Math.Abs(x - y) < Epsilon;
+        }
+        const double Epsilon = 0.000001;
+    }
 }

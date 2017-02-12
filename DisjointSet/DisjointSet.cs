@@ -22,7 +22,7 @@ namespace Data_Structures_and_Algorithms {
             if(Values.ContainsKey(item)) {
                 ThrowHandleIsAlreadyReserved(nameof(item));
             }
-            Values[item] = new SetItem(item, 0);
+            this.Values[item] = CreateSetItem(item, 0);
             return item;
         }
         public T Find(T item) {
@@ -112,6 +112,10 @@ namespace Data_Structures_and_Algorithms {
             return Values.ContainsKey(item);
         }
 
+        protected virtual SetItem CreateSetItem(T item, int rank) {
+            return new SetItem(item, rank);
+        }
+
         Dictionary<T, SetItem> Values { get { return values; } }
 
         internal bool HandleIsValueType {
@@ -129,7 +133,7 @@ namespace Data_Structures_and_Algorithms {
         }
 
         [DebuggerDisplay("SetItem (Parent = {Parent}, Rank = {Rank})")]
-        internal class SetItem {
+        protected internal class SetItem {
             T parent;
             int rank;
             public SetItem(T parent, int rank) {

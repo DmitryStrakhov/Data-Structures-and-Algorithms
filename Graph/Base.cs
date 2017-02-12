@@ -11,7 +11,6 @@ namespace Data_Structures_and_Algorithms {
         T value;
         Guid? ownerID;
         int? handle;
-        bool isSelfLooped;
         VertexTag tag;
 
         internal Vertex(T value) {
@@ -41,10 +40,7 @@ namespace Data_Structures_and_Algorithms {
         internal VertexTag Tag {
             get { return tag; }
         }
-        internal bool IsSelfLooped {
-            get { return isSelfLooped; }
-            set { isSelfLooped = value; }
-        }
+
         public T Value { get { return value; } }
     }
 
@@ -75,6 +71,13 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
+    [Flags]
+    public enum GraphProperties {
+        Unweighted = 1,
+        Weighted = 2,
+        NegativeWeighted = 4
+    }
+
     internal enum VertexColor {
         None, Gray
     }
@@ -100,22 +103,25 @@ namespace Data_Structures_and_Algorithms {
     abstract class GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
         public GraphDataBase(int capacity) {
         }
-        internal abstract void CreateEdge(TVertex vertex1, TVertex vertex2);
+        internal abstract void CreateEdge(TVertex vertex1, TVertex vertex2, double weight);
         internal abstract int GetSize();
         internal abstract void RegisterVertex(TVertex vertex);
         internal abstract bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2);
         internal abstract IList<TVertex> GetAdjacentVertextList(TVertex vertex);
         internal abstract IList<TVertex> GetVertexList();
         internal abstract TVertex GetVertex(int handle);
+        internal abstract double GetWeight(TVertex vertex1, TVertex vertex2);
     }
 
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
         readonly Guid id;
+        GraphProperties properties;
         readonly GraphDataBase<TValue, TVertex> _data;
 
         public Graph(int capacity) {
             Guard.IsPositive(capacity, nameof(capacity));
             this.id = Guid.NewGuid();
+            this.properties = GraphProperties.Unweighted;
             this._data = CreateDataCore(capacity);
         }
         public TVertex CreateVertex(TValue value) {
@@ -125,17 +131,28 @@ namespace Data_Structures_and_Algorithms {
             return vertex;
         }
         public void CreateEdge(TVertex vertex1, TVertex vertex2) {
+            CreateEdge(vertex1, vertex2, 1d);
+        }
+        public void CreateEdge(TVertex vertex1, TVertex vertex2, double weight) {
             Guard.IsNotNull(vertex1, nameof(vertex1));
             Guard.IsNotNull(vertex2, nameof(vertex2));
             CheckVertexOwner(vertex1);
             CheckVertexOwner(vertex2);
-            CreateEdgeCore(vertex1, vertex2);
+            CreateEdgeCore(vertex1, vertex2, weight);
+            UpdateProperties(weight: weight);
         }
-        protected virtual void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
-            Data.CreateEdge(vertex1, vertex2);
-            if(ReferenceEquals(vertex1, vertex2)) {
-                vertex1.IsSelfLooped = true;
-            }
+        public double GetWeight(TVertex vertex1, TVertex vertex2) {
+            Guard.IsNotNull(vertex1, nameof(vertex1));
+            Guard.IsNotNull(vertex2, nameof(vertex2));
+            CheckVertexOwner(vertex1);
+            CheckVertexOwner(vertex2);
+            if(!AreVerticesAdjacent(vertex1, vertex2))
+                throw new InvalidOperationException();
+            return Data.GetWeight(vertex1, vertex2);
+        }
+
+        protected virtual void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
+            Data.CreateEdge(vertex1, vertex2, weight);
         }
 
         public int Size {
@@ -201,6 +218,7 @@ namespace Data_Structures_and_Algorithms {
             CheckVertexOwner(vertex);
             DoSearch(vertex, action, BFSearchCore);
         }
+        public GraphProperties Properties { get { return properties; } }
 
         void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, bool> searchProc) {
             if(Size == 0) return;
@@ -253,6 +271,16 @@ namespace Data_Structures_and_Algorithms {
             return Data.GetVertex(handle);
         }
 
+        void UpdateProperties(double? weight = null) {
+            if(weight.HasValue) {
+                if(!MathUtils.AreDoubleEquals(1d, weight.Value)) {
+                    properties &= (~GraphProperties.Unweighted);
+                    properties |= GraphProperties.Weighted;
+                    if(weight.Value < 0)
+                        properties |= GraphProperties.NegativeWeighted;
+                }
+            }
+        }
         void CheckVertexOwner(TVertex vertex) {
             if(!vertex.OwnerID.Equals(this.id)) {
                 throw new InvalidOperationException();
@@ -273,8 +301,8 @@ namespace Data_Structures_and_Algorithms {
         public UndirectedGraph(int capacity)
             : base(capacity) {
         }
-        protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
-            base.CreateEdgeCore(vertex1, vertex2);
+        protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
+            base.CreateEdgeCore(vertex1, vertex2, weight);
             vertex1.Degree++;
             vertex2.Degree++;
         }
@@ -305,8 +333,8 @@ namespace Data_Structures_and_Algorithms {
             if(Size != vertexCount)
                 throw new InvalidOperationException();
         }
-        protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2) {
-            base.CreateEdgeCore(vertex1, vertex2);
+        protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
+            base.CreateEdgeCore(vertex1, vertex2, weight);
             vertex1.OutDegree++;
             vertex2.InDegree++;
         }

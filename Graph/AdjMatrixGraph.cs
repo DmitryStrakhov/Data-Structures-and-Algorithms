@@ -26,13 +26,13 @@ namespace Data_Structures_and_Algorithms {
         int size;
         int capacity;
         TVertex[] vertexList;
-        readonly BitMatrix matrix;
+        readonly SquareMatrix<double?> matrix;
 
         public AdjMatrixGraphDataBase(int capacity) : base(capacity) {
             this.size = 0;
             this.capacity = capacity;
             this.vertexList = new TVertex[capacity];
-            this.matrix = new BitMatrix(capacity);
+            this.matrix = new SquareMatrix<double?>(capacity);
         }
 
         public int Size { get { return size; } }
@@ -52,12 +52,12 @@ namespace Data_Structures_and_Algorithms {
         internal override IList<TVertex> GetAdjacentVertextList(TVertex vertex) {
             List<TVertex> list = new List<TVertex>();
             for(int n = 0; n < Size; n++) {
-                if(Matrix[vertex.Handle, n]) list.Add(VertexList[n]);
+                if(Matrix[vertex.Handle, n].HasValue) list.Add(VertexList[n]);
             }
             return list;
         }
         internal override bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
-            return Matrix[vertex1.Handle, vertex2.Handle];
+            return Matrix[vertex1.Handle, vertex2.Handle].HasValue;
         }
         internal override int GetSize() {
             return Size;
@@ -65,6 +65,9 @@ namespace Data_Structures_and_Algorithms {
         internal override TVertex GetVertex(int handle) {
             Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
             return VertexList[handle];
+        }
+        internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
+            return Matrix[vertex1.Handle, vertex2.Handle].Value;
         }
 
         void EnsureVertexListSize(int newSize) {
@@ -84,13 +87,13 @@ namespace Data_Structures_and_Algorithms {
             int[,] result = new int[sz, sz];
             for(int i = 0; i < sz; i++) {
                 for(int j = 0; j < sz; j++) {
-                    result[i, j] = Matrix[i, j] ? 1 : 0;
+                    result[i, j] = Matrix[i, j].HasValue ? 1 : 0;
                 }
             }
             return result;
         }
 
-        public BitMatrix Matrix { get { return matrix; } }
+        public SquareMatrix<double?> Matrix { get { return matrix; } }
         public TVertex[] VertexList { get { return vertexList; } }
     }
 
@@ -98,9 +101,9 @@ namespace Data_Structures_and_Algorithms {
         public UndirectedAdjMatrixGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2) {
-            Matrix[vertex1.Handle, vertex2.Handle] = true;
-            Matrix[vertex2.Handle, vertex1.Handle] = true;
+        internal override void CreateEdge(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2, double weight) {
+            Matrix[vertex1.Handle, vertex2.Handle] = weight;
+            Matrix[vertex2.Handle, vertex1.Handle] = weight;
         }
     }
 
@@ -108,8 +111,8 @@ namespace Data_Structures_and_Algorithms {
         public DirectedAdjMatrixGraphData(int capacity)
             : base(capacity) {
         }
-        internal override void CreateEdge(DirectedAdjMatrixGraphVertex<T> vertex1, DirectedAdjMatrixGraphVertex<T> vertex2) {
-            Matrix[vertex1.Handle, vertex2.Handle] = true;
+        internal override void CreateEdge(DirectedAdjMatrixGraphVertex<T> vertex1, DirectedAdjMatrixGraphVertex<T> vertex2, double weight) {
+            Matrix[vertex1.Handle, vertex2.Handle] = weight;
         }
     }
 
