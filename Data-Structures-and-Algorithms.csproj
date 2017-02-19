@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -46,6 +47,7 @@
     <Compile Include="Graph\AdjMatrixGraph.cs" />
     <Compile Include="Graph\AdjSetGraph.cs" />
     <Compile Include="Graph\Base.cs" />
+    <Compile Include="Graph\Distance.cs" />
     <Compile Include="Matrix\SquareMatrix.cs" />
     <Compile Include="List\LinkedList.cs" />
     <Compile Include="Misc.cs" />

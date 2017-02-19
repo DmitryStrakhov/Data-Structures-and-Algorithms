@@ -220,6 +220,12 @@ namespace Data_Structures_and_Algorithms {
         }
         public GraphProperties Properties { get { return properties; } }
 
+        public DistanceObject<TValue, TVertex> GetShortestPath(TVertex baseVertex) {
+            Guard.IsNotNull(baseVertex, nameof(baseVertex));
+            CheckVertexOwner(baseVertex);
+            return PathAlgorithmFactory<TValue, TVertex>.Create(this).GetPath(baseVertex);
+        }
+
         void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, bool> searchProc) {
             if(Size == 0) return;
             int handle = vertex != null ? vertex.Handle : 0;
@@ -257,9 +263,10 @@ namespace Data_Structures_and_Algorithms {
                     return false;
                 var adjacentList = GetAdjacentVertextList(graphVertex);
                 for(int i = 0; i < adjacentList.Count; i++) {
-                    if(adjacentList[i].Tag.Color == VertexColor.None) {
-                        adjacentList[i].Tag.Color = VertexColor.Gray;
-                        queue.EnQueue(adjacentList[i]);
+                    TVertex adjacentVertex = adjacentList[i];
+                    if(adjacentVertex.Tag.Color == VertexColor.None) {
+                        adjacentVertex.Tag.Color = VertexColor.Gray;
+                        queue.EnQueue(adjacentVertex);
                     }
                 }
             }
@@ -281,8 +288,10 @@ namespace Data_Structures_and_Algorithms {
                 }
             }
         }
+        internal Guid ID { get { return id; } }
+
         void CheckVertexOwner(TVertex vertex) {
-            if(!vertex.OwnerID.Equals(this.id)) {
+            if(!vertex.OwnerID.Equals(ID)) {
                 throw new InvalidOperationException();
             }
         }

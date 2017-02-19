@@ -365,6 +365,164 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.CreateEdge(vC, vA, -3);
             Assert.AreEqual(GraphProperties.Weighted | GraphProperties.NegativeWeighted, graph.Properties);
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DistanceObjectGetPathToGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            distanceObj.GetPathTo(null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DistanceObjectGetPathToGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            distanceObj.GetPathTo(CreateVertex('A'));
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DistanceObjectGetPathToIfThereIsNoAnyTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vD);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var result = distanceObj.GetPathTo(vC);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetShortestPathGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var result = graph.GetShortestPath(null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetShortestPathGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var result = graph.GetShortestPath(CreateVertex('A'));
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DistanceObjectGetRowGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var result = distanceObj[null];
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DistanceObjectGetRowGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var result = distanceObj[CreateVertex('A')];
+        }
+        [TestMethod]
+        public void DistanceObjectGetRowSimpleTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var rowA = new DistanceObject<char, TVertex>.Row(vA, null, 0);
+            Assert.AreEqual(rowA, distanceObj[vA]);
+            Assert.IsNull(distanceObj[vB]);
+            Assert.IsNull(distanceObj[vC]);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DistanceObjectSetRowGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            distanceObj[null] = new DistanceObject<char, TVertex>.Row(vA, null, 0);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DistanceObjectSetRowGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            distanceObj[CreateVertex('A')] = new DistanceObject<char, TVertex>.Row(vA, null, 0);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DistanceObjectSetRowGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            distanceObj[vA] = new DistanceObject<char, TVertex>.Row(vB, null, 0);
+        }
+        [TestMethod]
+        public void DistanceObjectSetRowTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var row1 = new DistanceObject<char, TVertex>.Row(vA, null, 0);
+            var row2 = new DistanceObject<char, TVertex>.Row(vB, vA, 1);
+            var row3 = new DistanceObject<char, TVertex>.Row(vC, vA, 1);
+            distanceObj[vA] = row1;
+            distanceObj[vB] = row2;
+            distanceObj[vC] = row3;
+            Assert.AreSame(row1, distanceObj[vA]);
+            Assert.AreSame(row2, distanceObj[vB]);
+            Assert.AreSame(row3, distanceObj[vC]);
+        }
+
 
         protected abstract TGraph CreateGraph();
         protected abstract TVertex CreateVertex(char value);
@@ -502,6 +660,100 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(1, vC.Degree);
             Assert.AreEqual(1, vD.Degree);
         }
+        [TestMethod]
+        public void DistanceObjectGetPathToTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var result = distanceObj.GetPathTo(vA);
+            CollectionAssert.AreEqual(new TVertex[] { vA }, result);
+            result = distanceObj.GetPathTo(vB);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB }, result);
+            result = distanceObj.GetPathTo(vC);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vC }, result);
+            result = distanceObj.GetPathTo(vD);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vD }, result);
+        }
+        [TestMethod]
+        public void GetShortestPathTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+			graph.CreateEdge(vC, vF);            
+			graph.CreateEdge(vC, vA);
+			graph.CreateEdge(vA, vB);            
+			graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vD, vG);
+            graph.CreateEdge(vE, vG);
+            var result = graph.GetShortestPath(vC);
+            var expectedResult = new DistanceObject<char, TVertex>.Row[] {
+                new DistanceObject<char, TVertex>.Row(vA, vC, 1),
+                new DistanceObject<char, TVertex>.Row(vB, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vC, null, 0),
+                new DistanceObject<char, TVertex>.Row(vD, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vE, vB, 3),
+                new DistanceObject<char, TVertex>.Row(vF, vC, 1),
+                new DistanceObject<char, TVertex>.Row(vG, vD, 3),
+            };
+            CollectionAssert.AreEqual(expectedResult, result.Rows);
+        }
+        [TestMethod]
+        public void GetShortestPathTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vC, vA);
+			graph.CreateEdge(vC, vF);            
+			graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vE);
+            var result = graph.GetShortestPath(vC);
+            var expectedResult = new DistanceObject<char, TVertex>.Row[] {
+                new DistanceObject<char, TVertex>.Row(vA, vC, 1),
+                new DistanceObject<char, TVertex>.Row(vB, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vC, null, 0),
+                new DistanceObject<char, TVertex>.Row(vD, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vE, vB, 3),
+                new DistanceObject<char, TVertex>.Row(vF, vC, 1),
+                null
+            };
+            CollectionAssert.AreEqual(expectedResult, result.Rows);
+        }
+        [TestMethod]
+        public void DistanceObjectGetRowTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            Assert.AreEqual(new DistanceObject<char, TVertex>.Row(vA, null, 0), distanceObj[vA]);
+            Assert.AreEqual(new DistanceObject<char, TVertex>.Row(vB, vA, 1), distanceObj[vB]);
+            Assert.AreEqual(new DistanceObject<char, TVertex>.Row(vC, vA, 1), distanceObj[vC]);
+        }
+
     }
 
     public abstract class DirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : DirectedVertex<char> where TGraph : DirectedGraph<char, TVertex> {
@@ -712,6 +964,105 @@ namespace Data_Structures_and_Algorithms.Tests {
             var valueList = new List<char>();
             graph.TopologicalSort(x => valueList.Add(x.Value));
             CollectionAssert.AreEqual(new char[] { '7', '5', '3', '1', '8', '2', '4', '9'  }, valueList);
+        }
+        [TestMethod]
+        public void DistanceObjectGetPathToTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            var result = distanceObj.GetPathTo(vA);
+            CollectionAssert.AreEqual(new TVertex[] { vA }, result);
+            result = distanceObj.GetPathTo(vB);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB }, result);
+            result = distanceObj.GetPathTo(vC);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vC }, result);
+            result = distanceObj.GetPathTo(vD);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vC, vD }, result);
+        }
+        [TestMethod]
+        public void GetShortestPathTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vE, vG);
+            graph.CreateEdge(vD, vG);
+            graph.CreateEdge(vG, vF);
+            graph.CreateEdge(vD, vF);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vF);
+            var result = graph.GetShortestPath(vC);
+            var expectedResult = new DistanceObject<char, TVertex>.Row[] {
+                new DistanceObject<char, TVertex>.Row(vA, vC, 1),
+                new DistanceObject<char, TVertex>.Row(vB, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vC, null, 0),
+                new DistanceObject<char, TVertex>.Row(vD, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vE, vB, 3),
+                new DistanceObject<char, TVertex>.Row(vF, vC, 1),
+                new DistanceObject<char, TVertex>.Row(vG, vD, 3),
+            };
+            CollectionAssert.AreEqual(expectedResult, result.Rows);
+        }
+        [TestMethod]
+        public void GetShortestPathTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vG, vF);
+            graph.CreateEdge(vD, vF);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vF);
+            var result = graph.GetShortestPath(vC);
+            var expectedResult = new DistanceObject<char, TVertex>.Row[] {
+                new DistanceObject<char, TVertex>.Row(vA, vC, 1),
+                new DistanceObject<char, TVertex>.Row(vB, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vC, null, 0),
+                new DistanceObject<char, TVertex>.Row(vD, vA, 2),
+                new DistanceObject<char, TVertex>.Row(vE, vB, 3),
+                new DistanceObject<char, TVertex>.Row(vF, vC, 1),
+                null
+            };
+            CollectionAssert.AreEqual(expectedResult, result.Rows);
+        }
+        [TestMethod]
+        public void DistanceObjectGetRowTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            var distanceObj = graph.GetShortestPath(vA);
+            Assert.IsNotNull(distanceObj);
+            Assert.AreEqual(new DistanceObject<char, TVertex>.Row(vA, null, 0), distanceObj[vA]);
+            Assert.AreEqual(new DistanceObject<char, TVertex>.Row(vB, vA, 1), distanceObj[vB]);
+            Assert.AreEqual(new DistanceObject<char, TVertex>.Row(vC, vB, 2), distanceObj[vC]);
         }
     }
 
