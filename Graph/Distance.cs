@@ -188,7 +188,7 @@ namespace Data_Structures_and_Algorithms {
             }
             return result;
         }
-        #region PathWeightPriorityQueue
+        #region VertexPriorityQueue
         class VertexPriorityQueue : AscendingPriorityQueue<double, TVertex> {
         }
         #endregion
