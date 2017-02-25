@@ -99,7 +99,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(0, priorityQueue.Size);
         }
         [TestMethod]
-        public virtual void AscendingPriorityQueueClearTest() {
+        public void AscendingPriorityQueueClearTest() {
             AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
             Assert.AreEqual(0, priorityQueue.Size);
             priorityQueue.Clear();
@@ -109,6 +109,16 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(2, priorityQueue.Size);
             priorityQueue.Clear();
             Assert.AreEqual(0, priorityQueue.Size);
+        }
+        [TestMethod]
+        public void AscendingPriorityQueueIsEmptyTest() {
+            AscendingPriorityQueue<int, int> priorityQueue = new AscendingPriorityQueue<int, int>();
+            Assert.IsTrue(priorityQueue.IsEmpty);
+            priorityQueue.Insert(1, 1);
+            priorityQueue.Insert(2, 2);
+            Assert.IsFalse(priorityQueue.IsEmpty);
+            priorityQueue.Clear();
+            Assert.IsTrue(priorityQueue.IsEmpty);
         }
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void DescendingPriorityQueueInsertGuardTest() {
@@ -209,6 +219,16 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(2, priorityQueue.Size);
             priorityQueue.Clear();
             Assert.AreEqual(0, priorityQueue.Size);
+        }
+        [TestMethod]
+        public void DescendingPriorityQueueIsEmptyTest() {
+            DescendingPriorityQueue<int, int> priorityQueue = new DescendingPriorityQueue<int, int>();
+            Assert.IsTrue(priorityQueue.IsEmpty);
+            priorityQueue.Insert(1, 1);
+            priorityQueue.Insert(2, 2);
+            Assert.IsFalse(priorityQueue.IsEmpty);
+            priorityQueue.Clear();
+            Assert.IsTrue(priorityQueue.IsEmpty);
         }
     }
 }

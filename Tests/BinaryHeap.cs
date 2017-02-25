@@ -402,6 +402,26 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { 170, 130, 60, 50, 40, 20, 10 }, valueList);
         }
+        [TestMethod]
+        public void MinBinaryHeapIsEmptyTest() {
+            MinBinaryHeap<int, int> heap = new MinBinaryHeap<int, int>();
+            Assert.IsTrue(heap.IsEmpty);
+            heap.Insert(1, 1);
+            heap.Insert(2, 2);
+            Assert.IsFalse(heap.IsEmpty);
+            heap.Clear();
+            Assert.IsTrue(heap.IsEmpty);
+        }
+        [TestMethod]
+        public void MaxBinaryHeapIsEmptyTest() {
+            MaxBinaryHeap<int, int> heap = new MaxBinaryHeap<int, int>();
+            Assert.IsTrue(heap.IsEmpty);
+            heap.Insert(1, 1);
+            heap.Insert(2, 2);
+            Assert.IsFalse(heap.IsEmpty);
+            heap.Clear();
+            Assert.IsTrue(heap.IsEmpty);
+        }
 
 
         static MinBinaryHeap<int, int> CreateMinBinaryHeap() {

@@ -17,7 +17,7 @@ namespace Data_Structures_and_Algorithms {
             this.value = value;
             this.ownerID = null;
             this.handle = null;
-            this.tag = new VertexTag(0, VertexColor.None);
+            this.tag = new VertexTag(0, VertexColor.Empty);
         }
         internal Guid OwnerID {
             get { return ownerID.Value; }
@@ -78,8 +78,42 @@ namespace Data_Structures_and_Algorithms {
         NegativeWeighted = 4
     }
 
-    internal enum VertexColor {
-        None, Gray
+    internal class VertexColor {
+        Guid guid;
+
+        VertexColor() {
+            this.guid = Guid.NewGuid();
+        }
+
+        public static VertexColor NewColor() {
+            return new VertexColor();
+        }
+        public static readonly VertexColor Empty = new VertexColor();
+
+        #region Operators
+        public static bool operator ==(VertexColor x, VertexColor y) {
+            return AreEquals(x, y);
+        }
+        public static bool operator !=(VertexColor x, VertexColor y) {
+            return !AreEquals(x, y);
+        }
+        #endregion
+        
+        #region Equals & GetHashCode
+        public override bool Equals(object obj) {
+            VertexColor other = obj as VertexColor;
+            return other != null && AreEquals(this, other);
+        }
+        static bool AreEquals(VertexColor x, VertexColor y) {
+            if(ReferenceEquals(x, null) || ReferenceEquals(y, null)) {
+                return ReferenceEquals(x, null) && ReferenceEquals(y, null);
+            }
+            return x.guid.Equals(y.guid);
+        }
+        public override int GetHashCode() {
+            return guid.GetHashCode();
+        }
+        #endregion
     }
 
     internal class VertexTag {
@@ -226,37 +260,35 @@ namespace Data_Structures_and_Algorithms {
             return PathAlgorithmFactory<TValue, TVertex>.Create(this).GetPath(baseVertex);
         }
 
-        void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, bool> searchProc) {
+        void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, VertexColor, bool> searchProc) {
             if(Size == 0) return;
             int handle = vertex != null ? vertex.Handle : 0;
+            VertexColor colorID = VertexColor.NewColor();
             for(int i = 0; i < Size; i++) {
                 var graphVertex = GetVertex((handle + i) % Size);
-                if(graphVertex.Tag.Color == VertexColor.None) {
-                    if(!searchProc(graphVertex, action)) break;
+                if(graphVertex.Tag.Color != colorID) {
+                    if(!searchProc(graphVertex, action, colorID)) break;
                 }
-            }
-            for(int i = 0; i < Size; i++) {
-                GetVertex(i).Tag.Color = VertexColor.None;
             }
         }
 
-        bool DFSearchCore(TVertex vertex, Func<TVertex, bool> action) {
+        bool DFSearchCore(TVertex vertex, Func<TVertex, bool> action, VertexColor colorID) {
             bool @continue = action(vertex);
             if(!@continue)
                 return false;
-            vertex.Tag.Color = VertexColor.Gray;
+            vertex.Tag.Color = colorID;
             var adjacentList = GetAdjacentVertextList(vertex);
             for(int i = 0; i < adjacentList.Count; i++) {
-                if(adjacentList[i].Tag.Color == VertexColor.None) {
-                    if(!DFSearchCore(adjacentList[i], action)) return false;
+                if(adjacentList[i].Tag.Color != colorID) {
+                    if(!DFSearchCore(adjacentList[i], action, colorID)) return false;
                 }
             }
             return true;
         }
-        bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action) {
+        bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action, VertexColor colorID) {
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(vertex);
-            vertex.Tag.Color = VertexColor.Gray;
+            vertex.Tag.Color = colorID;
             while(!queue.IsEmpty) {
                 var graphVertex = queue.DeQueue();
                 if(!action(graphVertex))
@@ -264,8 +296,8 @@ namespace Data_Structures_and_Algorithms {
                 var adjacentList = GetAdjacentVertextList(graphVertex);
                 for(int i = 0; i < adjacentList.Count; i++) {
                     TVertex adjacentVertex = adjacentList[i];
-                    if(adjacentVertex.Tag.Color == VertexColor.None) {
-                        adjacentVertex.Tag.Color = VertexColor.Gray;
+                    if(adjacentVertex.Tag.Color != colorID) {
+                        adjacentVertex.Tag.Color = colorID;
                         queue.EnQueue(adjacentVertex);
                     }
                 }

@@ -31,6 +31,9 @@ namespace Data_Structures_and_Algorithms {
         public int Size {
             get { return size; }
         }
+        public bool IsEmpty {
+            get { return Size == 0; }
+        }
         public void Clear() {
             this.size = 0;
         }

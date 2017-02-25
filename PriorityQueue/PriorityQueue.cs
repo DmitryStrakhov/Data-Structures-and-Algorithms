@@ -20,6 +20,9 @@ namespace Data_Structures_and_Algorithms {
         public int Size {
             get { return Heap.Size; }
         }
+        public bool IsEmpty {
+            get { return Heap.IsEmpty; }
+        }
         public void Clear() {
             Heap.Clear();
         }

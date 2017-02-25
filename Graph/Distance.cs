@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 namespace Data_Structures_and_Algorithms {
     [DebuggerDisplay("DistanceObject (Vertex = {Vertex.Value}, Size = {Size})")]
     public class DistanceObject<TValue, TVertex> where TVertex : Vertex<TValue> {
-        int size;
+        readonly int size;
         readonly Row[] rows;
         readonly TVertex vertex;
         readonly Guid id;
 
-        internal DistanceObject(Guid id, int size, TVertex vertex) {
-            this.id = id;
-            this.size = size;
+        internal DistanceObject(Graph<TValue, TVertex> graph, TVertex vertex) {
+            this.id = graph.ID;
+            this.size = graph.Size;
             this.vertex = vertex;
             this.rows = new Row[size];
         }
@@ -27,10 +27,9 @@ namespace Data_Structures_and_Algorithms {
             stack.Push(targetVertex);
             TVertex current = targetVertex;
             while(!ReferenceEquals(Vertex, current)) {
-                var row = this[current];
-                if(row == null)
+                if(IsRowEmpty(current))
                     throw new InvalidOperationException();
-                current = row.Predecessor;
+                current = this[current].Predecessor;
                 stack.Push(current);
             }
             List<TVertex> list = new List<TVertex>(stack.Size);
@@ -55,6 +54,12 @@ namespace Data_Structures_and_Algorithms {
                 Rows[vertex.Handle] = value;
             }
         }
+        public bool IsRowEmpty(TVertex vertex) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            CheckVertexOwner(vertex);
+            return Rows[vertex.Handle] == null;
+        }
+
         void CheckVertexOwner(TVertex vertex) {
             if(!vertex.OwnerID.Equals(this.id)) {
                 throw new InvalidOperationException();
@@ -122,6 +127,14 @@ namespace Data_Structures_and_Algorithms {
             if(graph.Properties == GraphProperties.Unweighted) {
                 return new BFPathSearch<TValue, TVertex>(graph);
             }
+            if(graph.Properties.HasFlag(GraphProperties.Weighted)) {
+                if(graph.Properties.HasFlag(GraphProperties.NegativeWeighted)) {
+                    throw new NotImplementedException();
+                }
+                else {
+                    return new DijkstraPathSearch<TValue, TVertex>(graph);
+                }
+            }
             throw new ArgumentException(nameof(graph));
         }
     }
@@ -131,16 +144,15 @@ namespace Data_Structures_and_Algorithms {
             : base(graph) {
         }
         public override DistanceObject<TValue, TVertex> GetPath(TVertex baseVertex) {
-            DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph.ID, Graph.Size, baseVertex);
+            DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(baseVertex);
             result[baseVertex] = new DistanceObject<TValue, TVertex>.Row(baseVertex, null, 0);
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeQueue();
                 var adjacentList = Graph.GetAdjacentVertextList(vertex);
-                for(int i = 0; i < adjacentList.Count; i++) {
-                    TVertex adjacentVertex = adjacentList[i];
-                    if(result[adjacentVertex] == null) {
+                foreach(TVertex adjacentVertex in adjacentList) {
+                    if(result.IsRowEmpty(adjacentVertex)) {
                         result[adjacentVertex] = new DistanceObject<TValue, TVertex>.Row(adjacentVertex, vertex, result[vertex].Distance + 1);
                         queue.EnQueue(adjacentVertex);
                     }
@@ -148,5 +160,37 @@ namespace Data_Structures_and_Algorithms {
             }
             return result;
         }
+    }
+
+    class DijkstraPathSearch<TValue, TVertex> : PathSearchBase<TValue, TVertex> where TVertex : Vertex<TValue> {
+        public DijkstraPathSearch(Graph<TValue, TVertex> graph)
+            : base(graph) {
+        }
+        public override DistanceObject<TValue, TVertex> GetPath(TVertex baseVertex) {
+            DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
+            VertexPriorityQueue queue = new VertexPriorityQueue();
+            queue.Insert(0, baseVertex);
+            result[baseVertex] = new DistanceObject<TValue, TVertex>.Row(baseVertex, null, 0);
+            VertexColor colorId = VertexColor.NewColor();
+            while(!queue.IsEmpty) {
+                TVertex vertex = queue.DeleteMinimumValue();
+                if(vertex.Tag.Color != colorId) {
+                    vertex.Tag.Color = colorId;
+                    var adjacentList = Graph.GetAdjacentVertextList(vertex);
+                    foreach(TVertex adjacentVertex in adjacentList) {
+                        double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjacentVertex);
+                        if(result.IsRowEmpty(adjacentVertex) || weight < result[adjacentVertex].Distance) {
+                            result[adjacentVertex] = new DistanceObject<TValue, TVertex>.Row(adjacentVertex, vertex, weight);
+                            queue.Insert(weight, adjacentVertex);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+        #region PathWeightPriorityQueue
+        class VertexPriorityQueue : AscendingPriorityQueue<double, TVertex> {
+        }
+        #endregion
     }
 }
