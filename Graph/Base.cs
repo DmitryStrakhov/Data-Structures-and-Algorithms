@@ -254,7 +254,7 @@ namespace Data_Structures_and_Algorithms {
         }
         public GraphProperties Properties { get { return properties; } }
 
-        public DistanceObject<TValue, TVertex> GetShortestPath(TVertex baseVertex) {
+        public DistanceObject<TValue, TVertex> GetShortestPathFrom(TVertex baseVertex) {
             Guard.IsNotNull(baseVertex, nameof(baseVertex));
             CheckVertexOwner(baseVertex);
             return PathAlgorithmFactory<TValue, TVertex>.Create(this).GetPath(baseVertex);

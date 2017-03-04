@@ -129,7 +129,7 @@ namespace Data_Structures_and_Algorithms {
             }
             if(graph.Properties.HasFlag(GraphProperties.Weighted)) {
                 if(graph.Properties.HasFlag(GraphProperties.NegativeWeighted)) {
-                    throw new NotImplementedException();
+                    return new BellmanFordPathSearch<TValue, TVertex>(graph);
                 }
                 else {
                     return new DijkstraPathSearch<TValue, TVertex>(graph);
@@ -192,5 +192,34 @@ namespace Data_Structures_and_Algorithms {
         class VertexPriorityQueue : AscendingPriorityQueue<double, TVertex> {
         }
         #endregion
+    }
+
+    class BellmanFordPathSearch<TValue, TVertex> : PathSearchBase<TValue, TVertex> where TVertex : Vertex<TValue> {
+        public BellmanFordPathSearch(Graph<TValue, TVertex> graph)
+            : base(graph) {
+        }
+        public override DistanceObject<TValue, TVertex> GetPath(TVertex baseVertex) {
+            DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
+            Queue<TVertex> queue = new Queue<TVertex>();
+            queue.EnQueue(baseVertex);
+            result[baseVertex] = new DistanceObject<TValue, TVertex>.Row(baseVertex, null, 0);
+            VertexColor colorId = VertexColor.NewColor();
+            while(!queue.IsEmpty) {
+                TVertex vertex = queue.DeQueue();
+                vertex.Tag.Color = VertexColor.Empty;
+                var adjacentList = Graph.GetAdjacentVertextList(vertex);
+                foreach(TVertex adjacentVertex in adjacentList) {
+                    double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjacentVertex);
+                    if(result.IsRowEmpty(adjacentVertex) || weight < result[adjacentVertex].Distance) {
+                        result[adjacentVertex] = new DistanceObject<TValue, TVertex>.Row(adjacentVertex, vertex, weight);
+                        if(adjacentVertex.Tag.Color != colorId) {
+                            queue.EnQueue(adjacentVertex);
+                            adjacentVertex.Tag.Color = colorId;
+                        }
+                    }
+                }
+            }
+            return result;
+        }
     }
 }
