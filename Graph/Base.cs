@@ -78,17 +78,13 @@ namespace Data_Structures_and_Algorithms {
         NegativeWeighted = 4
     }
 
-    internal class VertexColor {
+    internal struct VertexColor {
         Guid guid;
 
-        VertexColor() {
-            this.guid = Guid.NewGuid();
-        }
-
         public static VertexColor NewColor() {
-            return new VertexColor();
+            return new VertexColor() { guid = Guid.NewGuid() };
         }
-        public static readonly VertexColor Empty = new VertexColor();
+        public static readonly VertexColor Empty = NewColor();
 
         #region Operators
         public static bool operator ==(VertexColor x, VertexColor y) {
@@ -101,19 +97,19 @@ namespace Data_Structures_and_Algorithms {
         
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
-            VertexColor other = obj as VertexColor;
+            VertexColor other = (VertexColor)obj;
             return other != null && AreEquals(this, other);
         }
+        public override int GetHashCode() {
+            return guid.GetHashCode();
+        }
+        #endregion
         static bool AreEquals(VertexColor x, VertexColor y) {
             if(ReferenceEquals(x, null) || ReferenceEquals(y, null)) {
                 return ReferenceEquals(x, null) && ReferenceEquals(y, null);
             }
             return x.guid.Equals(y.guid);
         }
-        public override int GetHashCode() {
-            return guid.GetHashCode();
-        }
-        #endregion
     }
 
     internal class VertexTag {

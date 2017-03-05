@@ -19,6 +19,7 @@ namespace Data_Structures_and_Algorithms {
             this.size = graph.Size;
             this.vertex = vertex;
             this.rows = new Row[size];
+            this[Vertex] = new Row(Vertex, null, 0);
         }
         public ReadOnlyCollection<TVertex> GetPathTo(TVertex targetVertex) {
             Guard.IsNotNull(targetVertex, nameof(targetVertex));
@@ -147,14 +148,12 @@ namespace Data_Structures_and_Algorithms {
             DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(baseVertex);
-            result[baseVertex] = new DistanceObject<TValue, TVertex>.Row(baseVertex, null, 0);
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeQueue();
-                var adjacentList = Graph.GetAdjacentVertextList(vertex);
-                foreach(TVertex adjacentVertex in adjacentList) {
-                    if(result.IsRowEmpty(adjacentVertex)) {
-                        result[adjacentVertex] = new DistanceObject<TValue, TVertex>.Row(adjacentVertex, vertex, result[vertex].Distance + 1);
-                        queue.EnQueue(adjacentVertex);
+                foreach(TVertex adjVertex in Graph.GetAdjacentVertextList(vertex)) {
+                    if(result.IsRowEmpty(adjVertex)) {
+                        result[adjVertex] = new DistanceObject<TValue, TVertex>.Row(adjVertex, vertex, result[vertex].Distance + 1);
+                        queue.EnQueue(adjVertex);
                     }
                 }
             }
@@ -170,19 +169,16 @@ namespace Data_Structures_and_Algorithms {
             DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
             VertexPriorityQueue queue = new VertexPriorityQueue();
             queue.Insert(0, baseVertex);
-            result[baseVertex] = new DistanceObject<TValue, TVertex>.Row(baseVertex, null, 0);
             VertexColor colorId = VertexColor.NewColor();
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeleteMinimumValue();
-                if(vertex.Tag.Color != colorId) {
-                    vertex.Tag.Color = colorId;
-                    var adjacentList = Graph.GetAdjacentVertextList(vertex);
-                    foreach(TVertex adjacentVertex in adjacentList) {
-                        double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjacentVertex);
-                        if(result.IsRowEmpty(adjacentVertex) || weight < result[adjacentVertex].Distance) {
-                            result[adjacentVertex] = new DistanceObject<TValue, TVertex>.Row(adjacentVertex, vertex, weight);
-                            queue.Insert(weight, adjacentVertex);
-                        }
+                if(vertex.Tag.Color == colorId) continue;
+                vertex.Tag.Color = colorId;
+                foreach(TVertex adjVertex in Graph.GetAdjacentVertextList(vertex)) {
+                    double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjVertex);
+                    if(result.IsRowEmpty(adjVertex) || weight < result[adjVertex].Distance) {
+                        result[adjVertex] = new DistanceObject<TValue, TVertex>.Row(adjVertex, vertex, weight);
+                        queue.Insert(weight, adjVertex);
                     }
                 }
             }
@@ -202,20 +198,16 @@ namespace Data_Structures_and_Algorithms {
             DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(baseVertex);
-            result[baseVertex] = new DistanceObject<TValue, TVertex>.Row(baseVertex, null, 0);
             VertexColor colorId = VertexColor.NewColor();
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeQueue();
                 vertex.Tag.Color = VertexColor.Empty;
-                var adjacentList = Graph.GetAdjacentVertextList(vertex);
-                foreach(TVertex adjacentVertex in adjacentList) {
-                    double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjacentVertex);
-                    if(result.IsRowEmpty(adjacentVertex) || weight < result[adjacentVertex].Distance) {
-                        result[adjacentVertex] = new DistanceObject<TValue, TVertex>.Row(adjacentVertex, vertex, weight);
-                        if(adjacentVertex.Tag.Color != colorId) {
-                            queue.EnQueue(adjacentVertex);
-                            adjacentVertex.Tag.Color = colorId;
-                        }
+                foreach(TVertex adjVertex in Graph.GetAdjacentVertextList(vertex)) {
+                    double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjVertex);
+                    if(result.IsRowEmpty(adjVertex) || weight < result[adjVertex].Distance) {
+                        result[adjVertex] = new DistanceObject<TValue, TVertex>.Row(adjVertex, vertex, weight);
+                        if(adjVertex.Tag.Color != colorId) queue.EnQueue(adjVertex);
+                        adjVertex.Tag.Color = colorId;
                     }
                 }
             }
