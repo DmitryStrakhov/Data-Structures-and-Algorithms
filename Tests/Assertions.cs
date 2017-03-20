@@ -41,9 +41,13 @@ namespace Data_Structures_and_Algorithms.Tests {
 
     public static class CollectionAssertEx {
         public static void AreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
+            if(expected == null || actual == null)
+                throw new AssertFailedException();
             CollectionAssert.AreEqual(expected.ToList(), actual.ToList());
         }
         public static void AreEquivalent<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
+            if(expected == null || actual == null)
+                throw new AssertFailedException();
             CollectionAssert.AreEquivalent(expected.ToList(), actual.ToList());
         }
         public static void IsCollectionAscOrdered<T>(IEnumerable<T> collection) {

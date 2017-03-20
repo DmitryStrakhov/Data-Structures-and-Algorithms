@@ -71,6 +71,70 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
+    [DebuggerDisplay("StartVertex: {StartVertex.Value}, EndVertex: {EndVertex.Value}, Weight: {Weight}")]
+    public class Edge<TValue, TVertex> where TVertex : Vertex<TValue> {
+        readonly TVertex startVertex;
+        readonly TVertex endVertex;
+        readonly double weight;
+
+        internal Edge(TVertex startVertex, TVertex endVertex, double weight) {
+            this.startVertex = startVertex;
+            this.endVertex = endVertex;
+            this.weight = weight;
+        }
+        #region Equals & GetHashCode
+        public override bool Equals(object obj) {
+            Edge<TValue, TVertex> other = obj as Edge<TValue, TVertex>;
+            return other != null && AreEquals(this, other);
+        }
+        public override int GetHashCode() {
+            return StartVertex.GetHashCode() ^ EndVertex.GetHashCode() ^ Weight.GetHashCode();
+        }
+        #endregion
+        static bool AreEquals(Edge<TValue, TVertex> x, Edge<TValue, TVertex> y) {
+            return ReferenceEquals(x.StartVertex, y.StartVertex) && ReferenceEquals(x.EndVertex, y.EndVertex) && MathUtils.AreDoubleEquals(x.Weight, y.Weight);
+        }
+
+        internal EdgeTriplet<TValue> CreateTriplet() {
+            return new EdgeTriplet<TValue>(StartVertex.Value, EndVertex.Value, Weight);
+        }
+
+        public TVertex StartVertex { get { return startVertex; } }
+        public TVertex EndVertex { get { return endVertex; } }
+        public double Weight { get { return weight; } }
+    }
+
+    [DebuggerDisplay("Value1: {Value1}, Value2: {Value2}, Weight: {Weight}")]
+    class EdgeTriplet<T> {
+        readonly T value1;
+        readonly T value2;
+        readonly double weight;
+
+        public EdgeTriplet(T value1, T value2, double weight) {
+            this.value1 = value1;
+            this.value2 = value2;
+            this.weight = weight;
+        }
+
+        #region Equals & GetHashCode
+        public override bool Equals(object obj) {
+            EdgeTriplet<T> other = obj as EdgeTriplet<T>;
+            return other != null && AreEquals(this, other);
+        }
+        public override int GetHashCode() {
+            return Value1.GetHashCode() ^ Value2.GetHashCode() ^ Weight.GetHashCode();
+        }
+        #endregion
+        static bool AreEquals(EdgeTriplet<T> x, EdgeTriplet<T> y) {
+            return EqualityComparer<T>.Default.Equals(x.Value1, y.Value1) && EqualityComparer<T>.Default.Equals(x.Value2, y.Value2) && MathUtils.AreDoubleEquals(x.Weight, y.Weight);
+        }
+
+        public T Value1 { get { return value1; } }
+        public T Value2 { get { return value2; } }
+        public double Weight { get { return weight; } }
+    }
+
+
     [Flags]
     public enum GraphProperties {
         Unweighted = 1,
@@ -137,10 +201,11 @@ namespace Data_Structures_and_Algorithms {
         internal abstract int GetSize();
         internal abstract void RegisterVertex(TVertex vertex);
         internal abstract bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2);
-        internal abstract IList<TVertex> GetAdjacentVertextList(TVertex vertex);
-        internal abstract IList<TVertex> GetVertexList();
+        internal abstract List<TVertex> GetAdjacentVertextList(TVertex vertex);
+        internal abstract List<TVertex> GetVertexList();
         internal abstract TVertex GetVertex(int handle);
         internal abstract double GetWeight(TVertex vertex1, TVertex vertex2);
+        internal abstract List<Edge<TValue, TVertex>> GetEdgeList();
     }
 
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
@@ -204,6 +269,10 @@ namespace Data_Structures_and_Algorithms {
             CheckVertexOwner(vertex);
             var list = Data.GetAdjacentVertextList(vertex);
             return new ReadOnlyCollection<TVertex>(list);
+        }
+        public ReadOnlyCollection<Edge<TValue, TVertex>> GetEdgeList() {
+            var list = Data.GetEdgeList();
+            return new ReadOnlyCollection<Edge<TValue, TVertex>>(list);
         }
         protected static readonly int DefaultCapacity = 4;
 
@@ -337,6 +406,21 @@ namespace Data_Structures_and_Algorithms {
     public abstract class UndirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : UndirectedVertex<TValue> {
         public UndirectedGraph(int capacity)
             : base(capacity) {
+        }
+        protected internal void DoBuildMSF(UndirectedGraph<TValue, TVertex> forest) {
+            DisjointSet<TVertex> set = new DisjointSet<TVertex>();
+            foreach(TVertex vertex in GetVertexList()) {
+                set.MakeSet(vertex);
+                forest.CreateVertex(vertex.Value);
+            }
+            var edgeList = Data.GetEdgeList();
+            edgeList.Sort((x, y) => x.Weight.CompareTo(y.Weight));
+            foreach(Edge<TValue, TVertex> edge in edgeList) {
+                if(!set.AreEquivalent(edge.StartVertex, edge.EndVertex)) {
+                    set.Union(edge.StartVertex, edge.EndVertex);
+                    forest.CreateEdge(forest.GetVertex(edge.StartVertex.Handle), forest.GetVertex(edge.EndVertex.Handle), edge.Weight);
+                }
+            }
         }
         protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
             base.CreateEdgeCore(vertex1, vertex2, weight);

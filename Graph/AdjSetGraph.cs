@@ -42,10 +42,10 @@ namespace Data_Structures_and_Algorithms {
             List[handle] = new VertexDisjointSet(vertex);
             vertex.Handle = handle;
         }
-        internal override IList<TVertex> GetVertexList() {
+        internal override List<TVertex> GetVertexList() {
             return List.Take(Size).Select(x => x.Vertex).ToList();
         }
-        internal override IList<TVertex> GetAdjacentVertextList(TVertex vertex) {
+        internal override List<TVertex> GetAdjacentVertextList(TVertex vertex) {
             return List[vertex.Handle].GetVertices(false).ToList();
         }
         internal override bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
@@ -62,6 +62,18 @@ namespace Data_Structures_and_Algorithms {
         internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
             return List[vertex1.Handle].GetItemWeight(vertex2);
         }
+        internal override List<Edge<TValue, TVertex>> GetEdgeList() {
+            List<Edge<TValue, TVertex>> list = new List<Edge<TValue, TVertex>>();
+            for(int n = 0; n < Size; n++) {
+                VertexDisjointSet set = List[n];
+                foreach(TVertex vertex in set.GetVertices(false)) {
+                    if(AllowEdge(set, vertex))
+                        list.Add(new Edge<TValue, TVertex>(set.Vertex, vertex, set.GetItemWeight(vertex)));
+                }
+            }
+            return list;
+        }
+        protected abstract bool AllowEdge(VertexDisjointSet set, TVertex vertex);
 
         void EnsureListSize(int newSize) {
             if(newSize > this.capacity) {
@@ -156,6 +168,9 @@ namespace Data_Structures_and_Algorithms {
                 List[vertex2.Handle].AddVertex(vertex1, weight);
             }
         }
+        protected override bool AllowEdge(VertexDisjointSet set, AdjSetGraphVertex<T> vertex) {
+            return vertex.Handle >= set.Vertex.Handle;
+        }
     }
 
     class DirectedAdjSetGraphData<T> : AdjSetGraphDataBase<T, DirectedAdjSetGraphVertex<T>> {
@@ -164,6 +179,9 @@ namespace Data_Structures_and_Algorithms {
         }
         internal override void CreateEdge(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2, double weight) {
             List[vertex1.Handle].AddVertex(vertex2, weight);
+        }
+        protected override bool AllowEdge(VertexDisjointSet set, DirectedAdjSetGraphVertex<T> vertex) {
+            return true;
         }
     }
 
@@ -174,6 +192,11 @@ namespace Data_Structures_and_Algorithms {
         }
         public AdjSetGraph(int capacity)
             : base(capacity) {
+        }
+        public AdjSetGraph<T> BuildMSF() {
+            AdjSetGraph<T> graph = new AdjSetGraph<T>();
+            DoBuildMSF(graph);
+            return graph;
         }
         internal override GraphDataBase<T, AdjSetGraphVertex<T>> CreateDataCore(int capacity) {
             return new UndirectedAdjSetGraphData<T>(capacity);

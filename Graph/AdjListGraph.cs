@@ -44,10 +44,10 @@ namespace Data_Structures_and_Algorithms {
             List[handle] = node;
             vertex.Handle = handle;
         }
-        internal override IList<TVertex> GetVertexList() {
+        internal override List<TVertex> GetVertexList() {
             return List.Take(Size).Select(x => x.Vertex).ToList();
         }
-        internal override IList<TVertex> GetAdjacentVertextList(TVertex vertex) {
+        internal override List<TVertex> GetAdjacentVertextList(TVertex vertex) {
             ListNode head = List[vertex.Handle];
             return GetList(head, false).Select(x => x.Vertex).ToList();
         }
@@ -66,6 +66,20 @@ namespace Data_Structures_and_Algorithms {
             ListNode head = List[vertex1.Handle];
             return FindNode(head, x => ReferenceEquals(x.Next.Vertex, vertex2)).Weight;
         }
+        internal override List<Edge<TValue, TVertex>> GetEdgeList() {
+            List<Edge<TValue, TVertex>> list = new List<Edge<TValue, TVertex>>();
+            for(int n = 0; n < Size; n++) {
+                ListNode head = List[n];
+                ListNode prev = head;
+                foreach(ListNode node in GetList(head, false)) {
+                    if(AllowEdge(head, node))
+                        list.Add(new Edge<TValue, TVertex>(head.Vertex, node.Vertex, prev.Weight));
+                    prev = node;
+                }
+            }
+            return list;
+        }
+        protected abstract bool AllowEdge(ListNode headNode, ListNode node);
 
         internal IEnumerable<TValue>[] GetData() {
             IEnumerable<TValue>[] result = new IEnumerable<TValue>[Size];
@@ -152,6 +166,9 @@ namespace Data_Structures_and_Algorithms {
                 InsertListNode(List[vertex2.Handle], new ListNode(vertex1), weight);
             }
         }
+        protected override bool AllowEdge(ListNode headNode, ListNode node) {
+            return node.Vertex.Handle >= headNode.Vertex.Handle;
+        }
     }
 
     class DirectedAdjListGraphData<T> : AdjListGraphDataBase<T, DirectedAdjListGraphVertex<T>> {
@@ -160,6 +177,9 @@ namespace Data_Structures_and_Algorithms {
         }
         internal override void CreateEdge(DirectedAdjListGraphVertex<T> vertex1, DirectedAdjListGraphVertex<T> vertex2, double weight) {
             InsertListNode(List[vertex1.Handle], new ListNode(vertex2), weight);
+        }
+        protected override bool AllowEdge(ListNode headNode, ListNode node) {
+            return true;
         }
     }
 
@@ -170,6 +190,11 @@ namespace Data_Structures_and_Algorithms {
         }
         public AdjListGraph(int capacity)
             : base(capacity) {
+        }
+        public AdjListGraph<T> BuildMSF() {
+            AdjListGraph<T> graph = new AdjListGraph<T>();
+            DoBuildMSF(graph);
+            return graph;
         }
         internal override GraphDataBase<T, AdjListGraphVertex<T>> CreateDataCore(int capacity) {
             return new UndirectedAdjListGraphData<T>(capacity);

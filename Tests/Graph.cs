@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    public abstract class GraphBaseTests<TVertex, TGraph> where TVertex : Vertex<char> where TGraph : Graph<char, TVertex> {
+    public abstract class GraphBaseTests<TVertex, TEdge, TGraph> where TVertex : Vertex<char> where TEdge : Edge<char, TVertex> where TGraph : Graph<char, TVertex> {
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void CreateEdgeGuardCase1Test() {
             var graph = CreateGraph();
@@ -557,12 +557,18 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsFalse(distanceObj.IsRowEmpty(vB));
             Assert.IsTrue(distanceObj.IsRowEmpty(vC));
         }
+        [TestMethod]
+        public void GetEdgeListSimpleTest() {
+            var graph = CreateGraph();
+            CollectionAssertEx.IsEmpty(graph.GetEdgeList());
+        }
 
         protected abstract TGraph CreateGraph();
         protected abstract TVertex CreateVertex(char value);
+        protected abstract TEdge CreateEdgeObject(TVertex startVertex, TVertex endVertex, double weight);
     }
 
-    public abstract class UndirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : UndirectedVertex<char> where TGraph : UndirectedGraph<char, TVertex> {
+    public abstract class UndirectedGraphBaseTests<TVertex, TEdge, TGraph> : GraphBaseTests<TVertex, TEdge, TGraph> where TVertex : UndirectedVertex<char> where TEdge : Edge<char, TVertex> where TGraph : UndirectedGraph<char, TVertex> {
         [TestMethod]
         public void AreVerticesAdjacentTest() {
             var graph = CreateGraph();
@@ -827,9 +833,103 @@ namespace Data_Structures_and_Algorithms.Tests {
             };
             CollectionAssert.AreEqual(expectedResult, result.Rows);
         }
+        [TestMethod]
+        public void GetEdgeListTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            graph.CreateEdge(vA, vB, 1);
+            graph.CreateEdge(vB, vC, 2);
+            graph.CreateEdge(vC, vD, 3);
+            graph.CreateEdge(vD, vB, 4);
+            graph.CreateEdge(vA, vE, 4);
+            graph.CreateEdge(vE, vD, 2);
+            var result = graph.GetEdgeList();
+            TEdge[] expected = new TEdge[] {
+                CreateEdgeObject(vA, vB, 1),
+                CreateEdgeObject(vA, vE, 4),
+                CreateEdgeObject(vB, vC, 2),
+                CreateEdgeObject(vB, vD, 4),
+                CreateEdgeObject(vC, vD, 3),
+                CreateEdgeObject(vD, vE, 2),
+            };
+            CollectionAssert.AreEquivalent(expected, result);
+        }
+        [TestMethod]
+        public void BuildMSFTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vA, vB, 7);
+            graph.CreateEdge(vA, vD, 5);
+            graph.CreateEdge(vD, vB, 9);
+            graph.CreateEdge(vB, vC, 8);
+            graph.CreateEdge(vB, vE, 7);
+            graph.CreateEdge(vC, vE, 5);
+            graph.CreateEdge(vD, vE, 15);
+            graph.CreateEdge(vD, vF, 6);
+            graph.CreateEdge(vE, vF, 8);
+            graph.CreateEdge(vE, vG, 9);
+            graph.CreateEdge(vF, vG, 11);
+            var forest = CreateGraph();
+            graph.DoBuildMSF(forest);
+            Assert.AreEqual(7, forest.Size);
+            char[] extectedValues = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
+            CollectionAssert.AreEquivalent(extectedValues, forest.GetVertexList().Select(x => x.Value).ToList());
+            EdgeTriplet<char>[] extectedEdges = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('A', 'D', 5),
+                new EdgeTriplet<char>('D', 'F', 6),
+                new EdgeTriplet<char>('A', 'B', 7),
+                new EdgeTriplet<char>('B', 'E', 7),
+                new EdgeTriplet<char>('C', 'E', 5),
+                new EdgeTriplet<char>('E', 'G', 9),
+            };
+            CollectionAssertEx.AreEquivalent(extectedEdges, forest.GetEdgeList().Select(x => x.CreateTriplet()));
+        }
+        [TestMethod]
+        public void BuildMSFTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vP = graph.CreateVertex('P');
+            var vQ = graph.CreateVertex('Q');
+            var vL = graph.CreateVertex('L');
+            var vK = graph.CreateVertex('K');
+            graph.CreateEdge(vA, vB, 8);
+            graph.CreateEdge(vB, vC, 5);
+            graph.CreateEdge(vC, vD, 2);
+            graph.CreateEdge(vD, vA, 9);
+            graph.CreateEdge(vA, vC, 11);
+            graph.CreateEdge(vP, vQ, 7);
+            graph.CreateEdge(vQ, vL, 9);
+            graph.CreateEdge(vP, vL, 3);
+            var forest = CreateGraph();
+            graph.DoBuildMSF(forest);
+            Assert.AreEqual(8, forest.Size);
+            char[] extectedValues = new char[] { 'A', 'B', 'C', 'D', 'P', 'Q', 'L', 'K' };
+            CollectionAssert.AreEquivalent(extectedValues, forest.GetVertexList().Select(x => x.Value).ToList());
+            EdgeTriplet<char>[] extectedEdges = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('A', 'B', 8),
+                new EdgeTriplet<char>('B', 'C', 5),
+                new EdgeTriplet<char>('C', 'D', 2),
+                new EdgeTriplet<char>('P', 'Q', 7),
+                new EdgeTriplet<char>('P', 'L', 3),
+            };
+            CollectionAssertEx.AreEquivalent(extectedEdges, forest.GetEdgeList().Select(x => x.CreateTriplet()));
+        }
     }
 
-    public abstract class DirectedGraphBaseTests<TVertex, TGraph> : GraphBaseTests<TVertex, TGraph> where TVertex : DirectedVertex<char> where TGraph : DirectedGraph<char, TVertex> {
+    public abstract class DirectedGraphBaseTests<TVertex, TEdge, TGraph> : GraphBaseTests<TVertex, TEdge, TGraph> where TVertex : DirectedVertex<char> where TEdge : Edge<char, TVertex> where TGraph : DirectedGraph<char, TVertex> {
         [TestMethod]
         public void AreVerticesAdjacentTest() {
             var graph = CreateGraph();
@@ -1208,11 +1308,40 @@ namespace Data_Structures_and_Algorithms.Tests {
             };
             CollectionAssert.AreEqual(expectedResult, result.Rows);
         }
+        [TestMethod]
+        public void GetEdgeListTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            graph.CreateEdge(vA, vB, 2);
+            graph.CreateEdge(vC, vB, 7);
+            graph.CreateEdge(vA, vC, 1);
+            graph.CreateEdge(vD, vA, 5);
+            graph.CreateEdge(vD, vC, 3);
+            graph.CreateEdge(vE, vA, 6);
+            graph.CreateEdge(vE, vD, 2);
+            graph.CreateEdge(vD, vE, 3);
+            var result = graph.GetEdgeList();
+            TEdge[] expected = new TEdge[] {
+                CreateEdgeObject(vA, vB, 2),
+                CreateEdgeObject(vC, vB, 7),
+                CreateEdgeObject(vA, vC, 1),
+                CreateEdgeObject(vD, vA, 5),
+                CreateEdgeObject(vD, vC, 3),
+                CreateEdgeObject(vE, vA, 6),
+                CreateEdgeObject(vE, vD, 2),
+                CreateEdgeObject(vD, vE, 3),
+            };
+            CollectionAssert.AreEquivalent(expected, result);
+        }
     }
 
 
     [TestClass]
-    public class AdjMatrixGraphTests : UndirectedGraphBaseTests<AdjMatrixGraphVertex<char>, AdjMatrixGraph<char>> {
+    public class AdjMatrixGraphTests : UndirectedGraphBaseTests<AdjMatrixGraphVertex<char>, Edge<char, AdjMatrixGraphVertex<char>>, AdjMatrixGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             AdjMatrixGraph<char> graph = CreateGraph();
@@ -1262,10 +1391,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override AdjMatrixGraphVertex<char> CreateVertex(char value) {
             return new AdjMatrixGraphVertex<char>(value);
         }
+        protected override Edge<char, AdjMatrixGraphVertex<char>> CreateEdgeObject(AdjMatrixGraphVertex<char> startVertex, AdjMatrixGraphVertex<char> endVertex, double weight) {
+            return new Edge<char, AdjMatrixGraphVertex<char>>(startVertex, endVertex, weight);
+        }
     }
 
     [TestClass]
-    public class AdjListGraphTests : UndirectedGraphBaseTests<AdjListGraphVertex<char>, AdjListGraph<char>> {
+    public class AdjListGraphTests : UndirectedGraphBaseTests<AdjListGraphVertex<char>, Edge<char, AdjListGraphVertex<char>>, AdjListGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             AdjListGraph<char> graph = CreateGraph();
@@ -1318,10 +1450,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override AdjListGraphVertex<char> CreateVertex(char value) {
             return new AdjListGraphVertex<char>(value);
         }
+        protected override Edge<char, AdjListGraphVertex<char>> CreateEdgeObject(AdjListGraphVertex<char> startVertex, AdjListGraphVertex<char> endVertex, double weight) {
+            return new Edge<char, AdjListGraphVertex<char>>(startVertex, endVertex, weight);
+        }
     }
 
     [TestClass]
-    public class AdjSetGraphTests : UndirectedGraphBaseTests<AdjSetGraphVertex<char>, AdjSetGraph<char>> {
+    public class AdjSetGraphTests : UndirectedGraphBaseTests<AdjSetGraphVertex<char>, Edge<char, AdjSetGraphVertex<char>>, AdjSetGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             AdjSetGraph<char> graph = CreateGraph();
@@ -1374,10 +1509,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override AdjSetGraphVertex<char> CreateVertex(char value) {
             return new AdjSetGraphVertex<char>(value);
         }
+        protected override Edge<char, AdjSetGraphVertex<char>> CreateEdgeObject(AdjSetGraphVertex<char> startVertex, AdjSetGraphVertex<char> endVertex, double weight) {
+            return new Edge<char, AdjSetGraphVertex<char>>(startVertex, endVertex, weight);
+        }
     }
 
     [TestClass]
-    public class DirectedAdjMatrixGraphTests : DirectedGraphBaseTests<DirectedAdjMatrixGraphVertex<char>, DirectedAdjMatrixGraph<char>> {
+    public class DirectedAdjMatrixGraphTests : DirectedGraphBaseTests<DirectedAdjMatrixGraphVertex<char>, Edge<char, DirectedAdjMatrixGraphVertex<char>>, DirectedAdjMatrixGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             DirectedAdjMatrixGraph<char> graph = CreateGraph();
@@ -1427,10 +1565,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override DirectedAdjMatrixGraphVertex<char> CreateVertex(char value) {
             return new DirectedAdjMatrixGraphVertex<char>(value);
         }
+        protected override Edge<char, DirectedAdjMatrixGraphVertex<char>> CreateEdgeObject(DirectedAdjMatrixGraphVertex<char> startVertex, DirectedAdjMatrixGraphVertex<char> endVertex, double weight) {
+            return new Edge<char, DirectedAdjMatrixGraphVertex<char>>(startVertex, endVertex, weight);
+        }
     }
 
     [TestClass]
-    public class DirectedAdjListGraphTests : DirectedGraphBaseTests<DirectedAdjListGraphVertex<char>, DirectedAdjListGraph<char>> {
+    public class DirectedAdjListGraphTests : DirectedGraphBaseTests<DirectedAdjListGraphVertex<char>, Edge<char, DirectedAdjListGraphVertex<char>>, DirectedAdjListGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             DirectedAdjListGraph<char> graph = CreateGraph();
@@ -1483,10 +1624,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         protected override DirectedAdjListGraphVertex<char> CreateVertex(char value) {
             return new DirectedAdjListGraphVertex<char>(value);
         }
+        protected override Edge<char, DirectedAdjListGraphVertex<char>> CreateEdgeObject(DirectedAdjListGraphVertex<char> startVertex, DirectedAdjListGraphVertex<char> endVertex, double weight) {
+            return new Edge<char, DirectedAdjListGraphVertex<char>>(startVertex, endVertex, weight);
+        }
     }
 
     [TestClass]
-    public class DirectedAdjSetGraphTests : DirectedGraphBaseTests<DirectedAdjSetGraphVertex<char>, DirectedAdjSetGraph<char>> {
+    public class DirectedAdjSetGraphTests : DirectedGraphBaseTests<DirectedAdjSetGraphVertex<char>, Edge<char, DirectedAdjSetGraphVertex<char>>, DirectedAdjSetGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
             DirectedAdjSetGraph<char> graph = CreateGraph();
@@ -1538,6 +1682,9 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         protected override DirectedAdjSetGraphVertex<char> CreateVertex(char value) {
             return new DirectedAdjSetGraphVertex<char>(value);
+        }
+        protected override Edge<char, DirectedAdjSetGraphVertex<char>> CreateEdgeObject(DirectedAdjSetGraphVertex<char> startVertex, DirectedAdjSetGraphVertex<char> endVertex, double weight) {
+            return new Edge<char, DirectedAdjSetGraphVertex<char>>(startVertex, endVertex, weight);
         }
     }
 
