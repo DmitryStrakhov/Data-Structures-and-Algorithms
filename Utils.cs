@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,5 +72,11 @@ namespace Data_Structures_and_Algorithms {
             return Math.Abs(x - y) < Epsilon;
         }
         const double Epsilon = 0.000001;
+    }
+
+    public static class CollectionUtils {
+        public static ReadOnlyCollection<T> ReadOnly<T>() {
+            return new ReadOnlyCollection<T>(new T[0]);
+        }
     }
 }

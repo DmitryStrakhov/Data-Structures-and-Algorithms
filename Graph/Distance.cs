@@ -169,11 +169,11 @@ namespace Data_Structures_and_Algorithms {
             DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
             VertexPriorityQueue queue = new VertexPriorityQueue();
             queue.Insert(0, baseVertex);
-            VertexColor colorId = VertexColor.NewColor();
+            Color colorId = Color.CreateColor();
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeleteMinimumValue();
-                if(vertex.Tag.Color == colorId) continue;
-                vertex.Tag.Color = colorId;
+                if(vertex.Color == colorId) continue;
+                vertex.Color = colorId;
                 foreach(TVertex adjVertex in Graph.GetAdjacentVertextList(vertex)) {
                     double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjVertex);
                     if(result.IsRowEmpty(adjVertex) || weight < result[adjVertex].Distance) {
@@ -198,16 +198,16 @@ namespace Data_Structures_and_Algorithms {
             DistanceObject<TValue, TVertex> result = new DistanceObject<TValue, TVertex>(Graph, baseVertex);
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(baseVertex);
-            VertexColor colorId = VertexColor.NewColor();
+            Color colorId = Color.CreateColor();
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeQueue();
-                vertex.Tag.Color = VertexColor.Empty;
+                vertex.Color = Color.Empty;
                 foreach(TVertex adjVertex in Graph.GetAdjacentVertextList(vertex)) {
                     double weight = result[vertex].Distance + Graph.GetWeight(vertex, adjVertex);
                     if(result.IsRowEmpty(adjVertex) || weight < result[adjVertex].Distance) {
                         result[adjVertex] = new DistanceObject<TValue, TVertex>.Row(adjVertex, vertex, weight);
-                        if(adjVertex.Tag.Color != colorId) queue.EnQueue(adjVertex);
-                        adjVertex.Tag.Color = colorId;
+                        if(adjVertex.Color != colorId) queue.EnQueue(adjVertex);
+                        adjVertex.Color = colorId;
                     }
                 }
             }

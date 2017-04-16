@@ -11,13 +11,17 @@ namespace Data_Structures_and_Algorithms {
         T value;
         Guid? ownerID;
         int? handle;
-        VertexTag tag;
+        int valueCore;
+        Color color;
+        IVertexData data;
 
         internal Vertex(T value) {
             this.value = value;
             this.ownerID = null;
             this.handle = null;
-            this.tag = new VertexTag(0, VertexColor.Empty);
+            this.valueCore = 0;
+            this.color = Color.Empty;
+            this.data = null;
         }
         internal Guid OwnerID {
             get { return ownerID.Value; }
@@ -37,12 +41,28 @@ namespace Data_Structures_and_Algorithms {
                 handle = value;
             }
         }
-        internal VertexTag Tag {
-            get { return tag; }
+        internal int ValueCore {
+            get { return valueCore; }
+            set { valueCore = value; }
+        }
+        internal Color Color {
+            get { return color; }
+            set { color = value; }
+        }
+        internal IVertexData Data {
+            get { return data; }
+            set { data = value; }
+        }
+        internal TData GetData<TData>() where TData : IVertexData {
+            return (TData)this.Data;
         }
 
         public T Value { get { return value; } }
     }
+
+    internal interface IVertexData {
+    }
+
 
     public abstract class UndirectedVertex<T> : Vertex<T> {
         int degree;
@@ -69,6 +89,75 @@ namespace Data_Structures_and_Algorithms {
             get { return outDegree; }
             internal set { outDegree = value; }
         }
+    }
+
+    interface IEdgeData {
+    }
+
+    [DebuggerDisplay("Initialized: {Initialized}, Weight: {Weight}, Color: {Color}, Data: {Data}")]
+    struct EdgeData : ICloneable {
+        readonly double weight;
+        readonly bool initialized;
+        Color color;
+        IEdgeData data;
+
+        public EdgeData(double weight)
+            : this(weight, true, Color.Empty, null) {
+        }
+        internal EdgeData(double weight, bool initialized, Color color, IEdgeData data) {
+            this.weight = weight;
+            this.initialized = initialized;
+            this.color = color;
+            this.data = data;
+        }
+
+        public Color Color {
+            get { return color; }
+        }
+        public IEdgeData Data {
+            get { return data; }
+        }
+        public double Weight {
+            get { return weight; }
+        }
+        public bool Initialized {
+            get { return initialized; }
+        }
+
+        public EdgeData WithColor(Color color) {
+            EdgeData result = Clone();
+            result.color = color;
+            return result;
+        }
+        public EdgeData WithData(IEdgeData data) {
+            EdgeData result = Clone();
+            result.data = data;
+            return result;
+        }
+
+        #region Equals & GetHashCode
+        public override bool Equals(object obj) {
+            EdgeData other = (EdgeData)obj;
+            return Equals(this, other);
+        }
+        static bool Equals(EdgeData x, EdgeData y) {
+            return x.Initialized == y.Initialized && MathUtils.AreDoubleEquals(x.Weight, y.Weight) && x.Color.Equals(y.Color) && ReferenceEquals(x.Data, y.Data);
+        }
+        public override int GetHashCode() {
+            int hashCode = Initialized.GetHashCode() ^ Weight.GetHashCode() ^ Color.GetHashCode();
+            if(Data != null)
+                hashCode ^= Data.GetHashCode();
+            return hashCode;
+        }
+        #endregion
+        #region ICloneable
+        object ICloneable.Clone() {
+            return Clone();
+        }
+        EdgeData Clone() {
+            return new EdgeData(Weight, Initialized, Color, Data);
+        }
+        #endregion
     }
 
     [DebuggerDisplay("StartVertex: {StartVertex.Value}, EndVertex: {EndVertex.Value}, Weight: {Weight}")]
@@ -142,55 +231,41 @@ namespace Data_Structures_and_Algorithms {
         NegativeWeighted = 4
     }
 
-    internal struct VertexColor {
-        Guid guid;
+    internal struct Color {
+        readonly Guid guid;
 
-        public static VertexColor NewColor() {
-            return new VertexColor() { guid = Guid.NewGuid() };
+        Color(Guid guid) {
+            this.guid = guid;
         }
-        public static readonly VertexColor Empty = NewColor();
+
+        public static Color CreateColor() {
+            return new Color(Guid.NewGuid());
+        }
+        public static readonly Color Empty = new Color(Guid.Empty);
 
         #region Operators
-        public static bool operator ==(VertexColor x, VertexColor y) {
+        public static bool operator ==(Color x, Color y) {
             return AreEquals(x, y);
         }
-        public static bool operator !=(VertexColor x, VertexColor y) {
+        public static bool operator !=(Color x, Color y) {
             return !AreEquals(x, y);
         }
         #endregion
         
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
-            VertexColor other = (VertexColor)obj;
+            Color other = (Color)obj;
             return other != null && AreEquals(this, other);
         }
         public override int GetHashCode() {
             return guid.GetHashCode();
         }
         #endregion
-        static bool AreEquals(VertexColor x, VertexColor y) {
+        static bool AreEquals(Color x, Color y) {
             if(ReferenceEquals(x, null) || ReferenceEquals(y, null)) {
                 return ReferenceEquals(x, null) && ReferenceEquals(y, null);
             }
             return x.guid.Equals(y.guid);
-        }
-    }
-
-    internal class VertexTag {
-        int nValue;
-        VertexColor color;
-
-        public VertexTag(int nValue, VertexColor color) {
-            this.nValue = nValue;
-            this.color = color;
-        }
-        internal VertexColor Color {
-            get { return color; }
-            set { color = value; }
-        }
-        public int NValue {
-            get { return nValue; }
-            set { nValue = value; }
         }
     }
 
@@ -206,6 +281,8 @@ namespace Data_Structures_and_Algorithms {
         internal abstract TVertex GetVertex(int handle);
         internal abstract double GetWeight(TVertex vertex1, TVertex vertex2);
         internal abstract List<Edge<TValue, TVertex>> GetEdgeList();
+        internal abstract EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2);
+        internal abstract void UpdateEdgeData(TVertex vertex1, TVertex vertex2, Func<EdgeData, EdgeData> updateFunc);
     }
 
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
@@ -241,7 +318,7 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex2, nameof(vertex2));
             CheckVertexOwner(vertex1);
             CheckVertexOwner(vertex2);
-            if(!AreVerticesAdjacent(vertex1, vertex2))
+            if(!Data.AreVerticesAdjacent(vertex1, vertex2))
                 throw new InvalidOperationException();
             return Data.GetWeight(vertex1, vertex2);
         }
@@ -324,36 +401,92 @@ namespace Data_Structures_and_Algorithms {
             CheckVertexOwner(baseVertex);
             return PathAlgorithmFactory<TValue, TVertex>.Create(this).GetPath(baseVertex);
         }
+        public ReadOnlyCollection<TVertex> GetEulerianCircuit(TVertex vertex) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            CheckVertexOwner(vertex);
+            var list = GetEulerianCircuitCore(vertex);
+            return new ReadOnlyCollection<TVertex>(list);
+        }
+        internal EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2) {
+            Guard.IsNotNull(vertex1, nameof(vertex1));
+            Guard.IsNotNull(vertex2, nameof(vertex2));
+            CheckVertexOwner(vertex1);
+            CheckVertexOwner(vertex2);
+            if(!Data.AreVerticesAdjacent(vertex1, vertex2))
+                throw new InvalidOperationException();
+            return Data.GetEdgeData(vertex1, vertex2);
+        }
+        internal void UpdateEdgeData(TVertex vertex1, TVertex vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            Guard.IsNotNull(vertex1, nameof(vertex1));
+            Guard.IsNotNull(vertex2, nameof(vertex2));
+            Guard.IsNotNull(updateFunc, nameof(updateFunc));
+            CheckVertexOwner(vertex1);
+            CheckVertexOwner(vertex2);
+            if(!Data.AreVerticesAdjacent(vertex1, vertex2))
+                throw new InvalidOperationException();
+            Data.UpdateEdgeData(vertex1, vertex2, updateFunc);
+        }
+        internal ReadOnlyCollection<TVertex> GetSimpleCircuitCore(TVertex vertex, Func<TVertex, TVertex, bool> acceptEdge) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(acceptEdge, nameof(acceptEdge));
+            CheckVertexOwner(vertex);
+            IList<TVertex> list = DoGetSimpleCircuit(vertex, acceptEdge);
+            return new ReadOnlyCollection<TVertex>(list);
+        }
+        IList<TVertex> DoGetSimpleCircuit(TVertex vertex, Func<TVertex, TVertex, bool> acceptEdge) {
+            return DoGetSimpleCircuit(vertex, Color.CreateColor(), acceptEdge);
+        }
+        IList<TVertex> DoGetSimpleCircuit(TVertex vertex, Color colorID, Func<TVertex, TVertex, bool> acceptEdge) {
+            List<TVertex> list = new List<TVertex>();
+            FillSimpleCircuit(list, vertex, colorID, acceptEdge);
+            return list;
+        }
+        bool FillSimpleCircuit(IList<TVertex> list, TVertex vertex, Color colorID, Func<TVertex, TVertex, bool> acceptEdge) {
+            if(!CanBePartOfEulerianCircuit(vertex)) throw new InvalidOperationException();
+            bool exit = list.Count != 0 && ReferenceEquals(vertex, list.First());
+            list.Add(vertex);
+            if(exit) return true;
+            IList<TVertex> adjacentList = Data.GetAdjacentVertextList(vertex);
+            for(int i = 0; i < adjacentList.Count; i++) {
+                TVertex adjVertex = adjacentList[i];
+                if(Data.GetEdgeData(vertex, adjVertex).Color != colorID && acceptEdge(vertex, adjVertex)) {
+                    Data.UpdateEdgeData(vertex, adjVertex, x => x.WithColor(colorID));
+                    if(FillSimpleCircuit(list, adjVertex, colorID, acceptEdge)) return true;
+                }
+            }
+            return false;
+        }
+        protected abstract bool CanBePartOfEulerianCircuit(TVertex vertex);
 
-        void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, VertexColor, bool> searchProc) {
+        void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, Color, bool> searchProc) {
             if(Size == 0) return;
             int handle = vertex != null ? vertex.Handle : 0;
-            VertexColor colorID = VertexColor.NewColor();
+            Color colorID = Color.CreateColor();
             for(int i = 0; i < Size; i++) {
                 var graphVertex = GetVertex((handle + i) % Size);
-                if(graphVertex.Tag.Color != colorID) {
+                if(graphVertex.Color != colorID) {
                     if(!searchProc(graphVertex, action, colorID)) break;
                 }
             }
         }
 
-        bool DFSearchCore(TVertex vertex, Func<TVertex, bool> action, VertexColor colorID) {
+        bool DFSearchCore(TVertex vertex, Func<TVertex, bool> action, Color colorID) {
             bool @continue = action(vertex);
             if(!@continue)
                 return false;
-            vertex.Tag.Color = colorID;
+            vertex.Color = colorID;
             var adjacentList = GetAdjacentVertextList(vertex);
             for(int i = 0; i < adjacentList.Count; i++) {
-                if(adjacentList[i].Tag.Color != colorID) {
+                if(adjacentList[i].Color != colorID) {
                     if(!DFSearchCore(adjacentList[i], action, colorID)) return false;
                 }
             }
             return true;
         }
-        bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action, VertexColor colorID) {
+        bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action, Color colorID) {
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(vertex);
-            vertex.Tag.Color = colorID;
+            vertex.Color = colorID;
             while(!queue.IsEmpty) {
                 var graphVertex = queue.DeQueue();
                 if(!action(graphVertex))
@@ -361,13 +494,26 @@ namespace Data_Structures_and_Algorithms {
                 var adjacentList = GetAdjacentVertextList(graphVertex);
                 for(int i = 0; i < adjacentList.Count; i++) {
                     TVertex adjacentVertex = adjacentList[i];
-                    if(adjacentVertex.Tag.Color != colorID) {
-                        adjacentVertex.Tag.Color = colorID;
+                    if(adjacentVertex.Color != colorID) {
+                        adjacentVertex.Color = colorID;
                         queue.EnQueue(adjacentVertex);
                     }
                 }
             }
             return true;
+        }
+        IList<TVertex> GetEulerianCircuitCore(TVertex vertex) {
+            Color colorID = Color.CreateColor();
+            List<TVertex> list = new List<TVertex>();
+            list.Add(vertex);
+            for(int i = 0; i < list.Count; i++) {
+                TVertex vertexCore = list[i];
+                var circuitList = DoGetSimpleCircuit(vertexCore, colorID, (x, y) => GetEdgeData(x, y).Color != colorID);
+                if(circuitList.Count > 1) {
+                    list.InsertRange(i + 1, circuitList.Skip(1));
+                }
+            }
+            return list;
         }
 
         protected internal TVertex GetVertex(int handle) {
@@ -407,6 +553,42 @@ namespace Data_Structures_and_Algorithms {
         public UndirectedGraph(int capacity)
             : base(capacity) {
         }
+        public ReadOnlyCollection<TVertex> GetArticulationPointList() {
+            if(Size == 0) return CollectionUtils.ReadOnly<TVertex>();
+            List<TVertex> vertexList = new List<TVertex>();
+            FillArticulationPointList(vertexList);
+            return new ReadOnlyCollection<TVertex>(vertexList);
+        }
+        void FillArticulationPointList(List<TVertex> vertexList) {
+            int dfsNum = 1;
+            Color colorID = Color.CreateColor();
+            for(int handle = 0; handle < Size; handle++) {
+                var vertex = GetVertex(handle);
+                if(vertex.Color != colorID) FillArticulationPointListCore(vertex, vertex, colorID, vertexList, ref dfsNum);
+            }
+        }
+        void FillArticulationPointListCore(TVertex vertex, TVertex root, Color colorID, List<TVertex> vertexList, ref int dfsNum) {
+            GetCutVertexListData data = new GetCutVertexListData(dfsNum++);
+            vertex.Color = colorID;
+            vertex.Data = data;
+            var adjacentList = Data.GetAdjacentVertextList(vertex);
+            for(int i = 0; i < adjacentList.Count; i++) {
+                TVertex adjVertex = adjacentList[i];
+                if(adjVertex.Color != colorID) {
+                    data.ChildCount++;
+                    FillArticulationPointListCore(adjVertex, root, colorID, vertexList, ref dfsNum);
+                    if((ReferenceEquals(vertex, root) && data.ChildCount > 1) || (!ReferenceEquals(vertex, root) && adjVertex.GetData<GetCutVertexListData>().DfsLow >= data.DfsNum)) {
+                        if(!data.IsInList)
+                            vertexList.Add(vertex);
+                        data.IsInList = true;
+                    }
+                    data.DfsLow = Math.Min(data.DfsLow, adjVertex.GetData<GetCutVertexListData>().DfsLow);
+                }
+                else {
+                    data.DfsLow = Math.Min(data.DfsLow, adjVertex.GetData<GetCutVertexListData>().DfsNum);
+                }
+            }
+        }
         protected internal void DoBuildMSF(UndirectedGraph<TValue, TVertex> forest) {
             DisjointSet<TVertex> set = new DisjointSet<TVertex>();
             foreach(TVertex vertex in GetVertexList()) {
@@ -427,6 +609,28 @@ namespace Data_Structures_and_Algorithms {
             vertex1.Degree++;
             vertex2.Degree++;
         }
+        protected override bool CanBePartOfEulerianCircuit(TVertex vertex) {
+            return (vertex.Degree & 0x1) == 0;
+        }
+        #region GetCutVertexListData
+        [DebuggerDisplay("DfsNum = {DfsNum}, DfsLow = {DfsLow}, ChildCount = {ChildCount}, IsInList = {IsInList}")]
+        class GetCutVertexListData : IVertexData {
+            int dfsNum;
+            int dfsLow;
+            int childCount;
+            bool isInList;
+
+            public GetCutVertexListData(int num) {
+                this.dfsNum = this.dfsLow = num;
+                this.childCount = 0;
+                this.isInList = false;
+            }
+            public int DfsNum { get { return dfsNum; } set { dfsNum = value; } }
+            public int DfsLow { get { return dfsLow; } set { dfsLow = value; } }
+            public int ChildCount { get { return childCount; } set { childCount = value; } }
+            public bool IsInList { get { return isInList; } set { isInList = value; } }
+        }
+        #endregion
     }
 
     public abstract class DirectedGraph<TValue, TVertex> : Graph<TValue, TVertex> where TVertex : DirectedVertex<TValue> {
@@ -440,7 +644,7 @@ namespace Data_Structures_and_Algorithms {
             foreach(var vertex in GetVertexList()) {
                 if(vertex.InDegree == 0)
                     queue.EnQueue(vertex);
-                vertex.Tag.NValue = vertex.InDegree;
+                vertex.ValueCore = vertex.InDegree;
             }
             while(!queue.IsEmpty) {
                 TVertex vertex = queue.DeQueue();
@@ -448,7 +652,7 @@ namespace Data_Structures_and_Algorithms {
                 vertexCount++;
                 var adjacentList = GetAdjacentVertextList(vertex);
                 foreach(var adjacentVertex in adjacentList) {
-                    if(--adjacentVertex.Tag.NValue == 0) queue.EnQueue(adjacentVertex);
+                    if(--adjacentVertex.ValueCore == 0) queue.EnQueue(adjacentVertex);
                 }
             }
             if(Size != vertexCount)
@@ -458,6 +662,9 @@ namespace Data_Structures_and_Algorithms {
             base.CreateEdgeCore(vertex1, vertex2, weight);
             vertex1.OutDegree++;
             vertex2.InDegree++;
+        }
+        protected override bool CanBePartOfEulerianCircuit(TVertex vertex) {
+            return vertex.InDegree == vertex.OutDegree;
         }
     }
 }

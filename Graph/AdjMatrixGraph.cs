@@ -26,13 +26,13 @@ namespace Data_Structures_and_Algorithms {
         int size;
         int capacity;
         TVertex[] vertexList;
-        readonly SquareMatrix<double?> matrix;
+        readonly SquareMatrix<EdgeData> matrix;
 
         public AdjMatrixGraphDataBase(int capacity) : base(capacity) {
             this.size = 0;
             this.capacity = capacity;
             this.vertexList = new TVertex[capacity];
-            this.matrix = new SquareMatrix<double?>(capacity);
+            this.matrix = new SquareMatrix<EdgeData>(capacity);
         }
 
         public int Size { get { return size; } }
@@ -52,12 +52,12 @@ namespace Data_Structures_and_Algorithms {
         internal override List<TVertex> GetAdjacentVertextList(TVertex vertex) {
             List<TVertex> list = new List<TVertex>();
             for(int n = 0; n < Size; n++) {
-                if(Matrix[vertex.Handle, n].HasValue) list.Add(VertexList[n]);
+                if(Matrix[vertex.Handle, n].Initialized) list.Add(VertexList[n]);
             }
             return list;
         }
         internal override bool AreVerticesAdjacent(TVertex vertex1, TVertex vertex2) {
-            return Matrix[vertex1.Handle, vertex2.Handle].HasValue;
+            return Matrix[vertex1.Handle, vertex2.Handle].Initialized;
         }
         internal override int GetSize() {
             return Size;
@@ -67,20 +67,26 @@ namespace Data_Structures_and_Algorithms {
             return VertexList[handle];
         }
         internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
-            return Matrix[vertex1.Handle, vertex2.Handle].Value;
+            return GetEdgeDataCore(vertex1, vertex2).Weight;
+        }
+        internal override EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2) {
+            return GetEdgeDataCore(vertex1, vertex2);
         }
         internal override List<Edge<TValue, TVertex>> GetEdgeList() {
             List<Edge<TValue, TVertex>> list = new List<Edge<TValue, TVertex>>();
             for(int row = 0; row < Size; row++) {
                 for(int column = GetColumnByRow(row); column < Size; column++) {
-                    if(Matrix[row, column].HasValue)
-                        list.Add(new Edge<TValue, TVertex>(VertexList[row], VertexList[column], Matrix[row, column].Value));
+                    if(Matrix[row, column].Initialized)
+                        list.Add(new Edge<TValue, TVertex>(VertexList[row], VertexList[column], Matrix[row, column].Weight));
                 }
             }
             return list;
         }
         protected abstract int GetColumnByRow(int row);
 
+        protected EdgeData GetEdgeDataCore(TVertex vertex1, TVertex vertex2) {
+            return Matrix[vertex1.Handle, vertex2.Handle];
+        }
         void EnsureVertexListSize(int newSize) {
             if(newSize > this.capacity) {
                 int _capacity = this.capacity * 2;
@@ -98,13 +104,13 @@ namespace Data_Structures_and_Algorithms {
             int[,] result = new int[sz, sz];
             for(int row = 0; row < sz; row++) {
                 for(int column = 0; column < sz; column++) {
-                    result[row, column] = Matrix[row, column].HasValue ? 1 : 0;
+                    result[row, column] = Matrix[row, column].Initialized ? 1 : 0;
                 }
             }
             return result;
         }
 
-        public SquareMatrix<double?> Matrix { get { return matrix; } }
+        public SquareMatrix<EdgeData> Matrix { get { return matrix; } }
         public TVertex[] VertexList { get { return vertexList; } }
     }
 
@@ -113,8 +119,13 @@ namespace Data_Structures_and_Algorithms {
             : base(capacity) {
         }
         internal override void CreateEdge(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2, double weight) {
-            Matrix[vertex1.Handle, vertex2.Handle] = weight;
-            Matrix[vertex2.Handle, vertex1.Handle] = weight;
+            Matrix[vertex1.Handle, vertex2.Handle] = new EdgeData(weight);
+            Matrix[vertex2.Handle, vertex1.Handle] = new EdgeData(weight);
+        }
+        internal override void UpdateEdgeData(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            EdgeData edgeData = updateFunc(GetEdgeDataCore(vertex1, vertex2));
+            Matrix[vertex1.Handle, vertex2.Handle] = edgeData;
+            Matrix[vertex2.Handle, vertex1.Handle] = edgeData;
         }
         protected override int GetColumnByRow(int row) {
             return row;
@@ -126,7 +137,10 @@ namespace Data_Structures_and_Algorithms {
             : base(capacity) {
         }
         internal override void CreateEdge(DirectedAdjMatrixGraphVertex<T> vertex1, DirectedAdjMatrixGraphVertex<T> vertex2, double weight) {
-            Matrix[vertex1.Handle, vertex2.Handle] = weight;
+            Matrix[vertex1.Handle, vertex2.Handle] = new EdgeData(weight);
+        }
+        internal override void UpdateEdgeData(DirectedAdjMatrixGraphVertex<T> vertex1, DirectedAdjMatrixGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            Matrix[vertex1.Handle, vertex2.Handle] = updateFunc(GetEdgeDataCore(vertex1, vertex2));
         }
         protected override int GetColumnByRow(int row) {
             return 0;

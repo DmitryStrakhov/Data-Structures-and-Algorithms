@@ -60,7 +60,10 @@ namespace Data_Structures_and_Algorithms {
             return Size;
         }
         internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
-            return List[vertex1.Handle].GetItemWeight(vertex2);
+            return GetVertexSetItem(vertex1, vertex2).EdgeData.Weight;
+        }
+        internal override EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2) {
+            return GetVertexSetItem(vertex1, vertex2).EdgeData;
         }
         internal override List<Edge<TValue, TVertex>> GetEdgeList() {
             List<Edge<TValue, TVertex>> list = new List<Edge<TValue, TVertex>>();
@@ -68,13 +71,16 @@ namespace Data_Structures_and_Algorithms {
                 VertexDisjointSet set = List[n];
                 foreach(TVertex vertex in set.GetVertices(false)) {
                     if(AllowEdge(set, vertex))
-                        list.Add(new Edge<TValue, TVertex>(set.Vertex, vertex, set.GetItemWeight(vertex)));
+                        list.Add(new Edge<TValue, TVertex>(set.Vertex, vertex, set.GetItem(vertex).EdgeData.Weight));
                 }
             }
             return list;
         }
         protected abstract bool AllowEdge(VertexDisjointSet set, TVertex vertex);
 
+        protected VertexSetItem GetVertexSetItem(TVertex vertex1, TVertex vertex2) {
+            return List[vertex1.Handle].GetItem(vertex2);
+        }
         void EnsureListSize(int newSize) {
             if(newSize > this.capacity) {
                 int _capacity = this.capacity * 2;
@@ -104,7 +110,7 @@ namespace Data_Structures_and_Algorithms {
                     MakeSet(other);
                     Union(Vertex, other);
                 }
-                GetItemCore(other).Weight = weight;
+                GetItem(other).EdgeData = new EdgeData(weight);
             }
             public bool IsVertexAdjacent(TVertex other) {
                 return Exists(other) && AreEquivalent(Vertex, other);
@@ -118,32 +124,27 @@ namespace Data_Structures_and_Algorithms {
                     if(!ReferenceEquals(item, Vertex)) yield return item;
                 }
             }
-            internal double GetItemWeight(TVertex vertex) {
-                return GetItemCore(vertex).Weight;
+            sealed protected override SetItem CreateSetItem(TVertex item, int rank) {
+                return new VertexSetItem(item, rank);
             }
 
-            protected override DisjointSet<TVertex>.SetItem CreateSetItem(TVertex item, int rank) {
-                return new SetItem(item, rank);
+            internal VertexSetItem GetItem(TVertex item) {
+                return (VertexSetItem)GetItemCore(item);
             }
             public TVertex Vertex { get { return vertex; } }
-
-            #region SetItem
-            new class SetItem : DisjointSet<TVertex>.SetItem {
-                double weight;
-                public SetItem(TVertex parent, int rank)
-                    : base(parent, rank) {
-                }
-                public double Weight {
-                    get { return weight; }
-                    set { weight = value; }
-                }
+        }
+        #region VertexSetItem
+        internal class VertexSetItem : DisjointSet<TVertex>.SetItem {
+            EdgeData edgeData;
+            public VertexSetItem(TVertex parent, int rank)
+                : base(parent, rank) {
             }
-            #endregion
-
-            new SetItem GetItemCore(TVertex item) {
-                return (SetItem)base.GetItemCore(item);
+            public EdgeData EdgeData {
+                get { return edgeData; }
+                set { edgeData = value; }
             }
         }
+        #endregion
         #endregion
 
         internal IEnumerable<TValue>[] GetData() {
@@ -168,6 +169,11 @@ namespace Data_Structures_and_Algorithms {
                 List[vertex2.Handle].AddVertex(vertex1, weight);
             }
         }
+        internal override void UpdateEdgeData(AdjSetGraphVertex<T> vertex1, AdjSetGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            VertexSetItem setItem1 = GetVertexSetItem(vertex1, vertex2);
+            VertexSetItem setItem2 = GetVertexSetItem(vertex2, vertex1);
+            setItem1.EdgeData = setItem2.EdgeData = updateFunc(setItem1.EdgeData);
+        }
         protected override bool AllowEdge(VertexDisjointSet set, AdjSetGraphVertex<T> vertex) {
             return vertex.Handle >= set.Vertex.Handle;
         }
@@ -179,6 +185,10 @@ namespace Data_Structures_and_Algorithms {
         }
         internal override void CreateEdge(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2, double weight) {
             List[vertex1.Handle].AddVertex(vertex2, weight);
+        }
+        internal override void UpdateEdgeData(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            VertexSetItem setItem = GetVertexSetItem(vertex1, vertex2);
+            setItem.EdgeData = updateFunc(setItem.EdgeData);
         }
         protected override bool AllowEdge(VertexDisjointSet set, DirectedAdjSetGraphVertex<T> vertex) {
             return true;

@@ -63,8 +63,10 @@ namespace Data_Structures_and_Algorithms {
             return Size;
         }
         internal override double GetWeight(TVertex vertex1, TVertex vertex2) {
-            ListNode head = List[vertex1.Handle];
-            return FindNode(head, x => ReferenceEquals(x.Next.Vertex, vertex2)).Weight;
+            return FindEdgeNode(vertex1, vertex2).EdgeData.Weight;
+        }
+        internal override EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2) {
+            return FindEdgeNode(vertex1, vertex2).EdgeData;
         }
         internal override List<Edge<TValue, TVertex>> GetEdgeList() {
             List<Edge<TValue, TVertex>> list = new List<Edge<TValue, TVertex>>();
@@ -73,7 +75,7 @@ namespace Data_Structures_and_Algorithms {
                 ListNode prev = head;
                 foreach(ListNode node in GetList(head, false)) {
                     if(AllowEdge(head, node))
-                        list.Add(new Edge<TValue, TVertex>(head.Vertex, node.Vertex, prev.Weight));
+                        list.Add(new Edge<TValue, TVertex>(head.Vertex, node.Vertex, prev.EdgeData.Weight));
                     prev = node;
                 }
             }
@@ -107,8 +109,8 @@ namespace Data_Structures_and_Algorithms {
         [DebuggerDisplay("ListNode: ({Vertex.Value})")]
         internal class ListNode {
             readonly TVertex vertex;
-            double weight;
             ListNode next;
+            EdgeData edgeData;
 
             public ListNode(TVertex value) {
                 this.vertex = value;
@@ -118,13 +120,16 @@ namespace Data_Structures_and_Algorithms {
                 get { return next; }
                 set { next = value; }
             }
-            public double Weight {
-                get { return weight; }
-                set { weight = value; }
+            public EdgeData EdgeData {
+                get { return edgeData; }
+                set { edgeData = value; }
             }
             public TVertex Vertex { get { return vertex; } }
         }
-
+        protected ListNode FindEdgeNode(TVertex vertex1, TVertex vertex2) {
+            ListNode head = List[vertex1.Handle];
+            return FindNode(head, x => ReferenceEquals(x.Next.Vertex, vertex2));
+        }
         internal static IEnumerable<ListNode> GetList(ListNode head, bool includeHead = true) {
             ListNode next = head.Next;
             if(includeHead)
@@ -140,7 +145,7 @@ namespace Data_Structures_and_Algorithms {
         internal static void InsertListNode(ListNode head, ListNode node, double weight) {
             ListNode tail = GetListTail(head);
             tail.Next = node;
-            tail.Weight = weight;
+            tail.EdgeData = new EdgeData(weight);
             node.Next = head;
         }
         internal static ListNode FindNode(ListNode head, Predicate<ListNode> findCondition) {
@@ -166,6 +171,11 @@ namespace Data_Structures_and_Algorithms {
                 InsertListNode(List[vertex2.Handle], new ListNode(vertex1), weight);
             }
         }
+        internal override void UpdateEdgeData(AdjListGraphVertex<T> vertex1, AdjListGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            ListNode node1 = FindEdgeNode(vertex1, vertex2);
+            ListNode node2 = FindEdgeNode(vertex2, vertex1);
+            node1.EdgeData = node2.EdgeData = updateFunc(node1.EdgeData);
+        }
         protected override bool AllowEdge(ListNode headNode, ListNode node) {
             return node.Vertex.Handle >= headNode.Vertex.Handle;
         }
@@ -177,6 +187,10 @@ namespace Data_Structures_and_Algorithms {
         }
         internal override void CreateEdge(DirectedAdjListGraphVertex<T> vertex1, DirectedAdjListGraphVertex<T> vertex2, double weight) {
             InsertListNode(List[vertex1.Handle], new ListNode(vertex2), weight);
+        }
+        internal override void UpdateEdgeData(DirectedAdjListGraphVertex<T> vertex1, DirectedAdjListGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
+            ListNode node = FindEdgeNode(vertex1, vertex2);
+            node.EdgeData = updateFunc(node.EdgeData);
         }
         protected override bool AllowEdge(ListNode headNode, ListNode node) {
             return true;

@@ -562,6 +562,226 @@ namespace Data_Structures_and_Algorithms.Tests {
             var graph = CreateGraph();
             CollectionAssertEx.IsEmpty(graph.GetEdgeList());
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetEdgeDataGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var edgeData = graph.GetEdgeData(null, vB);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetEdgeDataGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var edgeData = graph.GetEdgeData(vA, null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEdgeDataGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var edgeData = graph.GetEdgeData(CreateVertex('A'), vB);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEdgeDataGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var edgeData = graph.GetEdgeData(vA, CreateVertex('B'));
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEdgeDataGuardCase5Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var edgeData = graph.GetEdgeData(vA, vC);
+        }
+        [TestMethod]
+        public void GetEdgeDataSimpleTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            EdgeData edgeData;
+            edgeData = graph.GetEdgeData(vA, vB);
+            Assert.AreEqual(new EdgeData(1, true, Color.Empty, null), edgeData);
+            edgeData = graph.GetEdgeData(vB, vC);
+            Assert.AreEqual(new EdgeData(1, true, Color.Empty, null), edgeData);
+        }
+        [TestMethod]
+        public void GetEdgeDataTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB, 2);
+            graph.CreateEdge(vB, vC, 3);
+            EdgeData edgeData;
+            edgeData = graph.GetEdgeData(vA, vB);
+            Assert.AreEqual(new EdgeData(2, true, Color.Empty, null), edgeData);
+            edgeData = graph.GetEdgeData(vB, vC);
+            Assert.AreEqual(new EdgeData(3, true, Color.Empty, null), edgeData);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void UpdateEdgeDataGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.UpdateEdgeData(null, vB, x => x);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void UpdateEdgeDataGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.UpdateEdgeData(vA, null, x => x);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void UpdateEdgeDataGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.UpdateEdgeData(vA, vB, null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void UpdateEdgeDataGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.UpdateEdgeData(CreateVertex('A'), vB, x => x);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void UpdateEdgeDataGuardCase5Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.UpdateEdgeData(vA, CreateVertex('B'), x => x);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void UpdateEdgeDataGuardCase6Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.UpdateEdgeData(vA, vC, x => x);
+        }
+        [TestMethod]
+        public void UpdateEdgeDataTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            EdgeData edgeData;
+            edgeData = graph.GetEdgeData(vA, vB);
+            Assert.AreEqual(new EdgeData(1, true, Color.Empty, null), edgeData);
+            Color colorID = Color.CreateColor();
+            graph.UpdateEdgeData(vA, vB, x => x.WithColor(colorID));
+            edgeData = graph.GetEdgeData(vA, vB);
+            Assert.AreEqual(new EdgeData(1, true, colorID, null), edgeData);
+            TestEdgeData data = new TestEdgeData();
+            graph.UpdateEdgeData(vA, vB, x => x.WithData(data));
+            edgeData = graph.GetEdgeData(vA, vB);
+            Assert.AreEqual(new EdgeData(1, true, colorID, data), edgeData);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetSimpleCircuitCoreGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var result = graph.GetSimpleCircuitCore(null, (x, y) => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetSimpleCircuitCoreGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var result = graph.GetSimpleCircuitCore(vA, null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetSimpleCircuitCoreGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var result = graph.GetSimpleCircuitCore(CreateVertex('A'), (x, y) => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void GetEulerianCircuitGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var result = graph.GetEulerianCircuit(null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEulerianCircuitGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var result = graph.GetEulerianCircuit(CreateVertex('A'));
+        }
+        [TestMethod]
+        public void GetEulerianCircuitSimpleTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var result = graph.GetEulerianCircuit(vA);
+            CollectionAssert.AreEqual(new TVertex[] { vA }, result);
+        }
+
+        #region TestEdgeData
+        protected class TestEdgeData : IEdgeData {
+        }
+        #endregion
 
         protected abstract TGraph CreateGraph();
         protected abstract TVertex CreateVertex(char value);
@@ -926,6 +1146,222 @@ namespace Data_Structures_and_Algorithms.Tests {
                 new EdgeTriplet<char>('P', 'L', 3),
             };
             CollectionAssertEx.AreEquivalent(extectedEdges, forest.GetEdgeList().Select(x => x.CreateTriplet()));
+        }
+        [TestMethod]
+        public void UpdateEdgeDataConsistencyTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            Color colorID = Color.CreateColor();
+            TestEdgeData data = new TestEdgeData();
+            graph.UpdateEdgeData(vB, vC, x => x.WithColor(colorID).WithData(data));
+            EdgeData edgeData1 = graph.GetEdgeData(vB, vC);
+            Assert.AreEqual(new EdgeData(1, true, colorID, data), edgeData1);
+            EdgeData edgeData2 = graph.GetEdgeData(vC, vB);
+            Assert.AreEqual(edgeData1, edgeData2);
+        }
+        [TestMethod]
+        public void GetArticulationPointListSimpleTest1() {
+            var graph = CreateGraph();
+            CollectionAssertEx.IsEmpty(graph.GetArticulationPointList());
+        }
+        [TestMethod]
+        public void GetArticulationPointListSimpleTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vB, vD);
+            CollectionAssertEx.IsEmpty(graph.GetArticulationPointList());
+        }
+        [TestMethod]
+        public void GetArticulationPointListTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vC, vB);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vB, vA);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vD, vF);
+            graph.CreateEdge(vF, vE);
+            graph.CreateEdge(vG, vC);
+            CollectionAssert.AreEquivalent(new TVertex[] { vC, vD }, graph.GetArticulationPointList());
+        }
+        [TestMethod]
+        public void GetArticulationPointListTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vE);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vE, vF);
+            graph.CreateEdge(vE, vG);
+            graph.CreateEdge(vG, vH);
+            graph.CreateEdge(vF, vH);
+            CollectionAssert.AreEquivalent(new TVertex[] { vA, vB, vE }, graph.GetArticulationPointList());
+        }
+        [TestMethod]
+        public void GetArticulationPointListTest3() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vE, vF);
+            graph.CreateEdge(vE, vG);
+            CollectionAssert.AreEquivalent(new TVertex[] { vE }, graph.GetArticulationPointList());
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetSimpleCircuitCoreGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vM = graph.CreateVertex('M');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vD, vC);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vM);
+            var result = graph.GetSimpleCircuitCore(vA, (x, y) => true);
+        }
+        [TestMethod]
+        public void GetSimpleCircuitCoreTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vN = graph.CreateVertex('N');
+            var vM = graph.CreateVertex('M');
+            var vT = graph.CreateVertex('T');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vN);
+            graph.CreateEdge(vN, vC);
+            graph.CreateEdge(vB, vM);
+            graph.CreateEdge(vC, vT);
+            graph.CreateEdge(vM, vT);
+            var result = graph.GetSimpleCircuitCore(vA, (x, y) => true);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vC, vA }, result);
+        }
+        [TestMethod]
+        public void GetSimpleCircuitCoreTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vN = graph.CreateVertex('N');
+            var vM = graph.CreateVertex('M');
+            var vT = graph.CreateVertex('T');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vN);
+            graph.CreateEdge(vN, vC);
+            graph.CreateEdge(vB, vM);
+            graph.CreateEdge(vC, vT);
+            graph.CreateEdge(vM, vT);
+            var result = graph.GetSimpleCircuitCore(vA, (x, y) => {
+                if(ReferenceEquals(x, vB) && ReferenceEquals(y, vC)) return false;
+                if(ReferenceEquals(x, vC) && ReferenceEquals(y, vB)) return false;
+                return true;
+            });
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vN, vC, vA }, result);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEulerianCircuitTwoVertexTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            var result = graph.GetEulerianCircuit(vA);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEulerianCircuitGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vD, vC);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vC, vE);
+            var result = graph.GetEulerianCircuit(vA);
+        }
+        [TestMethod]
+        public void GetEulerianCircuitTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vB, vF);
+            graph.CreateEdge(vE, vF);
+            var result = graph.GetEulerianCircuit(vC);
+            CollectionAssert.AreEqual(new TVertex[] { vC, vA, vB, vE, vF, vB, vD, vC }, result);
+        }
+        [TestMethod]
+        public void GetEulerianCircuitTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vD, vG);
+            graph.CreateEdge(vG, vF);
+            graph.CreateEdge(vE, vF);
+            var result = graph.GetEulerianCircuit(vD);
+            CollectionAssert.AreEqual(new TVertex[] { vD, vE, vF, vG, vD }, result);
         }
     }
 
@@ -1337,6 +1773,123 @@ namespace Data_Structures_and_Algorithms.Tests {
             };
             CollectionAssert.AreEquivalent(expected, result);
         }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetSimpleCircuitCoreGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vN = graph.CreateVertex('N');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vN);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vN, vC);
+            graph.CreateEdge(vC, vA);
+            var result = graph.GetSimpleCircuitCore(vA, (x, y) => true);
+        }
+        [TestMethod]
+        public void GetSimpleCircuitCoreTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vN = graph.CreateVertex('N');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vB);
+            graph.CreateEdge(vB, vN);
+            graph.CreateEdge(vN, vC);
+            var result = graph.GetSimpleCircuitCore(vA, (x, y) => true);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vC, vA }, result);
+        }
+        [TestMethod]
+        public void GetSimpleCircuitCoreTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vN = graph.CreateVertex('N');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vB);
+            graph.CreateEdge(vB, vN);
+            graph.CreateEdge(vN, vC);
+            var result = graph.GetSimpleCircuitCore(vA, (x, y) => {
+                if(ReferenceEquals(x, vB) && ReferenceEquals(y, vC)) return false;
+                return true;
+            });
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vN, vC, vA }, result);
+        }
+        [TestMethod]
+        public void GetEulerianCircuitTwoVertexTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vA);
+            var result = graph.GetEulerianCircuit(vA);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vA }, result);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetEulerianCircuitGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vD, vC);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vE);
+            graph.CreateEdge(vE, vD);
+            var result = graph.GetEulerianCircuit(vA);
+        }
+        [TestMethod]
+        public void GetEulerianCircuitTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vD, vF);
+            graph.CreateEdge(vE, vB);
+            graph.CreateEdge(vE, vC);
+            graph.CreateEdge(vF, vE);
+            var result = graph.GetEulerianCircuit(vA);
+            CollectionAssert.AreEqual(new TVertex[] { vA, vB, vD, vF, vE, vC, vD, vE, vB, vC, vA }, result);
+        }
+        [TestMethod]
+        public void GetEulerianCircuitTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vE, vF);
+            graph.CreateEdge(vF, vG);
+            graph.CreateEdge(vG, vD);
+            var result = graph.GetEulerianCircuit(vD);
+            CollectionAssert.AreEqual(new TVertex[] { vD, vE, vF, vG, vD }, result);
+        }
     }
 
 
@@ -1360,7 +1913,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             AdjMatrixGraph<char> graph = CreateGraph();
             var vA = graph.CreateVertex('A');
             Assert.AreEqual(1, graph.Data.Matrix.Size);
-            Assert.IsFalse(graph.Data.Matrix[0, 0].HasValue);
+            Assert.IsFalse(graph.Data.Matrix[0, 0].Initialized);
             var vB = graph.CreateVertex('B');
             Assert.AreEqual(2, graph.Data.Matrix.Size);
             CollectionAssertEx.AreEqual(new int[,] { { 0, 0 }, { 0, 0 } }, graph.Data.GetMatrixData());
