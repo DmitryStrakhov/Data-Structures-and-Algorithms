@@ -1890,6 +1890,151 @@ namespace Data_Structures_and_Algorithms.Tests {
             var result = graph.GetEulerianCircuit(vD);
             CollectionAssert.AreEqual(new TVertex[] { vD, vE, vF, vG, vD }, result);
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void VertexRelationAreStronglyConnectedGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vA);
+            var data = graph.GetVertexRelationData();
+            bool result = data.AreStronglyConnected(null, vB);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void VertexRelationAreStronglyConnectedGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vA);
+            var data = graph.GetVertexRelationData();
+            bool result = data.AreStronglyConnected(vA, null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void VertexRelationAreStronglyConnectedGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vA);
+            var data = graph.GetVertexRelationData();
+            bool result = data.AreStronglyConnected(CreateVertex('A'), vB);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void VertexRelationAreStronglyConnectedGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vA);
+            var data = graph.GetVertexRelationData();
+            bool result = data.AreStronglyConnected(vA, CreateVertex('B'));
+        }
+        [TestMethod]
+        public void VertexRelationAreStronglyConnectedEmptyGraphTest() {
+            var graph = CreateGraph();
+            var data = graph.GetVertexRelationData();
+            Assert.IsNotNull(data);
+        }
+        [TestMethod]
+        public void VertexRelationAreStronglyConnectedSimpleTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vA);
+            var data = graph.GetVertexRelationData();
+            Assert.IsTrue(data.AreStronglyConnected(vA, vB));
+            Assert.IsTrue(data.AreStronglyConnected(vB, vA));
+            Assert.IsTrue(data.AreStronglyConnected(vA, vA));
+            Assert.IsTrue(data.AreStronglyConnected(vB, vB));
+        }
+        [TestMethod]
+        public void VertexRelationAreStronglyConnectedTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var data = graph.GetVertexRelationData();
+            Assert.IsFalse(data.AreStronglyConnected(vA, vB));
+            Assert.IsFalse(data.AreStronglyConnected(vB, vC));
+            Assert.IsFalse(data.AreStronglyConnected(vA, vC));
+            Assert.IsTrue(data.AreStronglyConnected(vA, vA));
+            Assert.IsTrue(data.AreStronglyConnected(vB, vB));
+            Assert.IsTrue(data.AreStronglyConnected(vC, vC));
+        }
+        [TestMethod]
+        public void VertexRelationAreStronglyConnectedTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            var data = graph.GetVertexRelationData();
+            Assert.IsFalse(data.AreStronglyConnected(vA, vB));
+            Assert.IsFalse(data.AreStronglyConnected(vB, vC));
+            Assert.IsFalse(data.AreStronglyConnected(vA, vC));
+            Assert.IsTrue(data.AreStronglyConnected(vA, vA));
+            Assert.IsTrue(data.AreStronglyConnected(vB, vB));
+            Assert.IsTrue(data.AreStronglyConnected(vC, vC));
+        }
+        [TestMethod]
+        public void VertexRelationAreStronglyConnectedTest3() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vD);
+            var data = graph.GetVertexRelationData();
+            Assert.IsTrue(data.AreStronglyConnected(vA, vB));
+            Assert.IsTrue(data.AreStronglyConnected(vB, vC));
+            Assert.IsTrue(data.AreStronglyConnected(vA, vC));
+            Assert.IsFalse(data.AreStronglyConnected(vD, vA));
+            Assert.IsTrue(data.AreStronglyConnected(vD, vD));
+        }
+        [TestMethod]
+        public void VertexRelationAreStronglyConnectedTest4() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vA);
+            graph.CreateEdge(vC, vB);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vC, vH);
+            graph.CreateEdge(vD, vB);
+            graph.CreateEdge(vE, vB);
+            graph.CreateEdge(vE, vF);
+            graph.CreateEdge(vF, vE);
+            graph.CreateEdge(vG, vF);
+            graph.CreateEdge(vG, vH);
+            graph.CreateEdge(vG, vG);
+            graph.CreateEdge(vH, vC);
+            graph.CreateEdge(vH, vE);
+            var data = graph.GetVertexRelationData();
+            Assert.IsTrue(data.AreStronglyConnected(vA, vB));
+            Assert.IsTrue(data.AreStronglyConnected(vB, vD));
+            Assert.IsTrue(data.AreStronglyConnected(vA, vD));
+            Assert.IsTrue(data.AreStronglyConnected(vF, vE));
+            Assert.IsTrue(data.AreStronglyConnected(vG, vG));
+            Assert.IsTrue(data.AreStronglyConnected(vH, vC));
+            Assert.IsFalse(data.AreStronglyConnected(vG, vA));
+            Assert.IsFalse(data.AreStronglyConnected(vA, vE));
+            Assert.IsFalse(data.AreStronglyConnected(vC, vE));
+            Assert.IsFalse(data.AreStronglyConnected(vH, vG));
+        }
     }
 
 

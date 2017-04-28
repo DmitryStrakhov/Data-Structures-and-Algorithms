@@ -231,7 +231,7 @@ namespace Data_Structures_and_Algorithms {
         NegativeWeighted = 4
     }
 
-    internal struct Color {
+    public struct Color {
         readonly Guid guid;
 
         Color(Guid guid) {
@@ -267,6 +267,10 @@ namespace Data_Structures_and_Algorithms {
             }
             return x.guid.Equals(y.guid);
         }
+    }
+
+    public interface IVertexRelation<TValue, TVertex> where TVertex : Vertex<TValue> {
+        bool AreStronglyConnected(TVertex vertex1, TVertex vertex2);
     }
 
     abstract class GraphDataBase<TValue, TVertex> where TVertex : Vertex<TValue> {
@@ -355,7 +359,7 @@ namespace Data_Structures_and_Algorithms {
 
         public void DFSearch(Action<TVertex> action) {
             Guard.IsNotNull(action, nameof(action));
-            DoSearch(null, x => { action(x); return true; }, DFSearchCore);
+            DoSearch<Func<TVertex, bool>>(null, x => { action(x); return true; }, DFSearchCore);
         }
         public void DFSearch(Func<TVertex, bool> action) {
             Guard.IsNotNull(action, nameof(action));
@@ -365,7 +369,7 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex, nameof(vertex));
             Guard.IsNotNull(action, nameof(action));
             CheckVertexOwner(vertex);
-            DoSearch(vertex, x => { action(x); return true; }, DFSearchCore);
+            DoSearch<Func<TVertex, bool>>(vertex, x => { action(x); return true; }, DFSearchCore);
         }
         public void DFSearch(TVertex vertex, Func<TVertex, bool> action) {
             Guard.IsNotNull(vertex, nameof(vertex));
@@ -376,7 +380,7 @@ namespace Data_Structures_and_Algorithms {
 
         public void BFSearch(Action<TVertex> action) {
             Guard.IsNotNull(action, nameof(action));
-            DoSearch(null, x => { action(x); return true; }, BFSearchCore);
+            DoSearch<Func<TVertex, bool>>(null, x => { action(x); return true; }, BFSearchCore);
         }
         public void BFSearch(Func<TVertex, bool> action) {
             Guard.IsNotNull(action, nameof(action));
@@ -386,7 +390,7 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex, nameof(vertex));
             Guard.IsNotNull(action, nameof(action));
             CheckVertexOwner(vertex);
-            DoSearch(vertex, x => { action(x); return true; }, BFSearchCore);
+            DoSearch<Func<TVertex, bool>>(vertex, x => { action(x); return true; }, BFSearchCore);
         }
         public void BFSearch(TVertex vertex, Func<TVertex, bool> action) {
             Guard.IsNotNull(vertex, nameof(vertex));
@@ -458,19 +462,19 @@ namespace Data_Structures_and_Algorithms {
         }
         protected abstract bool CanBePartOfEulerianCircuit(TVertex vertex);
 
-        void DoSearch(TVertex vertex, Func<TVertex, bool> action, Func<TVertex, Func<TVertex, bool>, Color, bool> searchProc) {
+        protected void DoSearch<T>(TVertex vertex, T data, Func<TVertex, Color, T, bool> searchProc) {
             if(Size == 0) return;
             int handle = vertex != null ? vertex.Handle : 0;
             Color colorID = Color.CreateColor();
             for(int i = 0; i < Size; i++) {
                 var graphVertex = GetVertex((handle + i) % Size);
                 if(graphVertex.Color != colorID) {
-                    if(!searchProc(graphVertex, action, colorID)) break;
+                    if(!searchProc(graphVertex, colorID, data)) break;
                 }
             }
         }
 
-        bool DFSearchCore(TVertex vertex, Func<TVertex, bool> action, Color colorID) {
+        bool DFSearchCore(TVertex vertex, Color colorID, Func<TVertex, bool> action) {
             bool @continue = action(vertex);
             if(!@continue)
                 return false;
@@ -478,12 +482,12 @@ namespace Data_Structures_and_Algorithms {
             var adjacentList = GetAdjacentVertextList(vertex);
             for(int i = 0; i < adjacentList.Count; i++) {
                 if(adjacentList[i].Color != colorID) {
-                    if(!DFSearchCore(adjacentList[i], action, colorID)) return false;
+                    if(!DFSearchCore(adjacentList[i], colorID, action)) return false;
                 }
             }
             return true;
         }
-        bool BFSearchCore(TVertex vertex, Func<TVertex, bool> action, Color colorID) {
+        bool BFSearchCore(TVertex vertex, Color colorID, Func<TVertex, bool> action) {
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(vertex);
             vertex.Color = colorID;
@@ -533,7 +537,7 @@ namespace Data_Structures_and_Algorithms {
         }
         internal Guid ID { get { return id; } }
 
-        void CheckVertexOwner(TVertex vertex) {
+        protected void CheckVertexOwner(TVertex vertex) {
             if(!vertex.OwnerID.Equals(ID)) {
                 throw new InvalidOperationException();
             }
@@ -658,6 +662,11 @@ namespace Data_Structures_and_Algorithms {
             if(Size != vertexCount)
                 throw new InvalidOperationException();
         }
+        public IVertexRelation<TValue, TVertex> GetVertexRelationData() {
+            DisjointSet<TVertex> vertexDisjointSet = new DisjointSet<TVertex>();
+            FillVertexRelationDataCore(vertexDisjointSet);
+            return new VertexRelationDataObj(this, vertexDisjointSet);
+        }
         protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
             base.CreateEdgeCore(vertex1, vertex2, weight);
             vertex1.OutDegree++;
@@ -666,5 +675,93 @@ namespace Data_Structures_and_Algorithms {
         protected override bool CanBePartOfEulerianCircuit(TVertex vertex) {
             return vertex.InDegree == vertex.OutDegree;
         }
+
+        void FillVertexRelationDataCore(DisjointSet<TVertex> set) {
+            if(Size == 0) return;
+            Stack<TVertex> stack = new Stack<TVertex>();
+            DoSearch(GetVertex(0), new FillVertexRelationDataContext(stack, set), FillVertexRelationDataCore);
+        }
+        bool FillVertexRelationDataCore(TVertex vertex, Color colorID, FillVertexRelationDataContext context) {
+            vertex.Color = colorID;
+            context.Stack.Push(vertex);
+            FillVertexRelationData _data = new FillVertexRelationData(context.DfsNum++, true);
+            vertex.Data = _data;
+            var adjacentList = GetAdjacentVertextList(vertex);
+            for(int i = 0; i < adjacentList.Count; i++) {
+                TVertex adjVertex = adjacentList[i];
+                if(adjVertex.Color != colorID) {
+                    FillVertexRelationDataCore(adjVertex, colorID, context);
+                    _data.LowNum = Math.Min(_data.LowNum, adjVertex.GetData<FillVertexRelationData>().LowNum);
+                }
+                else if(adjVertex.GetData<FillVertexRelationData>().IsInStack) {
+                    _data.LowNum = Math.Min(_data.LowNum, adjVertex.GetData<FillVertexRelationData>().DfsNum);
+                }
+            }
+            if(_data.DfsNum == _data.LowNum) {
+                context.Set.MakeSet(vertex);
+                while(true) {
+                    TVertex vertexOnStack = context.Stack.Pop();
+                    vertexOnStack.GetData<FillVertexRelationData>().IsInStack = false;
+                    if(ReferenceEquals(vertexOnStack, vertex))
+                        break;
+                    context.Set.MakeSet(vertexOnStack);
+                    context.Set.Union(vertex, vertexOnStack);
+                }
+            }
+            return true;
+        }
+
+        #region FillVertexRelationData
+        [DebuggerDisplay("DfsNum = {DfsNum}, LowNum = {LowNum}, IsInStack = {IsInStack}")]
+        class FillVertexRelationData : IVertexData {
+            int dfsNum;
+            int lowNum;
+            bool isInStack;
+
+            public FillVertexRelationData(int dfsNum, bool isInStack) {
+                this.dfsNum = this.lowNum = dfsNum;
+                this.isInStack = isInStack;
+            }
+            public int DfsNum { get { return dfsNum; } set { dfsNum = value; } }
+            public int LowNum { get { return lowNum; } set { lowNum = value; } }
+            public bool IsInStack { get { return isInStack; } set { isInStack = value; } }
+        }
+        #endregion
+
+        #region FillVertexRelationDataContext
+        class FillVertexRelationDataContext {
+            readonly Stack<TVertex> stack;
+            readonly DisjointSet<TVertex> set;
+            int dfsNumber;
+
+            public FillVertexRelationDataContext(Stack<TVertex> stack, DisjointSet<TVertex> set) {
+                this.stack = stack;
+                this.set = set;
+                this.dfsNumber = 1;
+            }
+            public Stack<TVertex> Stack { get { return stack; } }
+            public DisjointSet<TVertex> Set { get { return set; } }
+            public int DfsNum { get { return dfsNumber; } set { dfsNumber = value; } }
+        }
+        #endregion
+
+        #region VertexRelationDataObj
+        class VertexRelationDataObj : IVertexRelation<TValue, TVertex> {
+            readonly DirectedGraph<TValue, TVertex> graph;
+            readonly DisjointSet<TVertex> vertexDisjointSet;
+
+            public VertexRelationDataObj(DirectedGraph<TValue, TVertex> graph, DisjointSet<TVertex> vertexDisjointSet) {
+                this.graph = graph;
+                this.vertexDisjointSet = vertexDisjointSet;
+            }
+            public bool AreStronglyConnected(TVertex vertex1, TVertex vertex2) {
+                Guard.IsNotNull(vertex1, nameof(vertex1));
+                Guard.IsNotNull(vertex2, nameof(vertex2));
+                this.graph.CheckVertexOwner(vertex1);
+                this.graph.CheckVertexOwner(vertex2);
+                return this.vertexDisjointSet.AreEquivalent(vertex1, vertex2);
+            }
+        }
+        #endregion
     }
 }
