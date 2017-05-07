@@ -54,7 +54,11 @@ namespace Data_Structures_and_Algorithms {
             set { data = value; }
         }
         internal TData GetData<TData>() where TData : IVertexData {
+            if(!IsDataOfType<TData>()) return default(TData);
             return (TData)this.Data;
+        }
+        internal bool IsDataOfType<TData>() where TData : IVertexData {
+            return Data != null && Data.GetType() == typeof(TData);
         }
 
         public T Value { get { return value; } }
@@ -411,6 +415,19 @@ namespace Data_Structures_and_Algorithms {
             var list = GetEulerianCircuitCore(vertex);
             return new ReadOnlyCollection<TVertex>(list);
         }
+        public bool ContainsCycle() {
+            if(Size == 0) return false;
+            Color colorID = Color.CreateColor();
+            for(int n = 0; n < Size; n++) {
+                var vertex = GetVertex(n);
+                if(vertex.Color != colorID) {
+                    if(ContainsCycle(vertex, colorID)) return true;
+                }
+            }
+            return false;
+        }
+        protected abstract bool ContainsCycle(TVertex vertex, Color colorID);
+
         internal EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2) {
             Guard.IsNotNull(vertex1, nameof(vertex1));
             Guard.IsNotNull(vertex2, nameof(vertex2));
@@ -616,6 +633,21 @@ namespace Data_Structures_and_Algorithms {
         protected override bool CanBePartOfEulerianCircuit(TVertex vertex) {
             return (vertex.Degree & 0x1) == 0;
         }
+        protected override bool ContainsCycle(TVertex vertex, Color colorID) {
+            return ContainsCycleCore(vertex, null, colorID);
+        }
+        bool ContainsCycleCore(TVertex vertex, TVertex ancestor, Color colorID) {
+            vertex.Color = colorID;
+            List<TVertex> adjacentList = Data.GetAdjacentVertextList(vertex);
+            for(int i = 0; i < adjacentList.Count; i++) {
+                TVertex adjVertex = adjacentList[i];
+                if(!ReferenceEquals(adjVertex, ancestor)) {
+                    if(adjVertex.Color == colorID || ContainsCycleCore(adjVertex, vertex, colorID)) return true;
+                }
+            }
+            return false;
+        }
+
         #region GetCutVertexListData
         [DebuggerDisplay("DfsNum = {DfsNum}, DfsLow = {DfsLow}, ChildCount = {ChildCount}, IsInList = {IsInList}")]
         class GetCutVertexListData : IVertexData {
@@ -675,6 +707,23 @@ namespace Data_Structures_and_Algorithms {
         protected override bool CanBePartOfEulerianCircuit(TVertex vertex) {
             return vertex.InDegree == vertex.OutDegree;
         }
+        protected override bool ContainsCycle(TVertex vertex, Color colorID) {
+            return ContainsCycleCore(vertex, colorID);
+        }
+        bool ContainsCycleCore(TVertex vertex, Color colorID) {
+            vertex.Color = colorID;
+            vertex.Data = ContainsCycleData.Default;
+            List<TVertex> adjacentList = Data.GetAdjacentVertextList(vertex);
+            for(int i = 0; i < adjacentList.Count; i++) {
+                TVertex adjVertex = adjacentList[i];
+                if((adjVertex.Color == colorID && adjVertex.IsDataOfType<ContainsCycleData>()) || ContainsCycleCore(adjVertex, colorID)) {
+                    vertex.Data = null;
+                    return true;
+                }
+            }
+            vertex.Data = null;
+            return false;
+        }
 
         void FillVertexRelationDataCore(DisjointSet<TVertex> set) {
             if(Size == 0) return;
@@ -710,6 +759,14 @@ namespace Data_Structures_and_Algorithms {
             }
             return true;
         }
+
+        #region ContainsCycleData
+        class ContainsCycleData : IVertexData {
+            public ContainsCycleData() {
+            }
+            public static readonly ContainsCycleData Default = new ContainsCycleData();
+        }
+        #endregion
 
         #region FillVertexRelationData
         [DebuggerDisplay("DfsNum = {DfsNum}, LowNum = {LowNum}, IsInStack = {IsInStack}")]

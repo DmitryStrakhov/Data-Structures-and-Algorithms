@@ -777,6 +777,18 @@ namespace Data_Structures_and_Algorithms.Tests {
             var result = graph.GetEulerianCircuit(vA);
             CollectionAssert.AreEqual(new TVertex[] { vA }, result);
         }
+        [TestMethod]
+        public void ContainsCycleInEmptyGraphTest() {
+            var graph = CreateGraph();
+            Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleSimpleTest1() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            Assert.IsFalse(graph.ContainsCycle());
+        }
 
         #region TestEdgeData
         protected class TestEdgeData : IEdgeData {
@@ -1362,6 +1374,99 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.CreateEdge(vE, vF);
             var result = graph.GetEulerianCircuit(vD);
             CollectionAssert.AreEqual(new TVertex[] { vD, vE, vF, vG, vD }, result);
+        }
+        [TestMethod]
+        public void ContainsCycleSimpleTest2() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            graph.CreateEdge(v1, v2);
+            Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest1() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v2, v3);
+            Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            var vI = graph.CreateVertex('I');
+            var vJ = graph.CreateVertex('J');
+            var vK = graph.CreateVertex('K');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vC, vF);
+            graph.CreateEdge(vF, vG);
+            graph.CreateEdge(vG, vH);
+            graph.CreateEdge(vF, vK);
+            graph.CreateEdge(vK, vJ);
+            graph.CreateEdge(vJ, vI);
+            Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest3() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v2, v3);
+            graph.CreateEdge(v1, v3);
+            Assert.IsTrue(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest4() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            var vI = graph.CreateVertex('I');
+            var vJ = graph.CreateVertex('J');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vD, vE);
+            graph.CreateEdge(vC, vF);
+            graph.CreateEdge(vF, vG);
+            graph.CreateEdge(vG, vH);
+            graph.CreateEdge(vF, vJ);
+            graph.CreateEdge(vJ, vI);
+            graph.CreateEdge(vI, vH);
+            Assert.IsTrue(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest5() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            var v4 = graph.CreateVertex('4');
+            var v5 = graph.CreateVertex('5');
+            graph.CreateEdge(v3, v4);
+            graph.CreateEdge(v3, v5);
+            graph.CreateEdge(v4, v5);
+            Assert.IsTrue(graph.ContainsCycle());
         }
     }
 
@@ -2034,6 +2139,96 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsFalse(data.AreStronglyConnected(vA, vE));
             Assert.IsFalse(data.AreStronglyConnected(vC, vE));
             Assert.IsFalse(data.AreStronglyConnected(vH, vG));
+        }
+        [TestMethod]
+        public void ContainsCycleSimpleTest2() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v2, v1);
+            Assert.IsTrue(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest1() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v2, v3);
+            graph.CreateEdge(v1, v3);
+            Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest2() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            graph.CreateEdge(vA, vG);
+            graph.CreateEdge(vB, vF);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vE);
+            graph.CreateEdge(vD, vF);
+            graph.CreateEdge(vE, vB);
+            graph.CreateEdge(vE, vD);
+            graph.CreateEdge(vF, vH);
+            graph.CreateEdge(vG, vB);
+            graph.CreateEdge(vG, vH);
+            Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest3() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v2, v3);
+            graph.CreateEdge(v3, v1);
+            Assert.IsTrue(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest4() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            graph.CreateEdge(vA, vG);
+            graph.CreateEdge(vB, vF);
+            graph.CreateEdge(vC, vA);
+            graph.CreateEdge(vC, vE);
+            graph.CreateEdge(vD, vF);
+            graph.CreateEdge(vE, vB);
+            graph.CreateEdge(vE, vD);
+            graph.CreateEdge(vF, vH);
+            graph.CreateEdge(vG, vB);
+            graph.CreateEdge(vH, vG);
+            Assert.IsTrue(graph.ContainsCycle());
+        }
+        [TestMethod]
+        public void ContainsCycleTest5() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            var v4 = graph.CreateVertex('4');
+            var v5 = graph.CreateVertex('5');
+            graph.CreateEdge(v3, v4);
+            graph.CreateEdge(v4, v5);
+            graph.CreateEdge(v5, v3);
+            Assert.IsTrue(graph.ContainsCycle());
         }
     }
 
