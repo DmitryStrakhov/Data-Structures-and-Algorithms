@@ -177,7 +177,11 @@ namespace Data_Structures_and_Algorithms {
         public DirectedAdjMatrixGraph(int capacity)
             : base(capacity) {
         }
-
+        public DirectedAdjMatrixGraph<T> BuildTransposeGraph() {
+            DirectedAdjMatrixGraph<T> graph = new DirectedAdjMatrixGraph<T>();
+            FillTransposeGraph(graph);
+            return graph;
+        }
         internal override GraphDataBase<T, DirectedAdjMatrixGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjMatrixGraphData<T>(capacity);
         }

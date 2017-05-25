@@ -699,6 +699,14 @@ namespace Data_Structures_and_Algorithms {
             FillVertexRelationDataCore(vertexDisjointSet);
             return new VertexRelationDataObj(this, vertexDisjointSet);
         }
+        protected internal void FillTransposeGraph(DirectedGraph<TValue, TVertex> graph) {
+            foreach(TVertex vertex in Data.GetVertexList()) {
+                graph.CreateVertex(vertex.Value);
+            }
+            foreach(var edge in Data.GetEdgeList()) {
+                graph.CreateEdge(graph.GetVertex(edge.EndVertex.Handle), graph.GetVertex(edge.StartVertex.Handle), edge.Weight);
+            }
+        }
         protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
             base.CreateEdgeCore(vertex1, vertex2, weight);
             vertex1.OutDegree++;

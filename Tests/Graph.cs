@@ -2230,6 +2230,97 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.CreateEdge(v5, v3);
             Assert.IsTrue(graph.ContainsCycle());
         }
+        [TestMethod]
+        public void BuildTransposeGraphSimpeTest1() {
+            var transposeGraph = CreateGraph();
+            CreateGraph().FillTransposeGraph(transposeGraph);
+            CollectionAssertEx.IsEmpty(transposeGraph.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(transposeGraph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void BuildTransposeGraphSimpeTest2() {
+            var graph = CreateGraph();
+            graph.CreateVertex('A');
+            var transposeGraph = CreateGraph();
+            graph.FillTransposeGraph(transposeGraph);
+            CollectionAssert.AreEqual(new char[] { 'A' }, transposeGraph.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(transposeGraph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void BuildTransposeGraphTest1() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            graph.CreateEdge(vA, vA);
+            var transposeGraph = CreateGraph();
+            graph.FillTransposeGraph(transposeGraph);
+            CollectionAssert.AreEqual(new char[] { 'A' }, transposeGraph.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdgeList = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('A', 'A', 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, transposeGraph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void BuildTransposeGraphTest2() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            graph.CreateEdge(v1, v2);
+            var transposeGraph = CreateGraph();
+            graph.FillTransposeGraph(transposeGraph);
+            char[] extectedValues = new char[] { '1', '2' };
+            CollectionAssert.AreEqual(extectedValues, transposeGraph.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdgeList = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('2', '1', 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, transposeGraph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void BuildTransposeGraphTest3() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            graph.CreateEdge(v1, v2);
+            graph.CreateEdge(v2, v1);
+            var transposeGraph = CreateGraph();
+            graph.FillTransposeGraph(transposeGraph);
+            char[] extectedValues = new char[] { '1', '2' };
+            CollectionAssert.AreEqual(extectedValues, transposeGraph.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdgeList = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('1', '2', 1),
+                new EdgeTriplet<char>('2', '1', 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, transposeGraph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void BuildTransposeGraphTest4() {
+            var graph = CreateGraph();
+            var v1 = graph.CreateVertex('1');
+            var v2 = graph.CreateVertex('2');
+            var v3 = graph.CreateVertex('3');
+            var v4 = graph.CreateVertex('4');
+            var v5 = graph.CreateVertex('5');
+            var v6 = graph.CreateVertex('6');
+            var v7 = graph.CreateVertex('7');
+            graph.CreateEdge(v1, v2, 1);
+            graph.CreateEdge(v2, v3, 2);
+            graph.CreateEdge(v1, v3, 1);
+            graph.CreateEdge(v2, v4, 3);
+            graph.CreateEdge(v5, v4, 4);
+            graph.CreateEdge(v6, v7, 5);
+            var transposeGraph = CreateGraph();
+            graph.FillTransposeGraph(transposeGraph);
+            char[] extectedValues = new char[] { '1', '2', '3', '4', '5', '6', '7' };
+            CollectionAssert.AreEqual(extectedValues, transposeGraph.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdgeList = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('2', '1', 1),
+                new EdgeTriplet<char>('3', '1', 1),
+                new EdgeTriplet<char>('3', '2', 2),
+                new EdgeTriplet<char>('4', '2', 3),
+                new EdgeTriplet<char>('4', '5', 4),
+                new EdgeTriplet<char>('7', '6', 5),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, transposeGraph.GetEdgeTripletList());
+        }
     }
 
 
@@ -2581,6 +2672,15 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
     }
 
+
+    static class GraphTestExtensions {
+        public static List<TValue> GetVertexValueList<TValue, TVertex>(this Graph<TValue, TVertex> graph) where TVertex : Vertex<TValue> {
+            return graph.GetVertexList().Select(x => x.Value).ToList();
+        }
+        public static List<EdgeTriplet<TValue>> GetEdgeTripletList<TValue, TVertex>(this Graph<TValue, TVertex> graph) where TVertex : Vertex<TValue> {
+            return graph.GetEdgeList().Select(x => x.CreateTriplet()).ToList();
+        }
+    }
 
     class GraphTestUtils {
         #region Test Graph

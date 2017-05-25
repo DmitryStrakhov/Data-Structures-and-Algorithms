@@ -118,8 +118,8 @@ namespace Data_Structures_and_Algorithms {
             public IEnumerable<TVertex> GetVertices(bool includeBaseVertex = true) {
                 if(includeBaseVertex) {
                     yield return Vertex;
-                    if(this.selfLooped) yield return Vertex;
                 }
+                if(this.selfLooped) yield return Vertex;
                 foreach(var item in Items) {
                     if(!ReferenceEquals(item, Vertex)) yield return item;
                 }
@@ -223,6 +223,11 @@ namespace Data_Structures_and_Algorithms {
         }
         public DirectedAdjSetGraph(int capacity)
             : base(capacity) {
+        }
+        public DirectedAdjSetGraph<T> BuildTransposeGraph() {
+            DirectedAdjSetGraph<T> graph = new DirectedAdjSetGraph<T>();
+            FillTransposeGraph(graph);
+            return graph;
         }
         internal override GraphDataBase<T, DirectedAdjSetGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjSetGraphData<T>(capacity);

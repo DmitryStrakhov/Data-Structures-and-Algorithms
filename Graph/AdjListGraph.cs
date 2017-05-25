@@ -226,6 +226,11 @@ namespace Data_Structures_and_Algorithms {
         public DirectedAdjListGraph(int capacity)
             : base(capacity) {
         }
+        public DirectedAdjListGraph<T> BuildTransposeGraph() {
+            DirectedAdjListGraph<T> graph = new DirectedAdjListGraph<T>();
+            FillTransposeGraph(graph);
+            return graph;
+        }
         internal override GraphDataBase<T, DirectedAdjListGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjListGraphData<T>(capacity);
         }
