@@ -255,7 +255,7 @@ namespace Data_Structures_and_Algorithms {
             return !AreEquals(x, y);
         }
         #endregion
-        
+
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
             Color other = (Color)obj;
@@ -293,6 +293,20 @@ namespace Data_Structures_and_Algorithms {
         internal abstract void UpdateEdgeData(TVertex vertex1, TVertex vertex2, Func<EdgeData, EdgeData> updateFunc);
     }
 
+    abstract class BipartiteGraphDataBase<TValue, TVertex> : GraphDataBase<TValue, TVertex> where TVertex : BipartiteGraphVertex<TValue> {
+        public BipartiteGraphDataBase(int capacity)
+            : base(capacity) {
+        }
+        internal abstract void RegisterUVertex(TVertex vertex);
+        internal abstract void RegisterVVertex(TVertex vertex);
+        internal abstract List<TVertex> GetUVertexList();
+        internal abstract List<TVertex> GetVVertexList();
+        internal abstract int GetUSize();
+        internal abstract int GetVSize();
+        internal abstract TVertex GetUVertex(int handle);
+        internal abstract TVertex GetVVertex(int handle);
+    }
+
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
         readonly Guid id;
         GraphProperties properties;
@@ -304,11 +318,8 @@ namespace Data_Structures_and_Algorithms {
             this.properties = GraphProperties.Unweighted;
             this._data = CreateDataCore(capacity);
         }
-        public TVertex CreateVertex(TValue value) {
-            TVertex vertex = CreateVertexCore(value);
-            vertex.OwnerID = this.id;
-            Data.RegisterVertex(vertex);
-            return vertex;
+        public virtual TVertex CreateVertex(TValue value) {
+            return CreateVertex(value, Data.RegisterVertex);
         }
         public void CreateEdge(TVertex vertex1, TVertex vertex2) {
             CreateEdge(vertex1, vertex2, 1d);
@@ -428,6 +439,12 @@ namespace Data_Structures_and_Algorithms {
         }
         protected abstract bool ContainsCycle(TVertex vertex, Color colorID);
 
+        protected TVertex CreateVertex(TValue value, Action<TVertex> dataRegisterAction) {
+            TVertex vertex = CreateVertexCore(value);
+            vertex.OwnerID = this.id;
+            dataRegisterAction(vertex);
+            return vertex;
+        }
         internal EdgeData GetEdgeData(TVertex vertex1, TVertex vertex2) {
             Guard.IsNotNull(vertex1, nameof(vertex1));
             Guard.IsNotNull(vertex2, nameof(vertex2));
@@ -610,7 +627,7 @@ namespace Data_Structures_and_Algorithms {
                 }
             }
         }
-        protected internal void DoBuildMSF(UndirectedGraph<TValue, TVertex> forest) {
+        protected internal TGraph DoBuildMSF<TGraph>(TGraph forest) where TGraph : UndirectedGraph<TValue, TVertex> {
             DisjointSet<TVertex> set = new DisjointSet<TVertex>();
             foreach(TVertex vertex in GetVertexList()) {
                 set.MakeSet(vertex);
@@ -624,6 +641,7 @@ namespace Data_Structures_and_Algorithms {
                     forest.CreateEdge(forest.GetVertex(edge.StartVertex.Handle), forest.GetVertex(edge.EndVertex.Handle), edge.Weight);
                 }
             }
+            return forest;
         }
         protected override void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
             base.CreateEdgeCore(vertex1, vertex2, weight);

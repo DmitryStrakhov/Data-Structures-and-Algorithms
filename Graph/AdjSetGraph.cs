@@ -204,9 +204,7 @@ namespace Data_Structures_and_Algorithms {
             : base(capacity) {
         }
         public AdjSetGraph<T> BuildMSF() {
-            AdjSetGraph<T> graph = new AdjSetGraph<T>();
-            DoBuildMSF(graph);
-            return graph;
+            return DoBuildMSF(new AdjSetGraph<T>());
         }
         internal override GraphDataBase<T, AdjSetGraphVertex<T>> CreateDataCore(int capacity) {
             return new UndirectedAdjSetGraphData<T>(capacity);

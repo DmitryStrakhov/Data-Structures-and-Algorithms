@@ -156,9 +156,7 @@ namespace Data_Structures_and_Algorithms {
             : base(capacity) {
         }
         public AdjMatrixGraph<T> BuildMSF() {
-            AdjMatrixGraph<T> graph = new AdjMatrixGraph<T>();
-            DoBuildMSF(graph);
-            return graph;
+            return DoBuildMSF(new AdjMatrixGraph<T>());
         }
 
         internal override GraphDataBase<T, AdjMatrixGraphVertex<T>> CreateDataCore(int capacity) {
