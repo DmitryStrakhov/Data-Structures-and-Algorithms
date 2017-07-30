@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -62,14 +63,14 @@ namespace Data_Structures_and_Algorithms {
         int vCapacity;
         TVertex[] uVertexList;
         TVertex[] vVertexList;
-        readonly RectMatrix<EdgeData> matrix;
+        readonly RectMatrix<EdgeData, Color> matrix;
 
         public BiAdjMatrixGraphDataBase(int capacity) : base(capacity) {
             this.uSize = this.vSize = 0;
             this.uCapacity = this.vCapacity = capacity;
             this.uVertexList = new TVertex[capacity];
             this.vVertexList = new TVertex[capacity];
-            this.matrix = new RectMatrix<EdgeData>(capacity, capacity);
+            this.matrix = new RectMatrix<EdgeData, Color>(capacity, capacity);
         }
         public int USize { get { return uSize; } }
         public int VSize { get { return vSize; } }
@@ -170,23 +171,23 @@ namespace Data_Structures_and_Algorithms {
             return Matrix[vVertex.Handle, uVertex.Handle];
         }
 
-        bool AreInTheSamePartition(TVertex vertex1, TVertex vertex2) {
+        internal bool AreInTheSamePartition(TVertex vertex1, TVertex vertex2) {
             return vertex1.PartitionID.Equals(vertex2.PartitionID);
         }
-        bool IsUVertex(TVertex vertex) {
+        internal override bool IsUVertex(TVertex vertex) {
             return USize != 0 && AreInTheSamePartition(UVertexList.First(), vertex);
         }
-        bool IsVVertex(TVertex vertex) {
+        internal override bool IsVVertex(TVertex vertex) {
             return VSize != 0 && AreInTheSamePartition(VVertexList.First(), vertex);
         }
-        protected TVertex GetUVertex(TVertex vertex1, TVertex vertex2) {
+        internal override TVertex GetUVertex(TVertex vertex1, TVertex vertex2) {
             if(IsUVertex(vertex1))
                 return vertex1;
             if(IsUVertex(vertex2))
                 return vertex2;
             throw new InvalidOperationException();
         }
-        protected TVertex GetVVertex(TVertex vertex1, TVertex vertex2) {
+        internal override TVertex GetVVertex(TVertex vertex1, TVertex vertex2) {
             if(IsVVertex(vertex1))
                 return vertex1;
             if(IsVVertex(vertex2))
@@ -234,7 +235,7 @@ namespace Data_Structures_and_Algorithms {
         }
         public TVertex[] UVertexList { get { return uVertexList; } }
         public TVertex[] VVertexList { get { return vVertexList; } }
-        public RectMatrix<EdgeData> Matrix { get { return matrix; } }
+        public RectMatrix<EdgeData, Color> Matrix { get { return matrix; } }
     }
 
     class UndirectedBiAdjMatrixGraphData<T> : BiAdjMatrixGraphDataBase<T, BipartiteGraphVertex<T>> {
@@ -245,6 +246,11 @@ namespace Data_Structures_and_Algorithms {
             var uVertex = GetUVertex(vertex1, vertex2);
             var vVertex = GetVVertex(vertex1, vertex2);
             Matrix[vVertex.Handle, uVertex.Handle] = new EdgeData(weight);
+        }
+        internal override void DeleteEdge(BipartiteGraphVertex<T> vertex1, BipartiteGraphVertex<T> vertex2) {
+            var uVertex = GetUVertex(vertex1, vertex2);
+            var vVertex = GetVVertex(vertex1, vertex2);
+            Matrix[vVertex.Handle, uVertex.Handle] = EdgeData.Empty;
         }
         internal override void UpdateEdgeData(BipartiteGraphVertex<T> vertex1, BipartiteGraphVertex<T> vertex2, Func<EdgeData, EdgeData> updateFunc) {
             var uVertex = GetUVertex(vertex1, vertex2);
@@ -296,10 +302,201 @@ namespace Data_Structures_and_Algorithms {
             }
             return forest;
         }
+        public void DeleteEdge(BipartiteGraphVertex<T> vertex1, BipartiteGraphVertex<T> vertex2) {
+            Guard.IsNotNull(vertex1, nameof(vertex1));
+            Guard.IsNotNull(vertex2, nameof(vertex2));
+            CheckVertexOwner(vertex1);
+            CheckVertexOwner(vertex2);
+            if(!Data.AreVerticesAdjacent(vertex1, vertex2))
+                throw new InvalidOperationException();
+            EdgeData edgeData = Data.GetEdgeData(vertex1, vertex2);
+            Data.DeleteEdge(vertex1, vertex2);
+            vertex1.Degree--;
+            vertex2.Degree--;
+            Properties.OnEdgeDeleted(edgeData);
+        }
+        public BipartiteGraphMatching<T> GetMaximalMatching() {
+            if(!Properties.IsUnweighted)
+                throw new InvalidOperationException();
+            return GetMaximalMatchingCore();
+        }
+        BipartiteGraphMatching<T> GetMaximalMatchingCore() {
+            BipartiteGraphMatching<T> matching = Clone<BipartiteGraphMatching<T>>(false);
+            if(Size != 0)
+                FillMaximalMatching(matching);
+            return matching;
+        }
+        void FillMaximalMatching(BipartiteGraphMatching<T> matching) {
+            GetMaximalMatchingFSet fSet = new GetMaximalMatchingFSet(Data.VSize);
+            do {
+                fSet.Clear();
+                var freeUVertexList = Data.GetUVertexList().Where(x => !IsMatchedVertex(x));
+                foreach(var uVertex in freeUVertexList) {
+                    Color bfsColor = Color.CreateColor();
+                    DoBFSearch(uVertex, (x, y) =>
+                        IsMatchedEdge(x, y) ? Data.IsVVertex(x) : Data.IsUVertex(x)
+                    , (x, y) =>
+                        Data.UpdateEdgeData(x, y, edgeData => edgeData.WithColor(bfsColor))
+                    , x => {
+                        if(Data.IsVVertex(x) && !IsMatchedVertex(x)) {
+                            if(IsInFSet(x)) {
+                                fSet.UpdateItem(x.GetData<GetMaximalMatchingVertexInFSetData>().ItemIndex, new GetMaximalMatchingFSetItem(x, bfsColor));
+                            }
+                            else {
+                                int itemIndex = fSet.AddItem(new GetMaximalMatchingFSetItem(x, bfsColor));
+                                x.Data = new GetMaximalMatchingVertexInFSetData(itemIndex);
+                            }
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+                foreach(var fSetItem in fSet) {
+                    DoDFSearch(fSetItem.Vertex, (x, y) => Data.GetEdgeData(x, y).Color == fSetItem.BfsColor
+                    , (x, y) => {
+                        var uVertex = matching.Data.GetUVertex(Data.GetUVertex(x, y).Handle);
+                        var vVertex = matching.Data.GetVVertex(Data.GetVVertex(x, y).Handle);
+                        if(IsMatchedEdge(x, y)) {
+                            Data.GetEdgeData(x, y).WithData(null);
+                            matching.DeleteEdge(uVertex, vVertex);
+                        }
+                        else {
+                            Data.UpdateEdgeData(x, y, edgeData => edgeData.WithData(new GetMaximalMatchingMatchedData()));
+                            matching.CreateEdge(uVertex, vVertex);
+                        }
+                    }, x => {
+                        bool stopSearch = Data.IsUVertex(x) && !IsMatchedVertex(x);
+                        x.Data = new GetMaximalMatchingMatchedData();
+                        return stopSearch ? false : true;
+                    });
+                }
+            }
+            while(fSet.Size != 0);
+            ClearData(true, true);
+        }
+        public BipartiteGraphMatching<T> GetAssignmentMatching() {
+            if(Data.USize != Data.VSize || Properties.IsNegativeWeighted || !IsComplete()) {
+                throw new InvalidOperationException();
+            }
+            BipartiteGraphMatching<T> graph = Clone<BipartiteGraphMatching<T>>(false);
+            Func<int, int, double, EdgeData, EdgeData> func1 = (row, column, minVal, x) => {
+                var edgeData = x.WithWeight(x.Weight - minVal);
+                if(MathUtils.AreEquals(edgeData.Weight, 0))
+                    graph.EnsureEdge(column, row, x.Weight);
+                return edgeData;
+            };
+            Func<int, int, double, EdgeData, EdgeData> func2 = (row, column, minVal, x) => {
+                var edgeData = x.WithWeight(x.Weight + minVal);
+                if(!MathUtils.AreEquals(edgeData.Weight, 0))
+                    graph.EnsureNoEdge(column, row);
+                return edgeData;
+            };
+            RectMatrix<EdgeData, Color> matrix = Data.Matrix.Clone();
+            int rowCount = matrix.Size.RowCount;
+            for(int n = 0; n < rowCount; n++) {
+                double minVal = matrix.GetRowItemList(n).Select(x => x.Weight).Min();
+                matrix.TranslateRow(n, func1, minVal);
+            }
+            if(graph.IsPerfect())
+                return graph;
+            int columnCount = matrix.Size.ColumnCount;
+            for(int n = 0; n < columnCount; n++) {
+                double minVal = matrix.GetColumnItemList(n).Select(x => x.Weight).Min();
+                matrix.TranslateColumn(n, func1, minVal);
+            }
+            if(graph.IsPerfect())
+                return graph;
+            while(true) {
+                var matching = graph.GetMaximalMatchingCore();
+                if(matching.IsPerfect())
+                    return CloneWithEdges(matching);
+                Color color1 = Color.CreateColor();
+                matching.Data.GetVVertexList()
+                    .Where(x => x.Degree != 0)
+                    .ForEach(x => matrix.RowAttributes[x.Handle] = color1);
+                Color color2 = Color.CreateColor();
+                matrix.TranslateRowAttributes((row, rowColor) => rowColor != color1, x => color2);
+                matrix.ForEach((row, column, rowColor, columnColor, x) => rowColor == color2 && MathUtils.AreEquals(x.Weight, 0), (row, column, x) => {
+                    matrix.ColumnAttributes[column] = color2;
+                    for(int n = 0; n < matrix.Size.RowCount; n++) {
+                        if(matching.AreVerticesAdjacent(column, n)) matrix.RowAttributes[n] = color2;
+                    }
+                });
+                Color color3 = Color.CreateColor();
+                matrix.TranslateColumnAttributes((column, columnColor) => columnColor == color2, x => color3);
+                matrix.TranslateRowAttributes((row, rowColor) => rowColor != color2, x => color3);
+                double minValue = matrix.GetItems((row, column, rowColor, columnColor, x) => rowColor != color3 && columnColor != color3).Select(x => x.Weight).Min();
+                matrix.Translate((row, column, rowColor, columnColor, x) => rowColor != color3 && columnColor != color3, func1, minValue);
+                matrix.Translate((row, column, rowColor, columnColor, x) => rowColor == color3 && columnColor == color3, func2, minValue);
+            }
+        }
+        public bool IsComplete() {
+            if(Data.USize == 0 || Data.VSize == 0) {
+                return false;
+            }
+            return Properties.EdgeCount == Data.USize * Data.VSize;
+        }
+        internal TGraph Clone<TGraph>(bool cloneEdges) where TGraph : BipartiteGraph<T>, new() {
+            TGraph graph = new TGraph();
+            foreach(var vertex in Data.GetUVertexList()) {
+                graph.U.CreateVertex(vertex.Value);
+            }
+            foreach(var vertex in Data.GetVVertexList()) {
+                graph.V.CreateVertex(vertex.Value);
+            }
+            if(cloneEdges) {
+                foreach(var edgeData in GetEdgeList()) {
+                    graph.CreateEdge(edgeData.StartVertex.Handle, edgeData.EndVertex.Handle, edgeData.Weight);
+                }
+            }
+            return graph;
+        }
+        internal TGraph CloneWithEdges<TGraph>(TGraph graph) where TGraph : BipartiteGraph<T>, new() {
+            Guard.IsNotNull(graph, nameof(graph));
+            if(Data.GetUSize() != graph.Data.GetUSize() || Data.GetVSize() != graph.Data.GetVSize()) {
+                throw new InvalidOperationException();
+            }
+            TGraph result = Clone<TGraph>(false);
+            foreach(var edge in graph.GetEdgeList()) {
+                int uVertexHandle = edge.StartVertex.Handle;
+                var vVertexHandle = edge.EndVertex.Handle;
+                if(!AreVerticesAdjacent(uVertexHandle, vVertexHandle))
+                    throw new InvalidOperationException();
+                EdgeData edgeData = GetEdgeData(uVertexHandle, vVertexHandle);
+                result.CreateEdge(uVertexHandle, vVertexHandle, edgeData.Weight);
+            }
+            return result;
+        }
+        #region Utils
+        bool AreVerticesAdjacent(int uVertexHandle, int vVertexHandle) {
+            return Data.AreVerticesAdjacent(GetUVertex(uVertexHandle), GetVVertex(vVertexHandle));
+        }
+        EdgeData GetEdgeData(int uVertexHandle, int vVertexHandle) {
+            return Data.GetEdgeData(GetUVertex(uVertexHandle), GetVVertex(vVertexHandle));
+        }
+        void CreateEdge(int uVertexHandle, int vVertexHandle, double weight) {
+            Data.CreateEdge(GetUVertex(uVertexHandle), GetVVertex(vVertexHandle), weight);
+        }
+        void DeleteEdge(int uVertexHandle, int vVertexHandle) {
+            Data.DeleteEdge(GetUVertex(uVertexHandle), GetVVertex(vVertexHandle));
+        }
+        void EnsureEdge(int uVertexHandle, int vVertexHandle, double weight) {
+            if(!AreVerticesAdjacent(uVertexHandle, vVertexHandle)) CreateEdge(uVertexHandle, vVertexHandle, weight);
+        }
+        void EnsureNoEdge(int uVertexHandle, int vVertexHandle) {
+            if(AreVerticesAdjacent(uVertexHandle, vVertexHandle)) DeleteEdge(uVertexHandle, vVertexHandle);
+        }
+        BipartiteGraphVertex<T> GetUVertex(int uVertexHandle) { return Data.GetUVertex(uVertexHandle); }
+        BipartiteGraphVertex<T> GetVVertex(int vVertexHandle) { return Data.GetVVertex(vVertexHandle); }
+        #endregion
 
         public BipartiteGraphPartition<T, BipartiteGraphVertex<T>> U { get { return uPartition; } }
         public BipartiteGraphPartition<T, BipartiteGraphVertex<T>> V { get { return vPartition; } }
 
+        protected override bool AllowEdge(BipartiteGraphVertex<T> vertex1, BipartiteGraphVertex<T> vertex2) {
+            if(Data.AreVerticesAdjacent(vertex1, vertex2)) return false;
+            return true;
+        }
         internal override GraphDataBase<T, BipartiteGraphVertex<T>> CreateDataCore(int capacity) {
             return new UndirectedBiAdjMatrixGraphData<T>(capacity);
         }
@@ -307,5 +504,62 @@ namespace Data_Structures_and_Algorithms {
             return new BipartiteGraphVertex<T>(value);
         }
         internal new UndirectedBiAdjMatrixGraphData<T> Data { get { return (UndirectedBiAdjMatrixGraphData<T>)base.Data; } }
+
+        #region GetMaximalMatchingMatchedData
+        class GetMaximalMatchingMatchedData : IVertexData, IEdgeData {
+            public GetMaximalMatchingMatchedData() {
+            }
+        }
+        bool IsMatchedVertex(BipartiteGraphVertex<T> vertex) {
+            return vertex.IsDataOfType<GetMaximalMatchingMatchedData>();
+        }
+        bool IsMatchedEdge(BipartiteGraphVertex<T> vertex1, BipartiteGraphVertex<T> vertex2) {
+            EdgeData edgeData = Data.GetEdgeData(vertex1, vertex2);
+            return edgeData.IsDataOfType<GetMaximalMatchingMatchedData>();
+        }
+        #endregion
+        #region GetMaximalMatchingVertexInFSetData
+        class GetMaximalMatchingVertexInFSetData : IVertexData {
+            readonly int itemIIndex;
+            public GetMaximalMatchingVertexInFSetData(int itemIIndex) {
+                this.itemIIndex = itemIIndex;
+            }
+            public int ItemIndex { get { return itemIIndex; } }
+        }
+        bool IsInFSet(BipartiteGraphVertex<T> vertex) {
+            return vertex.IsDataOfType<GetMaximalMatchingVertexInFSetData>();
+        }
+        #endregion
+
+        #region GetMaximalMatchingFSet
+        class GetMaximalMatchingFSet : SimpleSet<GetMaximalMatchingFSetItem> {
+            public GetMaximalMatchingFSet(int vVertexListSize)
+                : base(vVertexListSize) {
+            }
+        }
+        #endregion
+
+        #region GetMaximalMatchingFSetItem
+        class GetMaximalMatchingFSetItem {
+            readonly BipartiteGraphVertex<T> vertex;
+            readonly Color bfsColor;
+
+            public GetMaximalMatchingFSetItem(BipartiteGraphVertex<T> vertex, Color bfsColor) {
+                this.vertex = vertex;
+                this.bfsColor = bfsColor;
+            }
+            public Color BfsColor { get { return bfsColor; } }
+            public BipartiteGraphVertex<T> Vertex { get { return vertex; } }
+        }
+        #endregion
+    }
+
+    public class BipartiteGraphMatching<T> : BipartiteGraph<T> {
+        public BipartiteGraphMatching()
+            : base() {
+        }
+        public bool IsPerfect() {
+            return Size != 0 && Data.GetVertexList().All(x => x.Degree == 1);
+        }
     }
 }

@@ -332,38 +332,61 @@ namespace Data_Structures_and_Algorithms.Tests {
         [TestMethod]
         public void UnweightedGraphTest() {
             var graph = CreateGraph();
-            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            Assert.IsTrue(graph.Properties.IsUnweighted);
+            Assert.IsFalse(graph.Properties.IsWeighted);
+            Assert.IsFalse(graph.Properties.IsNegativeWeighted);
             var vA = graph.CreateVertex('A');
             var vB = graph.CreateVertex('B');
             var vC = graph.CreateVertex('C');
             graph.CreateEdge(vA, vB);
             graph.CreateEdge(vB, vC);
             graph.CreateEdge(vC, vA);
-            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            Assert.IsTrue(graph.Properties.IsUnweighted);
+            Assert.IsFalse(graph.Properties.IsWeighted);
+            Assert.IsFalse(graph.Properties.IsNegativeWeighted);
         }
         [TestMethod]
         public void WeightedGraphTest() {
             var graph = CreateGraph();
-            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            Assert.IsTrue(graph.Properties.IsUnweighted);
             var vA = graph.CreateVertex('A');
             var vB = graph.CreateVertex('B');
             var vC = graph.CreateVertex('C');
             graph.CreateEdge(vA, vB);
             graph.CreateEdge(vB, vC, 2);
             graph.CreateEdge(vC, vA, 3);
-            Assert.AreEqual(GraphProperties.Weighted, graph.Properties);
+            Assert.IsFalse(graph.Properties.IsUnweighted);
+            Assert.IsTrue(graph.Properties.IsWeighted);
+            Assert.IsFalse(graph.Properties.IsNegativeWeighted);
         }
         [TestMethod]
         public void NegativeWeightedGraphTest() {
             var graph = CreateGraph();
-            Assert.AreEqual(GraphProperties.Unweighted, graph.Properties);
+            Assert.IsTrue(graph.Properties.IsUnweighted);
             var vA = graph.CreateVertex('A');
             var vB = graph.CreateVertex('B');
             var vC = graph.CreateVertex('C');
             graph.CreateEdge(vA, vB);
             graph.CreateEdge(vB, vC, -2);
             graph.CreateEdge(vC, vA, -3);
-            Assert.AreEqual(GraphProperties.Weighted | GraphProperties.NegativeWeighted, graph.Properties);
+            Assert.IsFalse(graph.Properties.IsUnweighted);
+            Assert.IsFalse(graph.Properties.IsWeighted);
+            Assert.IsTrue(graph.Properties.IsNegativeWeighted);
+        }
+        [TestMethod]
+        public void GraphEdgeCountTest() {
+            var graph = CreateGraph();
+            Assert.AreEqual(0, graph.Properties.EdgeCount);
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            graph.CreateEdge(vA, vD);
+            Assert.AreEqual(1, graph.Properties.EdgeCount);
+            graph.CreateEdge(vA, vB);
+            Assert.AreEqual(2, graph.Properties.EdgeCount);
+            graph.CreateEdge(vB, vC);
+            Assert.AreEqual(3, graph.Properties.EdgeCount);
         }
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void DistanceObjectGetPathToGuardCase1Test() {
@@ -788,6 +811,156 @@ namespace Data_Structures_and_Algorithms.Tests {
             var v1 = graph.CreateVertex('1');
             var v2 = graph.CreateVertex('2');
             Assert.IsFalse(graph.ContainsCycle());
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoDFSearchGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoDFSearch(null, (x, y) => true, (x, y) => { }, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DoDFSearchGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoDFSearch(CreateVertex('A'), (x, y) => true, (x, y) => { }, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoDFSearchGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoDFSearch(vA, null, (x, y) => { }, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoDFSearchGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoDFSearch(vA, (x, y) => true, null, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoDFSearchGuardCase5Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoDFSearch(vA, (x, y) => true, (x, y) => { }, null);
+        }
+        [TestMethod]
+        public void DoDFSearchTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vK = graph.CreateVertex('K');
+            var vM = graph.CreateVertex('M');
+            graph.CreateEdge(vA, vB, 2);
+            graph.CreateEdge(vA, vC, 1);
+            graph.CreateEdge(vC, vE, 1);
+            graph.CreateEdge(vC, vF, 7);
+            graph.CreateEdge(vE, vK, 3);
+            graph.CreateEdge(vE, vM, 1);
+            List<char> vertexList = new List<char>();
+            List<char> edgeActionList = new List<char>();
+            graph.DoDFSearch(vA, (x, y) => MathUtils.AreEquals(graph.GetEdgeData(x, y).Weight, 1), (x, y) => { edgeActionList.AddRange(new char[] { x.Value, y.Value }); }, x => { vertexList.Add(x.Value); return true; });
+            CollectionAssert.AreEqual(new char[] { 'A', 'C', 'E', 'M' }, vertexList);
+            CollectionAssert.AreEqual(new char[] { 'A', 'C', 'C', 'E', 'E', 'M' }, edgeActionList);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoBFSearchGuardCase1Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoBFSearch(null, (x, y) => true, (x, y) => { }, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DoBFSearchGuardCase2Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoBFSearch(CreateVertex('A'), (x, y) => true, (x, y) => { }, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoBFSearchGuardCase3Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoBFSearch(vA, null, (x, y) => { }, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoBFSearchGuardCase4Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoBFSearch(vA, (x, y) => true, null, x => true);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DoBFSearchGuardCase5Test() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            graph.DoBFSearch(vA, (x, y) => true, (x, y) => { }, null);
+        }
+        [TestMethod]
+        public void DoBFSearchTest() {
+            var graph = CreateGraph();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            var vD = graph.CreateVertex('D');
+            var vE = graph.CreateVertex('E');
+            var vF = graph.CreateVertex('F');
+            var vG = graph.CreateVertex('G');
+            var vH = graph.CreateVertex('H');
+            var vI = graph.CreateVertex('I');
+            var vJ = graph.CreateVertex('J');
+            graph.CreateEdge(vA, vC, 3);
+            graph.CreateEdge(vA, vD, 7);
+            graph.CreateEdge(vA, vF, 5);
+            graph.CreateEdge(vA, vH, 1);
+            graph.CreateEdge(vC, vB, 2);
+            graph.CreateEdge(vD, vE, 2);
+            graph.CreateEdge(vF, vG, 9);
+            graph.CreateEdge(vH, vI, 6);
+            graph.CreateEdge(vH, vJ, 1);
+            List<char> vertexList = new List<char>();
+            List<char> edgeActionList = new List<char>();
+            graph.DoBFSearch(vA, (x, y) => MathUtils.AreEquals(graph.GetEdgeData(x, y).Weight, 1), (x, y) => { edgeActionList.AddRange(new char[] { x.Value, y.Value }); }, x => { vertexList.Add(x.Value); return true; });
+            CollectionAssert.AreEqual(new char[] { 'A', 'H', 'J' }, vertexList);
+            CollectionAssert.AreEqual(new char[] { 'A', 'H', 'H', 'J' }, edgeActionList);
         }
 
         #region TestEdgeData
@@ -2368,6 +2541,18 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CtorGuardCase2Test() {
             AdjMatrixGraph<char> graph = new AdjMatrixGraph<char>(0);
         }
+        [TestMethod]
+        public void GraphEdgeCountMultigraphCaseTest() {
+            AdjMatrixGraph<char> graph = new AdjMatrixGraph<char>();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vC);
+            Assert.AreEqual(2, graph.Properties.EdgeCount);
+        }
 
         protected override AdjMatrixGraph<char> CreateGraph() {
             return new AdjMatrixGraph<char>();
@@ -2426,6 +2611,18 @@ namespace Data_Structures_and_Algorithms.Tests {
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void CtorGuardCase2Test() {
             AdjListGraph<char> graph = new AdjListGraph<char>(0);
+        }
+        [TestMethod]
+        public void GraphEdgeCountMultigraphCaseTest() {
+            AdjListGraph<char> graph = new AdjListGraph<char>();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vC);
+            Assert.AreEqual(4, graph.Properties.EdgeCount);
         }
 
         protected override AdjListGraph<char> CreateGraph() {
@@ -2486,6 +2683,15 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CtorGuardCase2Test() {
             AdjSetGraph<char> graph = new AdjSetGraph<char>(0);
         }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void CreateEdgeMultigraphCaseTest() {
+            AdjSetGraph<char> graph = new AdjSetGraph<char>();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vB);
+        }
 
         protected override AdjSetGraph<char> CreateGraph() {
             return new AdjSetGraph<char>();
@@ -2502,7 +2708,7 @@ namespace Data_Structures_and_Algorithms.Tests {
     public class DirectedAdjMatrixGraphTests : DirectedGraphBaseTests<DirectedAdjMatrixGraphVertex<char>, Edge<char, DirectedAdjMatrixGraphVertex<char>>, DirectedAdjMatrixGraph<char>> {
         [TestMethod]
         public void CreateVertexTest() {
-            DirectedAdjMatrixGraph<char> graph = CreateGraph();
+            DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>();
             var vA = graph.CreateVertex('A');
             var vB = graph.CreateVertex('B');
             var vC = graph.CreateVertex('C');
@@ -2515,7 +2721,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         [TestMethod]
         public void CreateEdgeSimpleTest() {
-            DirectedAdjMatrixGraph<char> graph = CreateGraph();
+            DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>();
             var vA = graph.CreateVertex('A');
             Assert.AreEqual(1, graph.Data.Matrix.Size);
             CollectionAssertEx.AreEqual(new int[,] { { 0 } }, graph.Data.GetMatrixData());
@@ -2529,7 +2735,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         [TestMethod]
         public void CreateEdgeTest() {
-            DirectedAdjMatrixGraph<char> graph = CreateGraph();
+            DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>();
             GraphTestUtils.InitializeSimpleGraph(graph);
             Assert.AreEqual(4, graph.Data.Matrix.Size);
             CollectionAssertEx.AreEqual(new int[,] { { 0, 1, 1, 1 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 }, { 0, 0, 0, 0 } }, graph.Data.GetMatrixData());
@@ -2541,6 +2747,18 @@ namespace Data_Structures_and_Algorithms.Tests {
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void CtorGuardCase2Test() {
             DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>(0);
+        }
+        [TestMethod]
+        public void GraphEdgeCountMultigraphCaseTest() {
+            DirectedAdjMatrixGraph<char> graph = new DirectedAdjMatrixGraph<char>();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vC);
+            Assert.AreEqual(2, graph.Properties.EdgeCount);
         }
 
         protected override DirectedAdjMatrixGraph<char> CreateGraph() {
@@ -2601,6 +2819,18 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void CtorGuardCase2Test() {
             DirectedAdjListGraph<char> graph = new DirectedAdjListGraph<char>(0);
         }
+        [TestMethod]
+        public void GraphEdgeCountMultigraphCaseTest() {
+            DirectedAdjListGraph<char> graph = new DirectedAdjListGraph<char>();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vC);
+            Assert.AreEqual(4, graph.Properties.EdgeCount);
+        }
 
         protected override DirectedAdjListGraph<char> CreateGraph() {
             return new DirectedAdjListGraph<char>();
@@ -2659,6 +2889,15 @@ namespace Data_Structures_and_Algorithms.Tests {
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void CtorGuardCase2Test() {
             DirectedAdjSetGraph<char> graph = new DirectedAdjSetGraph<char>(0);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GraphEdgeCountMultigraphCaseTest() {
+            DirectedAdjSetGraph<char> graph = new DirectedAdjSetGraph<char>();
+            var vA = graph.CreateVertex('A');
+            var vB = graph.CreateVertex('B');
+            var vC = graph.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vB);
         }
 
         protected override DirectedAdjSetGraph<char> CreateGraph() {
@@ -3313,7 +3552,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         [TestMethod]
         public void BuildMSFTest1() {
-            var graph = new BipartiteGraph<char>();
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
             var vA = graph.U.CreateVertex('A');
             var vB = graph.V.CreateVertex('B');
             var vC = graph.U.CreateVertex('C');
@@ -3339,7 +3578,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         [TestMethod]
         public void BuildMSFTest2() {
-            var graph = new BipartiteGraph<char>();
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
             var vA = graph.U.CreateVertex('A');
             var vB = graph.V.CreateVertex('B');
             var vC = graph.U.CreateVertex('C');
@@ -3366,6 +3605,823 @@ namespace Data_Structures_and_Algorithms.Tests {
                 new EdgeTriplet<char>('L', 'Q', 9),
             };
             CollectionAssertEx.AreEquivalent(extectedEdges, forest.GetEdgeTripletList());
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DeleteEdgeGuardCase1Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.DeleteEdge(null, vB);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void DeleteEdgeGuardCase2Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.DeleteEdge(vA, null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DeleteEdgeGuardCase3Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.DeleteEdge(new BipartiteGraphVertex<char>('A'), vB);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DeleteEdgeGuardCase4Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            graph.DeleteEdge(vA, new BipartiteGraphVertex<char>('B'));
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void DeleteEdgeGuardCase5Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            var vE = graph.V.CreateVertex('E');
+            var vF = graph.V.CreateVertex('F');
+            var vG = graph.V.CreateVertex('G');
+            graph.CreateEdge(vB, vF);
+            graph.CreateEdge(vB, vG);
+            graph.CreateEdge(vC, vD);
+            graph.CreateEdge(vC, vE);
+            graph.DeleteEdge(vA, vG);
+        }
+        [TestMethod]
+        public void DeleteEdgeTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            var vE = graph.V.CreateVertex('E');
+            var vF = graph.V.CreateVertex('F');
+            var vG = graph.V.CreateVertex('G');
+            graph.CreateEdge(vB, vF, 1);
+            graph.CreateEdge(vB, vG, 2);
+            graph.CreateEdge(vC, vD, 3);
+            graph.CreateEdge(vC, vE, 4);
+            graph.DeleteEdge(vB, vG);
+            graph.DeleteEdge(vD, vC);
+            CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C' }, graph.U.GetVertexValueList());
+            CollectionAssert.AreEqual(new char[] { 'D', 'E', 'F', 'G' }, graph.V.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdges = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('B', 'F', 1),
+                new EdgeTriplet<char>('C', 'E', 4),
+            };
+            CollectionAssert.AreEquivalent(extectedEdges, graph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GraphEdgeCountTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            Assert.AreEqual(0, graph.Properties.EdgeCount);
+            graph.CreateEdge(vA, vC);
+            Assert.AreEqual(1, graph.Properties.EdgeCount);
+            graph.CreateEdge(vA, vD);
+            Assert.AreEqual(2, graph.Properties.EdgeCount);
+            graph.CreateEdge(vC, vB);
+            Assert.AreEqual(3, graph.Properties.EdgeCount);
+            graph.CreateEdge(vC, vB);
+            Assert.AreEqual(3, graph.Properties.EdgeCount);
+            graph.DeleteEdge(vA, vC);
+            Assert.AreEqual(2, graph.Properties.EdgeCount);
+            graph.DeleteEdge(vB, vC);
+            Assert.AreEqual(1, graph.Properties.EdgeCount);
+            graph.DeleteEdge(vA, vD);
+            Assert.AreEqual(0, graph.Properties.EdgeCount);
+        }
+        [TestMethod]
+        public void DeleteEdgeGraphPropertiesTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vD = graph.U.CreateVertex('D');
+            var vE = graph.V.CreateVertex('E');
+            var vF = graph.V.CreateVertex('F');
+            var vG = graph.V.CreateVertex('G');
+            var vH = graph.V.CreateVertex('H');
+            graph.CreateEdge(vA, vE);
+            graph.CreateEdge(vB, vF, 3);
+            graph.CreateEdge(vB, vG, 2);
+            graph.CreateEdge(vC, vH, -7);
+            graph.CreateEdge(vD, vH, -1);
+            Assert.IsFalse(graph.Properties.IsUnweighted);
+            Assert.IsFalse(graph.Properties.IsWeighted);
+            Assert.IsTrue(graph.Properties.IsNegativeWeighted);
+            graph.DeleteEdge(vC, vH);
+            Assert.IsFalse(graph.Properties.IsUnweighted);
+            Assert.IsFalse(graph.Properties.IsWeighted);
+            Assert.IsTrue(graph.Properties.IsNegativeWeighted);
+            graph.DeleteEdge(vD, vH);
+            Assert.IsFalse(graph.Properties.IsUnweighted);
+            Assert.IsTrue(graph.Properties.IsWeighted);
+            Assert.IsFalse(graph.Properties.IsNegativeWeighted);
+            graph.DeleteEdge(vF, vB);
+            Assert.IsFalse(graph.Properties.IsUnweighted);
+            Assert.IsTrue(graph.Properties.IsWeighted);
+            Assert.IsFalse(graph.Properties.IsNegativeWeighted);
+            graph.DeleteEdge(vB, vG);
+            Assert.IsTrue(graph.Properties.IsUnweighted);
+            Assert.IsFalse(graph.Properties.IsWeighted);
+            Assert.IsFalse(graph.Properties.IsNegativeWeighted);
+            CollectionAssertEx.AreEquivalent(new EdgeTriplet<char>('A', 'E', 1).Yield(), graph.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void DeleteEdgeVertexDegreeTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vC, vD);
+            CollectionAssertEx.AreEqual(new int[] { 1, 1, 1, 3 }, graph.GetVertexList().Select(x => x.Degree));
+            graph.DeleteEdge(vA, vD);
+            graph.DeleteEdge(vC, vD);
+            CollectionAssertEx.AreEqual(new int[] { 0, 1, 0, 1 }, graph.GetVertexList().Select(x => x.Degree));
+        }
+        [TestMethod]
+        public void GetMaximalMatchingInEmptyGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var matching = graph.GetMaximalMatching();
+            Assert.AreEqual(0, matching.Size);
+            CollectionAssertEx.IsEmpty(matching.GetEdgeList());
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetMaximalMatchingInWeightedGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB, 2);
+            var matching = graph.GetMaximalMatching();
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetMaximalMatchingInNegativeWeightedGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB, -2);
+            var matching = graph.GetMaximalMatching();
+        }
+        [TestMethod]
+        public void GetMaximalMatchingSimpleTest1() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.V.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            var matching = graph.GetMaximalMatching();
+            CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C' }, matching.V.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(matching.U.GetVertexList());
+            CollectionAssertEx.IsEmpty(matching.GetEdgeList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingSimpleTest2() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var matching = graph.GetMaximalMatching();
+            CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C' }, matching.U.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(matching.V.GetVertexList());
+            CollectionAssertEx.IsEmpty(matching.GetEdgeList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingSimpleTest3() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var u1 = graph.U.CreateVertex("U1");
+            var v1 = graph.V.CreateVertex("V1");
+            var v2 = graph.V.CreateVertex("V2");
+            var v3 = graph.V.CreateVertex("V3");
+            graph.CreateEdge(u1, v1);
+            graph.CreateEdge(u1, v2);
+            graph.CreateEdge(u1, v3);
+            var matching = graph.GetMaximalMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("U1", "V1", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingStructureTest() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var u1 = graph.U.CreateVertex("U1");
+            var u2 = graph.U.CreateVertex("U2");
+            var u3 = graph.U.CreateVertex("U3");
+            var v1 = graph.V.CreateVertex("V1");
+            var v2 = graph.V.CreateVertex("V2");
+            var v3 = graph.V.CreateVertex("V3");
+            graph.CreateEdge(u1, v1);
+            graph.CreateEdge(u2, v2);
+            graph.CreateEdge(u3, v3);
+            var matching = graph.GetMaximalMatching();
+            CollectionAssert.AreEqual(new string[] { "U1", "U2", "U3" }, matching.U.GetVertexValueList());
+            CollectionAssert.AreEqual(new string[] { "V1", "V2", "V3" }, matching.V.GetVertexValueList());
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("U1", "V1", 1),
+                new EdgeTriplet<string>("U2", "V2", 1),
+                new EdgeTriplet<string>("U3", "V3", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingTest1() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var u1 = graph.U.CreateVertex("U1");
+            var u2 = graph.U.CreateVertex("U2");
+            var u3 = graph.U.CreateVertex("U3");
+            var v1 = graph.V.CreateVertex("V1");
+            var v2 = graph.V.CreateVertex("V2");
+            var v3 = graph.V.CreateVertex("V3");
+            graph.CreateEdge(u1, v1);
+            graph.CreateEdge(u1, v3);
+            graph.CreateEdge(u2, v2);
+            graph.CreateEdge(u2, v3);
+            graph.CreateEdge(u3, v1);
+            graph.CreateEdge(u3, v2);
+            var matching = graph.GetMaximalMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("U3", "V1", 1),
+                new EdgeTriplet<string>("U2", "V2", 1),
+                new EdgeTriplet<string>("U1", "V3", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingTest2() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var u1 = graph.U.CreateVertex("U1");
+            var u2 = graph.U.CreateVertex("U2");
+            var u3 = graph.U.CreateVertex("U3");
+            var u4 = graph.U.CreateVertex("U4");
+            var u5 = graph.U.CreateVertex("U5");
+            var v1 = graph.V.CreateVertex("V1");
+            var v2 = graph.V.CreateVertex("V2");
+            var v3 = graph.V.CreateVertex("V3");
+            var v4 = graph.V.CreateVertex("V4");
+            graph.CreateEdge(u1, v1);
+            graph.CreateEdge(u2, v1);
+            graph.CreateEdge(u2, v3);
+            graph.CreateEdge(u3, v2);
+            graph.CreateEdge(u3, v3);
+            graph.CreateEdge(u3, v4);
+            graph.CreateEdge(u4, v3);
+            graph.CreateEdge(u5, v3);
+            var matching = graph.GetMaximalMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("U2", "V1", 1),
+                new EdgeTriplet<string>("U3", "V2", 1),
+                new EdgeTriplet<string>("U5", "V3", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingTest3() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var u1 = graph.U.CreateVertex("U1");
+            var u2 = graph.U.CreateVertex("U2");
+            var u3 = graph.U.CreateVertex("U3");
+            var u4 = graph.U.CreateVertex("U4");
+            var u5 = graph.U.CreateVertex("U5");
+            var v1 = graph.V.CreateVertex("V1");
+            var v2 = graph.V.CreateVertex("V2");
+            var v3 = graph.V.CreateVertex("V3");
+            var v4 = graph.V.CreateVertex("V4");
+            var v5 = graph.V.CreateVertex("V5");
+            graph.CreateEdge(u1, v1);
+            graph.CreateEdge(u1, v2);
+            graph.CreateEdge(u2, v1);
+            graph.CreateEdge(u2, v5);
+            graph.CreateEdge(u3, v3);
+            graph.CreateEdge(u3, v4);
+            graph.CreateEdge(u4, v1);
+            graph.CreateEdge(u4, v5);
+            graph.CreateEdge(u5, v2);
+            graph.CreateEdge(u5, v4);
+            var matching = graph.GetMaximalMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("U4", "V1", 1),
+                new EdgeTriplet<string>("U1", "V2", 1),
+                new EdgeTriplet<string>("U3", "V3", 1),
+                new EdgeTriplet<string>("U5", "V4", 1),
+                new EdgeTriplet<string>("U2", "V5", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingTest4() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var u1 = graph.U.CreateVertex("U1");
+            var u2 = graph.U.CreateVertex("U2");
+            var u3 = graph.U.CreateVertex("U3");
+            var v1 = graph.V.CreateVertex("V1");
+            var v2 = graph.V.CreateVertex("V2");
+            graph.CreateEdge(u1, v1);
+            graph.CreateEdge(u1, v2);
+            graph.CreateEdge(u2, v1);
+            graph.CreateEdge(u3, v1);
+            var matching = graph.GetMaximalMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("U3", "V1", 1),
+                new EdgeTriplet<string>("U1", "V2", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingTest5() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var vA = graph.U.CreateVertex("A");
+            var vB = graph.U.CreateVertex("B");
+            var vC = graph.U.CreateVertex("C");
+            var vD = graph.U.CreateVertex("D");
+            var vE = graph.V.CreateVertex("E");
+            var vF = graph.V.CreateVertex("F");
+            var vG = graph.V.CreateVertex("G");
+            var vH = graph.V.CreateVertex("H");
+            graph.CreateEdge(vA, vF);
+            graph.CreateEdge(vA, vH);
+            graph.CreateEdge(vB, vG);
+            graph.CreateEdge(vC, vE);
+            graph.CreateEdge(vC, vF);
+            graph.CreateEdge(vD, vG);
+            graph.CreateEdge(vD, vH);
+            var matching = graph.GetMaximalMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("C", "E", 1),
+                new EdgeTriplet<string>("A", "F", 1),
+                new EdgeTriplet<string>("B", "G", 1),
+                new EdgeTriplet<string>("D", "H", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetMaximalMatchingOriginGraphDataTest() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var vA = graph.U.CreateVertex("A");
+            var vB = graph.U.CreateVertex("B");
+            var vC = graph.U.CreateVertex("C");
+            var vD = graph.V.CreateVertex("D");
+            var vE = graph.V.CreateVertex("E");
+            var vF = graph.V.CreateVertex("F");
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vC, vE);
+            graph.CreateEdge(vC, vF);
+            var matching = graph.GetMaximalMatching();
+            Assert.IsNotNull(matching);
+            foreach(var vertex in graph.GetVertexList()) {
+                Assert.IsNull(vertex.Data);
+            }
+            graph.Data.Matrix.ForEach(x => Assert.IsNull(x.Data));
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetAssignmentMatchingInEmptyGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var matching = graph.GetAssignmentMatching();
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetAssignmentMatchingIfVIsBiggerTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            graph.CreateEdge(vA, vB);
+            graph.CreateEdge(vA, vC);
+            var matching = graph.GetAssignmentMatching();
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetAssignmentMatchingIfUIsBiggerTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            var matching = graph.GetAssignmentMatching();
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetAssignmentMatchingInNegativeWeightedGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB, -1);
+            var matching = graph.GetAssignmentMatching();
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void GetAssignmentMatchingInNonCompleteGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vB, vC);
+            var matching = graph.GetAssignmentMatching();
+        }
+        [TestMethod]
+        public void GetAssignmentMatchingSimpleTest() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var t1 = graph.U.CreateVertex("T1");
+            var w1 = graph.V.CreateVertex("W1");
+            graph.CreateEdge(t1, w1);
+            var matching = graph.GetAssignmentMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("T1", "W1", 1),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetAssignmentMatchingTest1() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var t1 = graph.U.CreateVertex("T1");
+            var t2 = graph.U.CreateVertex("T2");
+            var t3 = graph.U.CreateVertex("T3");
+            var w1 = graph.V.CreateVertex("W1");
+            var w2 = graph.V.CreateVertex("W2");
+            var w3 = graph.V.CreateVertex("W3");
+            graph.CreateEdge(w1, t1, 2);
+            graph.CreateEdge(w1, t2, 3);
+            graph.CreateEdge(w1, t3, 3);
+            graph.CreateEdge(w2, t1, 3);
+            graph.CreateEdge(w2, t2, 2);
+            graph.CreateEdge(w2, t3, 3);
+            graph.CreateEdge(w3, t1, 3);
+            graph.CreateEdge(w3, t2, 3);
+            graph.CreateEdge(w3, t3, 2);
+            var matching = graph.GetAssignmentMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("T1", "W1", 2),
+                new EdgeTriplet<string>("T2", "W2", 2),
+                new EdgeTriplet<string>("T3", "W3", 2),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetAssignmentMatchingTest2() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var t1 = graph.U.CreateVertex("T1");
+            var t2 = graph.U.CreateVertex("T2");
+            var t3 = graph.U.CreateVertex("T3");
+            var t4 = graph.U.CreateVertex("T4");
+            var w1 = graph.V.CreateVertex("W1");
+            var w2 = graph.V.CreateVertex("W2");
+            var w3 = graph.V.CreateVertex("W3");
+            var w4 = graph.V.CreateVertex("W4");
+            graph.CreateEdge(w1, t1, 1);
+            graph.CreateEdge(w1, t2, 7);
+            graph.CreateEdge(w1, t3, 1);
+            graph.CreateEdge(w1, t4, 3);
+            graph.CreateEdge(w2, t1, 1);
+            graph.CreateEdge(w2, t2, 6);
+            graph.CreateEdge(w2, t3, 4);
+            graph.CreateEdge(w2, t4, 6);
+            graph.CreateEdge(w3, t1, 17);
+            graph.CreateEdge(w3, t2, 1);
+            graph.CreateEdge(w3, t3, 5);
+            graph.CreateEdge(w3, t4, 1);
+            graph.CreateEdge(w4, t1, 1);
+            graph.CreateEdge(w4, t2, 6);
+            graph.CreateEdge(w4, t3, 10);
+            graph.CreateEdge(w4, t4, 4);
+            var matching = graph.GetAssignmentMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("T3", "W1", 1),
+                new EdgeTriplet<string>("T1", "W2", 1),
+                new EdgeTriplet<string>("T2", "W3", 1),
+                new EdgeTriplet<string>("T4", "W4", 4),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetAssignmentMatchingTest3() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var t1 = graph.U.CreateVertex("T1");
+            var t2 = graph.U.CreateVertex("T2");
+            var t3 = graph.U.CreateVertex("T3");
+            var t4 = graph.U.CreateVertex("T4");
+            var t5 = graph.U.CreateVertex("T5");
+            var w1 = graph.V.CreateVertex("W1");
+            var w2 = graph.V.CreateVertex("W2");
+            var w3 = graph.V.CreateVertex("W3");
+            var w4 = graph.V.CreateVertex("W4");
+            var w5 = graph.V.CreateVertex("W5");
+            graph.CreateEdge(w1, t1, 7);
+            graph.CreateEdge(w1, t2, 11);
+            graph.CreateEdge(w1, t3, 5);
+            graph.CreateEdge(w1, t4, 7);
+            graph.CreateEdge(w1, t5, 9);
+            graph.CreateEdge(w2, t1, 15);
+            graph.CreateEdge(w2, t2, 10);
+            graph.CreateEdge(w2, t3, 5);
+            graph.CreateEdge(w2, t4, 12);
+            graph.CreateEdge(w2, t5, 5);
+            graph.CreateEdge(w3, t1, 7);
+            graph.CreateEdge(w3, t2, 12);
+            graph.CreateEdge(w3, t3, 20);
+            graph.CreateEdge(w3, t4, 7);
+            graph.CreateEdge(w3, t5, 11);
+            graph.CreateEdge(w4, t1, 9);
+            graph.CreateEdge(w4, t2, 9);
+            graph.CreateEdge(w4, t3, 9);
+            graph.CreateEdge(w4, t4, 9);
+            graph.CreateEdge(w4, t5, 9);
+            graph.CreateEdge(w5, t1, 7);
+            graph.CreateEdge(w5, t2, 9);
+            graph.CreateEdge(w5, t3, 12);
+            graph.CreateEdge(w5, t4, 13);
+            graph.CreateEdge(w5, t5, 15);
+            var matching = graph.GetAssignmentMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("T3", "W1", 5),
+                new EdgeTriplet<string>("T5", "W2", 5),
+                new EdgeTriplet<string>("T4", "W3", 7),
+                new EdgeTriplet<string>("T2", "W4", 9),
+                new EdgeTriplet<string>("T1", "W5", 7),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetAssignmentMatchingTest4() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var t1 = graph.U.CreateVertex("T1");
+            var t2 = graph.U.CreateVertex("T2");
+            var t3 = graph.U.CreateVertex("T3");
+            var w1 = graph.V.CreateVertex("W1");
+            var w2 = graph.V.CreateVertex("W2");
+            var w3 = graph.V.CreateVertex("W3");
+            graph.CreateEdge(w1, t1, 7);
+            graph.CreateEdge(w1, t2, 9);
+            graph.CreateEdge(w1, t3, 2);
+            graph.CreateEdge(w2, t1, 3);
+            graph.CreateEdge(w2, t2, 6);
+            graph.CreateEdge(w2, t3, 8);
+            graph.CreateEdge(w3, t1, 4);
+            graph.CreateEdge(w3, t2, 12);
+            graph.CreateEdge(w3, t3, 12);
+            var matching = graph.GetAssignmentMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("T3", "W1", 2),
+                new EdgeTriplet<string>("T2", "W2", 6),
+                new EdgeTriplet<string>("T1", "W3", 4),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GetAssignmentMatchingTest5() {
+            BipartiteGraph<string> graph = new BipartiteGraph<string>();
+            var t1 = graph.U.CreateVertex("T1");
+            var t2 = graph.U.CreateVertex("T2");
+            var t3 = graph.U.CreateVertex("T3");
+            var t4 = graph.U.CreateVertex("T4");
+            var t5 = graph.U.CreateVertex("T5");
+            var w1 = graph.V.CreateVertex("W1");
+            var w2 = graph.V.CreateVertex("W2");
+            var w3 = graph.V.CreateVertex("W3");
+            var w4 = graph.V.CreateVertex("W4");
+            var w5 = graph.V.CreateVertex("W5");
+            graph.CreateEdge(w1, t1, 32);
+            graph.CreateEdge(w1, t2, 28);
+            graph.CreateEdge(w1, t3, 4);
+            graph.CreateEdge(w1, t4, 26);
+            graph.CreateEdge(w1, t5, 4);
+            graph.CreateEdge(w2, t1, 17);
+            graph.CreateEdge(w2, t2, 19);
+            graph.CreateEdge(w2, t3, 4);
+            graph.CreateEdge(w2, t4, 17);
+            graph.CreateEdge(w2, t5, 4);
+            graph.CreateEdge(w3, t1, 4);
+            graph.CreateEdge(w3, t2, 4);
+            graph.CreateEdge(w3, t3, 5);
+            graph.CreateEdge(w3, t4, 4);
+            graph.CreateEdge(w3, t5, 4);
+            graph.CreateEdge(w4, t1, 17);
+            graph.CreateEdge(w4, t2, 14);
+            graph.CreateEdge(w4, t3, 4);
+            graph.CreateEdge(w4, t4, 14);
+            graph.CreateEdge(w4, t5, 4);
+            graph.CreateEdge(w5, t1, 21);
+            graph.CreateEdge(w5, t2, 16);
+            graph.CreateEdge(w5, t3, 4);
+            graph.CreateEdge(w5, t4, 13);
+            graph.CreateEdge(w5, t5, 4);
+            var matching = graph.GetAssignmentMatching();
+            EdgeTriplet<string>[] extectedEdgeList = new EdgeTriplet<string>[] {
+                new EdgeTriplet<string>("T5", "W1", 4),
+                new EdgeTriplet<string>("T3", "W2", 4),
+                new EdgeTriplet<string>("T1", "W3", 4),
+                new EdgeTriplet<string>("T2", "W4", 14),
+                new EdgeTriplet<string>("T4", "W5", 13),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, matching.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void CloneEmptyGraphTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var result = graph.Clone<BipartiteGraph<char>>(false);
+            CollectionAssertEx.IsEmpty(result.U.GetVertexList());
+            CollectionAssertEx.IsEmpty(result.V.GetVertexList());
+            CollectionAssertEx.IsEmpty(result.GetEdgeList());
+        }
+        [TestMethod]
+        public void CloneTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vK = graph.V.CreateVertex('K');
+            var vM = graph.V.CreateVertex('M');
+            graph.CreateEdge(vA, vK);
+            graph.CreateEdge(vB, vK);
+            graph.CreateEdge(vC, vM);
+            var result = graph.Clone<BipartiteGraph<char>>(false);
+            CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C' }, result.U.GetVertexValueList());
+            CollectionAssert.AreEqual(new char[] { 'K', 'M' }, result.V.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(result.GetEdgeList());
+        }
+        [TestMethod]
+        public void CloneGraphWithEdgesSimpleTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var result = graph.Clone<BipartiteGraph<char>>(true);
+            CollectionAssertEx.IsEmpty(result.U.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(result.V.GetVertexValueList());
+            CollectionAssertEx.IsEmpty(result.GetEdgeList());
+        }
+        [TestMethod]
+        public void CloneGraphWtihEdgesTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            var vE = graph.V.CreateVertex('E');
+            var vF = graph.V.CreateVertex('F');
+            var vG = graph.V.CreateVertex('G');
+            graph.CreateEdge(vA, vF, 9);
+            graph.CreateEdge(vB, vD, 7);
+            graph.CreateEdge(vC, vE, 5);
+            var result = graph.Clone<BipartiteGraph<char>>(true);
+            CollectionAssertEx.AreEqual(new char[] { 'A', 'B', 'C' }, result.U.GetVertexValueList());
+            CollectionAssertEx.AreEqual(new char[] { 'D', 'E', 'F', 'G' }, result.V.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdgeList = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('B', 'D', 7),
+                new EdgeTriplet<char>('C', 'E', 5),
+                new EdgeTriplet<char>('A', 'F', 9),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, result.GetEdgeTripletList());
+        }
+        [TestMethod]
+        public void GraphEdgeCountMultigraphCaseTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vC);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vD);
+            Assert.AreEqual(2, graph.Properties.EdgeCount);
+        }
+        [TestMethod]
+        public void IsCompleteTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            Assert.IsFalse(graph.IsComplete());
+            var vA = graph.U.CreateVertex('A');
+            Assert.IsFalse(graph.IsComplete());
+            var vD = graph.V.CreateVertex('D');
+            Assert.IsFalse(graph.IsComplete());
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vE = graph.V.CreateVertex('E');
+            Assert.IsFalse(graph.IsComplete());
+            graph.CreateEdge(vA, vD);
+            graph.CreateEdge(vA, vE);
+            graph.CreateEdge(vB, vD);
+            graph.CreateEdge(vB, vE);
+            graph.CreateEdge(vC, vD);
+            Assert.IsFalse(graph.IsComplete());
+            graph.CreateEdge(vC, vE);
+            Assert.IsTrue(graph.IsComplete());
+        }
+        [TestMethod]
+        public void BipartiteGraphMatchingIsPerfectTest() {
+            BipartiteGraphMatching<char> graph = new BipartiteGraphMatching<char>();
+            Assert.IsFalse(graph.IsPerfect());
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vT = graph.U.CreateVertex('T');
+            var vD = graph.V.CreateVertex('D');
+            var vE = graph.V.CreateVertex('E');
+            var vF = graph.V.CreateVertex('F');
+            var vG = graph.V.CreateVertex('G');
+            Assert.IsFalse(graph.IsPerfect());
+            graph.CreateEdge(vC, vD);
+            Assert.IsFalse(graph.IsPerfect());
+            graph.CreateEdge(vB, vF);
+            Assert.IsFalse(graph.IsPerfect());
+            graph.CreateEdge(vT, vG);
+            Assert.IsFalse(graph.IsPerfect());
+            graph.CreateEdge(vA, vE);
+            Assert.IsTrue(graph.IsPerfect());
+            graph.CreateEdge(vT, vF);
+            Assert.IsFalse(graph.IsPerfect());
+            graph.DeleteEdge(vT, vF);
+            Assert.IsTrue(graph.IsPerfect());
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CloneWithEdgesGuardCase1Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.V.CreateVertex('B');
+            graph.CreateEdge(vA, vB);
+            var result = graph.CloneWithEdges<BipartiteGraph<char>>(null);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void CloneWithEdgesGuardCase2Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            BipartiteGraph<char> other = new BipartiteGraph<char>();
+            var otherA = other.U.CreateVertex('A');
+            var otherC = other.V.CreateVertex('C');
+            other.CreateEdge(otherA, otherC);
+            var result = graph.CloneWithEdges(other);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void CloneWithEdgesGuardCase3Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            graph.CreateEdge(vA, vC);
+            graph.CreateEdge(vB, vC);
+            BipartiteGraph<char> other = new BipartiteGraph<char>();
+            var otherA = other.U.CreateVertex('A');
+            var otherB = other.U.CreateVertex('B');
+            var otherC = other.V.CreateVertex('C');
+            var otherD = other.V.CreateVertex('D');
+            other.CreateEdge(otherA, otherC);
+            var result = graph.CloneWithEdges(other);
+        }
+        [TestMethod, ExpectedException(typeof(InvalidOperationException))]
+        public void CloneWithEdgesGuardCase4Test() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.V.CreateVertex('C');
+            graph.CreateEdge(vA, vC);
+            BipartiteGraph<char> other = new BipartiteGraph<char>();
+            var otherA = other.U.CreateVertex('A');
+            var otherB = other.U.CreateVertex('B');
+            var otherC = other.V.CreateVertex('C');
+            other.CreateEdge(otherA, otherC);
+            other.CreateEdge(otherB, otherC);
+            var result = graph.CloneWithEdges(other);
+        }
+        [TestMethod]
+        public void CloneWithEdgesTest() {
+            BipartiteGraph<char> graph = new BipartiteGraph<char>();
+            var vA = graph.U.CreateVertex('A');
+            var vB = graph.U.CreateVertex('B');
+            var vC = graph.U.CreateVertex('C');
+            var vD = graph.V.CreateVertex('D');
+            var vE = graph.V.CreateVertex('E');
+            graph.CreateEdge(vB, vD, 7);
+            graph.CreateEdge(vC, vD, 3);
+            graph.CreateEdge(vC, vE, 2);
+            BipartiteGraph<char> other = new BipartiteGraph<char>();
+            var otherK = other.U.CreateVertex('K');
+            var otherL = other.U.CreateVertex('L');
+            var otherM = other.U.CreateVertex('M');
+            var otherN = other.V.CreateVertex('N');
+            var otherP = other.V.CreateVertex('P');
+            other.CreateEdge(otherL, otherN, 2);
+            other.CreateEdge(otherM, otherN, 11);
+            var result = graph.CloneWithEdges(other);
+            CollectionAssert.AreEqual(new char[] { 'A', 'B', 'C' }, result.U.GetVertexValueList());
+            CollectionAssert.AreEqual(new char[] { 'D', 'E' }, result.V.GetVertexValueList());
+            EdgeTriplet<char>[] extectedEdgeList = new EdgeTriplet<char>[] {
+                new EdgeTriplet<char>('B', 'D', 7),
+                new EdgeTriplet<char>('C', 'D', 3),
+            };
+            CollectionAssert.AreEqual(extectedEdgeList, result.GetEdgeTripletList());
         }
     }
 

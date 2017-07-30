@@ -84,7 +84,7 @@ namespace Data_Structures_and_Algorithms {
                 return other != null && Equals(this, other);
             }
             static bool Equals(Row @this, Row other) {
-                return ReferenceEquals(@this.Vertex, other.Vertex) && ReferenceEquals(@this.Predecessor, other.Predecessor) && MathUtils.AreDoubleEquals(@this.Distance, other.Distance);
+                return ReferenceEquals(@this.Vertex, other.Vertex) && ReferenceEquals(@this.Predecessor, other.Predecessor) && MathUtils.AreEquals(@this.Distance, other.Distance);
             }
             public override int GetHashCode() {
                 return base.GetHashCode();
@@ -125,16 +125,14 @@ namespace Data_Structures_and_Algorithms {
 
     class PathAlgorithmFactory<TValue, TVertex> where TVertex : Vertex<TValue> {
         public static IPathSearch<TValue, TVertex> Create(Graph<TValue, TVertex> graph) {
-            if(graph.Properties == GraphProperties.Unweighted) {
+            if(graph.Properties.IsUnweighted) {
                 return new BFPathSearch<TValue, TVertex>(graph);
             }
-            if(graph.Properties.HasFlag(GraphProperties.Weighted)) {
-                if(graph.Properties.HasFlag(GraphProperties.NegativeWeighted)) {
-                    return new BellmanFordPathSearch<TValue, TVertex>(graph);
-                }
-                else {
-                    return new DijkstraPathSearch<TValue, TVertex>(graph);
-                }
+            if(graph.Properties.IsNegativeWeighted) {
+                return new BellmanFordPathSearch<TValue, TVertex>(graph);
+            }
+            if(graph.Properties.IsWeighted) {
+                return new DijkstraPathSearch<TValue, TVertex>(graph);
             }
             throw new ArgumentException(nameof(graph));
         }

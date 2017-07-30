@@ -158,7 +158,10 @@ namespace Data_Structures_and_Algorithms {
         public AdjMatrixGraph<T> BuildMSF() {
             return DoBuildMSF(new AdjMatrixGraph<T>());
         }
-
+        protected override bool AllowEdge(AdjMatrixGraphVertex<T> vertex1, AdjMatrixGraphVertex<T> vertex2) {
+            if(Data.AreVerticesAdjacent(vertex1, vertex2)) return false;
+            return true;
+        }
         internal override GraphDataBase<T, AdjMatrixGraphVertex<T>> CreateDataCore(int capacity) {
             return new UndirectedAdjMatrixGraphData<T>(capacity);
         }
@@ -179,6 +182,10 @@ namespace Data_Structures_and_Algorithms {
             DirectedAdjMatrixGraph<T> graph = new DirectedAdjMatrixGraph<T>();
             FillTransposeGraph(graph);
             return graph;
+        }
+        protected override bool AllowEdge(DirectedAdjMatrixGraphVertex<T> vertex1, DirectedAdjMatrixGraphVertex<T> vertex2) {
+            if(Data.AreVerticesAdjacent(vertex1, vertex2)) return false;
+            return true;
         }
         internal override GraphDataBase<T, DirectedAdjMatrixGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjMatrixGraphData<T>(capacity);

@@ -100,7 +100,7 @@ namespace Data_Structures_and_Algorithms {
 
     [DebuggerDisplay("Initialized: {Initialized}, Weight: {Weight}, Color: {Color}, Data: {Data}")]
     struct EdgeData : ICloneable {
-        readonly double weight;
+        double weight;
         readonly bool initialized;
         Color color;
         IEdgeData data;
@@ -128,6 +128,16 @@ namespace Data_Structures_and_Algorithms {
             get { return initialized; }
         }
 
+        public bool IsDefault {
+            get { return MathUtils.AreEquals(1d, Weight); }
+        }
+        public bool IsWeighed {
+            get { return !IsDefault && Weight >= 0; }
+        }
+        public bool IsNegativeWeighed {
+            get { return !IsDefault && Weight < 0; }
+        }
+
         public EdgeData WithColor(Color color) {
             EdgeData result = Clone();
             result.color = color;
@@ -138,6 +148,15 @@ namespace Data_Structures_and_Algorithms {
             result.data = data;
             return result;
         }
+        public EdgeData WithWeight(double weight) {
+            EdgeData result = Clone();
+            result.weight = weight;
+            return result;
+        }
+        internal bool IsDataOfType<TData>() where TData : IEdgeData {
+            return Data != null && Data.GetType() == typeof(TData);
+        }
+        internal static readonly EdgeData Empty = default(EdgeData);
 
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
@@ -145,7 +164,7 @@ namespace Data_Structures_and_Algorithms {
             return Equals(this, other);
         }
         static bool Equals(EdgeData x, EdgeData y) {
-            return x.Initialized == y.Initialized && MathUtils.AreDoubleEquals(x.Weight, y.Weight) && x.Color.Equals(y.Color) && ReferenceEquals(x.Data, y.Data);
+            return x.Initialized == y.Initialized && MathUtils.AreEquals(x.Weight, y.Weight) && x.Color.Equals(y.Color) && ReferenceEquals(x.Data, y.Data);
         }
         public override int GetHashCode() {
             int hashCode = Initialized.GetHashCode() ^ Weight.GetHashCode() ^ Color.GetHashCode();
@@ -185,7 +204,7 @@ namespace Data_Structures_and_Algorithms {
         }
         #endregion
         static bool AreEquals(Edge<TValue, TVertex> x, Edge<TValue, TVertex> y) {
-            return ReferenceEquals(x.StartVertex, y.StartVertex) && ReferenceEquals(x.EndVertex, y.EndVertex) && MathUtils.AreDoubleEquals(x.Weight, y.Weight);
+            return ReferenceEquals(x.StartVertex, y.StartVertex) && ReferenceEquals(x.EndVertex, y.EndVertex) && MathUtils.AreEquals(x.Weight, y.Weight);
         }
 
         internal EdgeTriplet<TValue> CreateTriplet() {
@@ -219,7 +238,7 @@ namespace Data_Structures_and_Algorithms {
         }
         #endregion
         static bool AreEquals(EdgeTriplet<T> x, EdgeTriplet<T> y) {
-            return EqualityComparer<T>.Default.Equals(x.Value1, y.Value1) && EqualityComparer<T>.Default.Equals(x.Value2, y.Value2) && MathUtils.AreDoubleEquals(x.Weight, y.Weight);
+            return EqualityComparer<T>.Default.Equals(x.Value1, y.Value1) && EqualityComparer<T>.Default.Equals(x.Value2, y.Value2) && MathUtils.AreEquals(x.Weight, y.Weight);
         }
 
         public T Value1 { get { return value1; } }
@@ -228,13 +247,67 @@ namespace Data_Structures_and_Algorithms {
     }
 
 
-    [Flags]
-    public enum GraphProperties {
-        Unweighted = 1,
-        Weighted = 2,
-        NegativeWeighted = 4
+    public class GraphProperties {
+        EdgeProperties edgeProperties;
+
+        internal GraphProperties() {
+            this.edgeProperties = new EdgeProperties();
+        }
+        internal void OnEdgeAdded(EdgeData edgeData) {
+            EdgeProperties.Count++;
+            if(edgeData.IsWeighed)
+                EdgeProperties.WCount++;
+            if(edgeData.IsNegativeWeighed)
+                EdgeProperties.NCount++;
+        }
+        internal void OnEdgeDeleted(EdgeData edgeData) {
+            EdgeProperties.Count--;
+            if(edgeData.IsWeighed)
+                EdgeProperties.WCount--;
+            if(edgeData.IsNegativeWeighed)
+                EdgeProperties.NCount--;
+        }
+        public bool IsUnweighted {
+            get { return EdgeProperties.WCount == 0 && EdgeProperties.NCount == 0; }
+        }
+        public bool IsWeighted {
+            get { return EdgeProperties.WCount != 0 && EdgeProperties.NCount == 0; }
+        }
+        public bool IsNegativeWeighted {
+            get { return EdgeProperties.NCount != 0; }
+        }
+        public int EdgeCount {
+            get { return EdgeProperties.Count; }
+        }
+        internal EdgeProperties EdgeProperties { get { return edgeProperties; } }
     }
 
+    #region EdgeProperties
+
+    class EdgeProperties {
+        int count;
+        int wCount;
+        int nCount;
+
+        public EdgeProperties() {
+            this.count = this.wCount = this.nCount = 0;
+        }
+        public int Count {
+            get { return count; }
+            set { count = value; }
+        }
+        public int WCount {
+            get { return wCount; }
+            set { wCount = value; }
+        }
+        public int NCount {
+            get { return nCount; }
+            set { nCount = value; }
+        }
+    }
+    #endregion
+
+    [DebuggerDisplay("Color ({guid})")]
     public struct Color {
         readonly Guid guid;
 
@@ -305,6 +378,11 @@ namespace Data_Structures_and_Algorithms {
         internal abstract int GetVSize();
         internal abstract TVertex GetUVertex(int handle);
         internal abstract TVertex GetVVertex(int handle);
+        internal abstract TVertex GetUVertex(TVertex vertex1, TVertex vertex2);
+        internal abstract TVertex GetVVertex(TVertex vertex1, TVertex vertex2);
+        internal abstract bool IsUVertex(TVertex vertex);
+        internal abstract bool IsVVertex(TVertex vertex);
+        internal abstract void DeleteEdge(TVertex vertex1, TVertex vertex2);
     }
 
     public abstract class Graph<TValue, TVertex> where TVertex : Vertex<TValue> {
@@ -315,7 +393,7 @@ namespace Data_Structures_and_Algorithms {
         public Graph(int capacity) {
             Guard.IsPositive(capacity, nameof(capacity));
             this.id = Guid.NewGuid();
-            this.properties = GraphProperties.Unweighted;
+            this.properties = new GraphProperties();
             this._data = CreateDataCore(capacity);
         }
         public virtual TVertex CreateVertex(TValue value) {
@@ -329,8 +407,10 @@ namespace Data_Structures_and_Algorithms {
             Guard.IsNotNull(vertex2, nameof(vertex2));
             CheckVertexOwner(vertex1);
             CheckVertexOwner(vertex2);
-            CreateEdgeCore(vertex1, vertex2, weight);
-            UpdateProperties(weight: weight);
+            if(AllowEdge(vertex1, vertex2)) {
+                CreateEdgeCore(vertex1, vertex2, weight);
+                Properties.OnEdgeAdded(Data.GetEdgeData(vertex1, vertex2));
+            }
         }
         public double GetWeight(TVertex vertex1, TVertex vertex2) {
             Guard.IsNotNull(vertex1, nameof(vertex1));
@@ -342,6 +422,9 @@ namespace Data_Structures_and_Algorithms {
             return Data.GetWeight(vertex1, vertex2);
         }
 
+        protected virtual bool AllowEdge(TVertex vertex1, TVertex vertex2) {
+            return true;
+        }
         protected virtual void CreateEdgeCore(TVertex vertex1, TVertex vertex2, double weight) {
             Data.CreateEdge(vertex1, vertex2, weight);
         }
@@ -439,6 +522,14 @@ namespace Data_Structures_and_Algorithms {
         }
         protected abstract bool ContainsCycle(TVertex vertex, Color colorID);
 
+        internal void ClearData(bool vertexData, bool edgeData) {
+            if(vertexData) {
+                Data.GetVertexList().ForEach(x => x.Data = null);
+            }
+            if(edgeData) {
+                Data.GetEdgeList().ForEach(x => Data.UpdateEdgeData(x.StartVertex, x.EndVertex, edge => edge.WithData(null)));
+            }
+        }
         protected TVertex CreateVertex(TValue value, Action<TVertex> dataRegisterAction) {
             TVertex vertex = CreateVertexCore(value);
             vertex.OwnerID = this.id;
@@ -508,31 +599,57 @@ namespace Data_Structures_and_Algorithms {
             }
         }
 
+        protected internal bool DoDFSearch(TVertex vertex, Func<TVertex, TVertex, bool> acceptEdge, Action<TVertex, TVertex> edgeAction, Func<TVertex, bool> action) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(acceptEdge, nameof(acceptEdge));
+            Guard.IsNotNull(edgeAction, nameof(edgeAction));
+            Guard.IsNotNull(action, nameof(action));
+            CheckVertexOwner(vertex);
+            return DFSearchCore(vertex, Color.CreateColor(), acceptEdge, edgeAction, action);
+        }
+        protected internal bool DoBFSearch(TVertex vertex, Func<TVertex, TVertex, bool> acceptEdge, Action<TVertex, TVertex> edgeAction, Func<TVertex, bool> action) {
+            Guard.IsNotNull(vertex, nameof(vertex));
+            Guard.IsNotNull(acceptEdge, nameof(acceptEdge));
+            Guard.IsNotNull(edgeAction, nameof(edgeAction));
+            Guard.IsNotNull(action, nameof(action));
+            CheckVertexOwner(vertex);
+            return BFSearchCore(vertex, Color.CreateColor(), acceptEdge, edgeAction, action);
+        }
+
         bool DFSearchCore(TVertex vertex, Color colorID, Func<TVertex, bool> action) {
+            return DFSearchCore(vertex, colorID, (x, y) => true, (x, y) => { }, action);
+        }
+        bool DFSearchCore(TVertex vertex, Color colorID, Func<TVertex, TVertex, bool> acceptEdge, Action<TVertex, TVertex> edgeAction, Func<TVertex, bool> action) {
             bool @continue = action(vertex);
             if(!@continue)
                 return false;
             vertex.Color = colorID;
             var adjacentList = GetAdjacentVertextList(vertex);
             for(int i = 0; i < adjacentList.Count; i++) {
-                if(adjacentList[i].Color != colorID) {
-                    if(!DFSearchCore(adjacentList[i], colorID, action)) return false;
+                if(adjacentList[i].Color != colorID && acceptEdge(vertex, adjacentList[i])) {
+                    edgeAction(vertex, adjacentList[i]);
+                    if(!DFSearchCore(adjacentList[i], colorID, acceptEdge, edgeAction, action)) return false;
                 }
             }
             return true;
         }
         bool BFSearchCore(TVertex vertex, Color colorID, Func<TVertex, bool> action) {
+            return BFSearchCore(vertex, colorID, (x, y) => true, (x, y) => { }, action);
+        }
+        bool BFSearchCore(TVertex vertex, Color colorID, Func<TVertex, TVertex, bool> acceptEdge, Action<TVertex, TVertex> edgeAction, Func<TVertex, bool> action) {
             Queue<TVertex> queue = new Queue<TVertex>();
             queue.EnQueue(vertex);
             vertex.Color = colorID;
             while(!queue.IsEmpty) {
                 var graphVertex = queue.DeQueue();
-                if(!action(graphVertex))
+                if(!action(graphVertex)) {
                     return false;
+                }
                 var adjacentList = GetAdjacentVertextList(graphVertex);
                 for(int i = 0; i < adjacentList.Count; i++) {
                     TVertex adjacentVertex = adjacentList[i];
-                    if(adjacentVertex.Color != colorID) {
+                    if(adjacentVertex.Color != colorID && acceptEdge(graphVertex, adjacentVertex)) {
+                        edgeAction(graphVertex, adjacentVertex);
                         adjacentVertex.Color = colorID;
                         queue.EnQueue(adjacentVertex);
                     }
@@ -557,17 +674,6 @@ namespace Data_Structures_and_Algorithms {
         protected internal TVertex GetVertex(int handle) {
             Guard.IsInRange(handle, 0, Size - 1, nameof(handle));
             return Data.GetVertex(handle);
-        }
-
-        void UpdateProperties(double? weight = null) {
-            if(weight.HasValue) {
-                if(!MathUtils.AreDoubleEquals(1d, weight.Value)) {
-                    properties &= (~GraphProperties.Unweighted);
-                    properties |= GraphProperties.Weighted;
-                    if(weight.Value < 0)
-                        properties |= GraphProperties.NegativeWeighted;
-                }
-            }
         }
         internal Guid ID { get { return id; } }
 

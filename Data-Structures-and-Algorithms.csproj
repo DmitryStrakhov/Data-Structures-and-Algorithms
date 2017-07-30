@@ -42,6 +42,7 @@
     <Reference Condition="'$(Configuration)'=='Debug'" Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base.cs" />
     <Compile Include="DisjointSet\DisjointSet.cs" />
     <Compile Include="Graph\AdjListGraph.cs" />
     <Compile Include="Graph\AdjMatrixGraph.cs" />

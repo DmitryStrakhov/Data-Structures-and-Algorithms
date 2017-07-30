@@ -206,6 +206,12 @@ namespace Data_Structures_and_Algorithms {
         public AdjSetGraph<T> BuildMSF() {
             return DoBuildMSF(new AdjSetGraph<T>());
         }
+        protected override void CreateEdgeCore(AdjSetGraphVertex<T> vertex1, AdjSetGraphVertex<T> vertex2, double weight) {
+            if(!ReferenceEquals(vertex1, vertex2) && Data.AreVerticesAdjacent(vertex1, vertex2)) {
+                throw new InvalidOperationException();
+            }
+            base.CreateEdgeCore(vertex1, vertex2, weight);
+        }
         internal override GraphDataBase<T, AdjSetGraphVertex<T>> CreateDataCore(int capacity) {
             return new UndirectedAdjSetGraphData<T>(capacity);
         }
@@ -226,6 +232,12 @@ namespace Data_Structures_and_Algorithms {
             DirectedAdjSetGraph<T> graph = new DirectedAdjSetGraph<T>();
             FillTransposeGraph(graph);
             return graph;
+        }
+        protected override void CreateEdgeCore(DirectedAdjSetGraphVertex<T> vertex1, DirectedAdjSetGraphVertex<T> vertex2, double weight) {
+            if(!ReferenceEquals(vertex1, vertex2) && Data.AreVerticesAdjacent(vertex1, vertex2)) {
+                throw new InvalidOperationException();
+            }
+            base.CreateEdgeCore(vertex1, vertex2, weight);
         }
         internal override GraphDataBase<T, DirectedAdjSetGraphVertex<T>> CreateDataCore(int capacity) {
             return new DirectedAdjSetGraphData<T>(capacity);
