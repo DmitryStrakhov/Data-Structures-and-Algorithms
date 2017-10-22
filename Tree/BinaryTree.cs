@@ -16,6 +16,9 @@ namespace Data_Structures_and_Algorithms {
         public BinaryTree(BinaryTreeNode<T> root)
             : base(root) {
         }
+        public BinaryTree(BinaryTreeNode<T> root, IComparer<T> comparer)
+            : base(root, comparer) {
+        }
         public new BinaryTreeNode<T> Root { get { return (BinaryTreeNode<T>)base.Root; } }
 
         #region Traversal
@@ -44,10 +47,16 @@ namespace Data_Structures_and_Algorithms {
 
         #region Insert
         public BinaryTreeNode<T> Insert(T value) {
-            return (BinaryTreeNode<T>)DoInsert(new BinaryTreeNode<T>(value));
+            return Insert(value, null);
         }
         public BinaryTreeNode<T> Insert(BinaryTreeNode<T> node) {
-            return (BinaryTreeNode<T>)DoInsert(node);
+            return Insert(node, null);
+        }
+        public BinaryTreeNode<T> Insert(T value, Action<T, T> visitAction) {
+            return (BinaryTreeNode<T>)DoInsert(new BinaryTreeNode<T>(value), visitAction);
+        }
+        public BinaryTreeNode<T> Insert(BinaryTreeNode<T> node, Action<T, T> visitAction) {
+            return (BinaryTreeNode<T>)DoInsert(node, visitAction);
         }
         #endregion
 
@@ -71,9 +80,9 @@ namespace Data_Structures_and_Algorithms {
         #endregion
 
         protected override BinaryTreeNodeBase<T> DoSearch(T value) {
-            return DoLevelOrderTraverse((x, level) => BinaryTreeNodeBase<T>.AreEquals(x.Value, value));
+            return DoLevelOrderTraverse((x, level) => AreEqual(x.Value, value));
         }
-        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node) {
+        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node, Action<T, T> visitAction) {
             Guard.IsNotNull(node, nameof(node));
             if(Root == null) {
                 SetRoot(node);
@@ -96,7 +105,7 @@ namespace Data_Structures_and_Algorithms {
             BinaryTreeNodeBase<T> itParent = null;
             int maxLevel = 0;
             return DoPostOrderTraverse(n => {
-                if(nodeToDelete == null && BinaryTreeNodeBase<T>.AreEquals(n.Value, value)) nodeToDelete = n;
+                if(nodeToDelete == null && AreEqual(n.Value, value)) nodeToDelete = n;
             },
             () => {
                 if(nodeToDelete == null || nodeDeepest == null) return false;

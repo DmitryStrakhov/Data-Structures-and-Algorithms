@@ -23,6 +23,9 @@ namespace Data_Structures_and_Algorithms {
         public static void IsInRange(int value, int minValue, int maxValue, string argument) {
             if(value < minValue || value > maxValue) throw new ArgumentException(argument);
         }
+        public static void IsAssignableFrom<TExpected, TActual>() {
+            if(!typeof(TExpected).IsAssignableFrom(typeof(TActual))) throw new NotSupportedException();
+        }
     }
 
     public static class Utils {
@@ -68,7 +71,7 @@ namespace Data_Structures_and_Algorithms {
     }
 
     public static class MathUtils {
-        public static bool AreEquals(double x, double y) {
+        public static bool AreEqual(double x, double y) {
             return Math.Abs(x - y) < Epsilon;
         }
         const double Epsilon = 0.000001;

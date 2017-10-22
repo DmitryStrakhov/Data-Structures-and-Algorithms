@@ -880,7 +880,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.CreateEdge(vE, vM, 1);
             List<char> vertexList = new List<char>();
             List<char> edgeActionList = new List<char>();
-            graph.DoDFSearch(vA, (x, y) => MathUtils.AreEquals(graph.GetEdgeData(x, y).Weight, 1), (x, y) => { edgeActionList.AddRange(new char[] { x.Value, y.Value }); }, x => { vertexList.Add(x.Value); return true; });
+            graph.DoDFSearch(vA, (x, y) => MathUtils.AreEqual(graph.GetEdgeData(x, y).Weight, 1), (x, y) => { edgeActionList.AddRange(new char[] { x.Value, y.Value }); }, x => { vertexList.Add(x.Value); return true; });
             CollectionAssert.AreEqual(new char[] { 'A', 'C', 'E', 'M' }, vertexList);
             CollectionAssert.AreEqual(new char[] { 'A', 'C', 'C', 'E', 'E', 'M' }, edgeActionList);
         }
@@ -958,7 +958,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             graph.CreateEdge(vH, vJ, 1);
             List<char> vertexList = new List<char>();
             List<char> edgeActionList = new List<char>();
-            graph.DoBFSearch(vA, (x, y) => MathUtils.AreEquals(graph.GetEdgeData(x, y).Weight, 1), (x, y) => { edgeActionList.AddRange(new char[] { x.Value, y.Value }); }, x => { vertexList.Add(x.Value); return true; });
+            graph.DoBFSearch(vA, (x, y) => MathUtils.AreEqual(graph.GetEdgeData(x, y).Weight, 1), (x, y) => { edgeActionList.AddRange(new char[] { x.Value, y.Value }); }, x => { vertexList.Add(x.Value); return true; });
             CollectionAssert.AreEqual(new char[] { 'A', 'H', 'J' }, vertexList);
             CollectionAssert.AreEqual(new char[] { 'A', 'H', 'H', 'J' }, edgeActionList);
         }

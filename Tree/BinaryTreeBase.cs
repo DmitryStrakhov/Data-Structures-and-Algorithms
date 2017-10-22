@@ -9,12 +9,19 @@ using System.Threading.Tasks;
 namespace Data_Structures_and_Algorithms {
     public abstract class BinaryTreeBase<T> {
         BinaryTreeNodeBase<T> root;
+        readonly IComparer<T> comparer;
+        readonly EqualityComparer<T> equalityComparer;
 
         public BinaryTreeBase()
             : this(null) {
         }
-        public BinaryTreeBase(BinaryTreeNodeBase<T> root) {
+        public BinaryTreeBase(BinaryTreeNodeBase<T> root)
+            : this(root, null) {
+        }
+        public BinaryTreeBase(BinaryTreeNodeBase<T> root, IComparer<T> comparer) {
             this.root = root;
+            this.comparer = comparer ?? Comparer<T>.Default;
+            this.equalityComparer = EqualityComparer<T>.Default;
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -90,6 +97,20 @@ namespace Data_Structures_and_Algorithms {
         }
         protected void DoLevelOrderTraverse(Action<BinaryTreeNodeBase<T>> action) {
             DoLevelOrderTraverse((n, level) => { action(n); return false; });
+        }
+        #endregion
+
+        #region Compare
+        protected internal bool AreEqual(BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
+            if(x == null) return (y == null);
+            if(y == null) return (x == null);
+            return AreEqual(x.Value, y.Value);
+        }
+        protected internal bool AreEqual(T x, T y) {
+            return this.equalityComparer.Equals(x, y);
+        }
+        protected internal int Compare(T x, T y) {
+            return this.comparer.Compare(x, y);
         }
         #endregion
 
@@ -226,7 +247,7 @@ namespace Data_Structures_and_Algorithms {
         #endregion
 
         protected abstract BinaryTreeNodeBase<T> DoSearch(T value);
-        protected abstract BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node);
+        protected abstract BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node, Action<T, T> visitAction);
         protected abstract bool DoDelete(T value);
 
         #region ThreadedTree Building

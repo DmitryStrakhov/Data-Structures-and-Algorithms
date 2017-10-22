@@ -16,18 +16,28 @@ namespace Data_Structures_and_Algorithms {
         public BinarySearchTree(BinarySearchTreeNode<T> root)
             : base(root) {
         }
+        public BinarySearchTree(BinarySearchTreeNode<T> root, IComparer<T> comparer)
+            : base(root, comparer) {
+        }
         public new BinarySearchTreeNode<T> Root { get { return (BinarySearchTreeNode<T>)base.Root; } }
 
         public BinarySearchTreeNode<T> Search(T value) {
             return (BinarySearchTreeNode<T>)DoSearch(value);
         }
+
         public BinarySearchTreeNode<T> Insert(T value) {
-            BinarySearchTreeNode<T> root = (BinarySearchTreeNode<T>)DoInsert(new BinarySearchTreeNode<T>(value));
+            return Insert(value, null);
+        }
+        public BinarySearchTreeNode<T> Insert(T value, Action<T, T> visitAction) {
+            BinarySearchTreeNode<T> root = (BinarySearchTreeNode<T>)DoInsert(new BinarySearchTreeNode<T>(value), visitAction);
             SetRoot(root);
             return root;
         }
         public BinarySearchTreeNode<T> Insert(BinarySearchTreeNode<T> node) {
-            return (BinarySearchTreeNode<T>)DoInsert(node);
+            return Insert(node, null);
+        }
+        public BinarySearchTreeNode<T> Insert(BinarySearchTreeNode<T> node, Action<T, T> visitAction) {
+            return (BinarySearchTreeNode<T>)DoInsert(node, visitAction);
         }
         public BinarySearchTreeNode<T> GetMinimum() {
             return DoGetMinimum(Root);
@@ -43,10 +53,10 @@ namespace Data_Structures_and_Algorithms {
         }
 
         protected override BinaryTreeNodeBase<T> DoSearch(T value) {
-            return DoSearchRecursive(Root, x => BinaryTreeNodeBase<T>.Compare(x.Value, value));
+            return DoSearchRecursive(Root, x => Compare(x.Value, value));
         }
-        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node) {
-            return DoInsertRecursive(Root, node);
+        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node, Action<T, T> visitAction) {
+            return DoInsertRecursive(Root, node, visitAction);
         }
         protected override bool DoDelete(T value) {
             bool result = true;
@@ -72,15 +82,16 @@ namespace Data_Structures_and_Algorithms {
             return right;
         }
 
-        BinaryTreeNodeBase<T> DoInsertRecursive(BinarySearchTreeNode<T> root, BinaryTreeNodeBase<T> node) {
+        BinaryTreeNodeBase<T> DoInsertRecursive(BinarySearchTreeNode<T> root, BinaryTreeNodeBase<T> node, Action<T, T> visitAction) {
             if(root == null) return node;
-            int comparisonResult = BinaryTreeNode<T>.Compare(node.Value, root.Value);
+            if(visitAction != null) visitAction(root.Value, node.Value);
+            int comparisonResult = Compare(node.Value, root.Value);
             if(comparisonResult == 0) return root;
             if(comparisonResult < 0) {
-                root.SetLeft(DoInsertRecursive(root.Left, node));
+                root.SetLeft(DoInsertRecursive(root.Left, node, visitAction));
             }
             else {
-                root.SetRight(DoInsertRecursive(root.Right, node));
+                root.SetRight(DoInsertRecursive(root.Right, node, visitAction));
             }
             return root;
         }
@@ -99,7 +110,7 @@ namespace Data_Structures_and_Algorithms {
                 result = false;
                 return root;
             }
-            int comparisonResult = BinaryTreeNode<T>.Compare(root.Value, value);
+            int comparisonResult = Compare(root.Value, value);
             if(comparisonResult == 0) {
                 if(root.IsFull) {
                     BinarySearchTreeNode<T>.ExchangeValues(root, DoGetMaximum(root.Left));
@@ -122,7 +133,7 @@ namespace Data_Structures_and_Algorithms {
             var right = GetFloorRecursive(root.Right, value);
             if(right != null)
                 return right;
-            if(BinarySearchTreeNode<T>.Compare(root.Value, value) <= 0) 
+            if(Compare(root.Value, value) <= 0) 
                 return root;
             return GetFloorRecursive(root.Left, value);
         }
@@ -131,7 +142,7 @@ namespace Data_Structures_and_Algorithms {
             var left = GetCeilingRecursive(root.Left, value);
             if(left != null)
                 return left;
-            if(BinarySearchTreeNode<T>.Compare(root.Value, value) >= 0)
+            if(Compare(root.Value, value) >= 0)
                 return root;
             return GetCeilingRecursive(root.Right, value);
         }
@@ -175,12 +186,12 @@ namespace Data_Structures_and_Algorithms {
 
         protected override BinaryTreeNodeBase<T> DoGetLeastCommonAncestor(BinaryTreeNodeBase<T> node, BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
             BinaryTreeNodeBase<T> n = node;
-            int comparisonResult = BinaryTreeNodeBase<T>.Compare(x.Value, y.Value);
+            int comparisonResult = Compare(x.Value, y.Value);
             BinaryTreeNodeBase<T> minN = (comparisonResult > 0 ? y : x);
             BinaryTreeNodeBase<T> maxN = (comparisonResult > 0 ? x : y);
             while(n != null) {
-                int minCompResult = BinaryTreeNodeBase<T>.Compare(n.Value, minN.Value);
-                int maxCompResult = BinaryTreeNodeBase<T>.Compare(n.Value, maxN.Value);
+                int minCompResult = Compare(n.Value, minN.Value);
+                int maxCompResult = Compare(n.Value, maxN.Value);
                 if(minCompResult > 0 && maxCompResult < 0)
                     return n;
                 if(maxCompResult == 0)

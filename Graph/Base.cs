@@ -129,7 +129,7 @@ namespace Data_Structures_and_Algorithms {
         }
 
         public bool IsDefault {
-            get { return MathUtils.AreEquals(1d, Weight); }
+            get { return MathUtils.AreEqual(1d, Weight); }
         }
         public bool IsWeighed {
             get { return !IsDefault && Weight >= 0; }
@@ -164,7 +164,7 @@ namespace Data_Structures_and_Algorithms {
             return Equals(this, other);
         }
         static bool Equals(EdgeData x, EdgeData y) {
-            return x.Initialized == y.Initialized && MathUtils.AreEquals(x.Weight, y.Weight) && x.Color.Equals(y.Color) && ReferenceEquals(x.Data, y.Data);
+            return x.Initialized == y.Initialized && MathUtils.AreEqual(x.Weight, y.Weight) && x.Color.Equals(y.Color) && ReferenceEquals(x.Data, y.Data);
         }
         public override int GetHashCode() {
             int hashCode = Initialized.GetHashCode() ^ Weight.GetHashCode() ^ Color.GetHashCode();
@@ -197,14 +197,14 @@ namespace Data_Structures_and_Algorithms {
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
             Edge<TValue, TVertex> other = obj as Edge<TValue, TVertex>;
-            return other != null && AreEquals(this, other);
+            return other != null && AreEqual(this, other);
         }
         public override int GetHashCode() {
             return StartVertex.GetHashCode() ^ EndVertex.GetHashCode() ^ Weight.GetHashCode();
         }
         #endregion
-        static bool AreEquals(Edge<TValue, TVertex> x, Edge<TValue, TVertex> y) {
-            return ReferenceEquals(x.StartVertex, y.StartVertex) && ReferenceEquals(x.EndVertex, y.EndVertex) && MathUtils.AreEquals(x.Weight, y.Weight);
+        static bool AreEqual(Edge<TValue, TVertex> x, Edge<TValue, TVertex> y) {
+            return ReferenceEquals(x.StartVertex, y.StartVertex) && ReferenceEquals(x.EndVertex, y.EndVertex) && MathUtils.AreEqual(x.Weight, y.Weight);
         }
 
         internal EdgeTriplet<TValue> CreateTriplet() {
@@ -231,14 +231,14 @@ namespace Data_Structures_and_Algorithms {
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
             EdgeTriplet<T> other = obj as EdgeTriplet<T>;
-            return other != null && AreEquals(this, other);
+            return other != null && AreEqual(this, other);
         }
         public override int GetHashCode() {
             return Value1.GetHashCode() ^ Value2.GetHashCode() ^ Weight.GetHashCode();
         }
         #endregion
-        static bool AreEquals(EdgeTriplet<T> x, EdgeTriplet<T> y) {
-            return EqualityComparer<T>.Default.Equals(x.Value1, y.Value1) && EqualityComparer<T>.Default.Equals(x.Value2, y.Value2) && MathUtils.AreEquals(x.Weight, y.Weight);
+        static bool AreEqual(EdgeTriplet<T> x, EdgeTriplet<T> y) {
+            return EqualityComparer<T>.Default.Equals(x.Value1, y.Value1) && EqualityComparer<T>.Default.Equals(x.Value2, y.Value2) && MathUtils.AreEqual(x.Weight, y.Weight);
         }
 
         public T Value1 { get { return value1; } }
@@ -322,23 +322,23 @@ namespace Data_Structures_and_Algorithms {
 
         #region Operators
         public static bool operator ==(Color x, Color y) {
-            return AreEquals(x, y);
+            return AreEqual(x, y);
         }
         public static bool operator !=(Color x, Color y) {
-            return !AreEquals(x, y);
+            return !AreEqual(x, y);
         }
         #endregion
 
         #region Equals & GetHashCode
         public override bool Equals(object obj) {
             Color other = (Color)obj;
-            return other != null && AreEquals(this, other);
+            return other != null && AreEqual(this, other);
         }
         public override int GetHashCode() {
             return guid.GetHashCode();
         }
         #endregion
-        static bool AreEquals(Color x, Color y) {
+        static bool AreEqual(Color x, Color y) {
             if(ReferenceEquals(x, null) || ReferenceEquals(y, null)) {
                 return ReferenceEquals(x, null) && ReferenceEquals(y, null);
             }

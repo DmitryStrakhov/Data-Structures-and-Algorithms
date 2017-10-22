@@ -47,17 +47,6 @@ namespace Data_Structures_and_Algorithms {
             this.right = right;
         }
 
-        internal static bool AreEquals(BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
-            if(x == null) return (y == null);
-            if(y == null) return (x == null);
-            return AreEquals(x.Value, y.Value);
-        }
-        internal static bool AreEquals(T x, T y) {
-            return EqualityComparer<T>.Default.Equals(x, y);
-        }
-        internal static int Compare(T x, T y) {
-            return Comparer<T>.Default.Compare(x, y);
-        }
         internal static void ExchangeValues(BinaryTreeNodeBase<T> x, BinaryTreeNodeBase<T> y) {
             if(x == null || y == null) return;
             T temp = x.Value;

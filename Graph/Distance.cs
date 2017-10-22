@@ -84,7 +84,7 @@ namespace Data_Structures_and_Algorithms {
                 return other != null && Equals(this, other);
             }
             static bool Equals(Row @this, Row other) {
-                return ReferenceEquals(@this.Vertex, other.Vertex) && ReferenceEquals(@this.Predecessor, other.Predecessor) && MathUtils.AreEquals(@this.Distance, other.Distance);
+                return ReferenceEquals(@this.Vertex, other.Vertex) && ReferenceEquals(@this.Predecessor, other.Predecessor) && MathUtils.AreEqual(@this.Distance, other.Distance);
             }
             public override int GetHashCode() {
                 return base.GetHashCode();

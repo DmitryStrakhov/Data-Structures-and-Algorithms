@@ -230,17 +230,17 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.IsNull(root.Right);
         }
         [TestMethod]
-        public void BinaryTreeNodeAreEqualsTest() {
-            Assert.IsTrue(BinaryTreeNode<int>.AreEquals(null, null));
-            Assert.IsTrue(BinaryTreeNode<object>.AreEquals(new BinaryTreeNode<object>(null), new BinaryTreeNode<object>(null)));
+        public void BinaryTreeAreEqualTest() {
+            BinaryTree<int> tree = new BinaryTree<int>();
+            Assert.IsTrue(tree.AreEqual(null, null));
             BinaryTreeNode<int> x = new BinaryTreeNode<int>(1);
             BinaryTreeNode<int> y = new BinaryTreeNode<int>(2);
             BinaryTreeNode<int> z = new BinaryTreeNode<int>(1);
-            Assert.IsFalse(BinaryTreeNode<int>.AreEquals(x, y));
-            Assert.IsFalse(BinaryTreeNode<int>.AreEquals(y, z));
-            Assert.IsTrue(BinaryTreeNode<int>.AreEquals(x, z));
-            Assert.IsTrue(BinaryTreeNode<int>.AreEquals(z, x));
-            Assert.IsTrue(BinaryTreeNode<int>.AreEquals(x, x));
+            Assert.IsFalse(tree.AreEqual(x, y));
+            Assert.IsFalse(tree.AreEqual(y, z));
+            Assert.IsTrue(tree.AreEqual(x, z));
+            Assert.IsTrue(tree.AreEqual(z, x));
+            Assert.IsTrue(tree.AreEqual(x, x));
         }
         [TestMethod]
         public void BinaryTreeNodeExchangeValuesTest() {

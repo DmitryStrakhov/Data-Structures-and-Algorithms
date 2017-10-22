@@ -8,11 +8,20 @@ namespace Data_Structures_and_Algorithms {
     public class AVLTree<T> : BinarySearchTree<T> {
         public AVLTree() {
         }
+        public AVLTree(IComparer<T> comparer)
+            : base(null, comparer) {
+        }
         public AVLTree(BinarySearchTreeNode<T> root)
             : base(root) {
         }
+        public AVLTree(BinarySearchTreeNode<T> root, IComparer<T> comparer)
+            : base(root, comparer) {
+        }
         public AVLTree(T rootValue)
             : base(rootValue) {
+        }
+        public AVLTree(T rootValue, IComparer<T> comparer)
+            : base(new BinarySearchTreeNode<T>(rootValue), comparer) {
         }
 
         public static bool IsAVLTree(BinarySearchTree<T> tree) {
@@ -31,24 +40,25 @@ namespace Data_Structures_and_Algorithms {
             return Math.Max(lHeight, rHeight) + 1;
         }
 
-        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node) {
-            return DoInsertRecursive(Root, (BinarySearchTreeNode<T>)node);
+        protected override BinaryTreeNodeBase<T> DoInsert(BinaryTreeNodeBase<T> node, Action<T, T> visitAction) {
+            return DoInsertRecursive(Root, (BinarySearchTreeNode<T>)node, visitAction);
         }
         
-        BinaryTreeNodeBase<T> DoInsertRecursive(BinarySearchTreeNode<T> root, BinarySearchTreeNode<T> node) {
+        BinaryTreeNodeBase<T> DoInsertRecursive(BinarySearchTreeNode<T> root, BinarySearchTreeNode<T> node, Action<T, T> visitAction) {
             if(root == null) {
                 node.SetHeight(0);
                 return node;
             }
-            int comparisonResult = BinaryTreeNode<T>.Compare(node.Value, root.Value);
+            if(visitAction != null) visitAction(root.Value, node.Value);
+            int comparisonResult = Compare(node.Value, root.Value);
             if(comparisonResult == 0) return root;
             if(comparisonResult < 0) {
-                root.SetLeft(DoInsertRecursive(root.Left, node));
-                root = EnsureBalanced(root, x => BinaryTreeNode<T>.Compare(x.Left.Value, node.Value) > 0, RotateLL, RotateLR);
+                root.SetLeft(DoInsertRecursive(root.Left, node, visitAction));
+                root = EnsureBalanced(root, x => Compare(x.Left.Value, node.Value) > 0, RotateLL, RotateLR);
             }
             else {
-                root.SetRight(DoInsertRecursive(root.Right, node));
-                root = EnsureBalanced(root, x => BinaryTreeNode<T>.Compare(x.Right.Value, node.Value) > 0, RotateRL, RotateRR);
+                root.SetRight(DoInsertRecursive(root.Right, node, visitAction));
+                root = EnsureBalanced(root, x => Compare(x.Right.Value, node.Value) > 0, RotateRL, RotateRR);
             }
             root.SetHeight(Math.Max(GetHeight(root.Left), GetHeight(root.Right)) + 1);
             return root;
@@ -58,7 +68,7 @@ namespace Data_Structures_and_Algorithms {
                 result = false;
                 return root;
             }
-            int comparisonResult = BinaryTreeNode<T>.Compare(root.Value, value);
+            int comparisonResult = Compare(root.Value, value);
             if(comparisonResult == 0) {
                 if(root.IsFull) {
                     BinarySearchTreeNode<T>.ExchangeValues(root, DoGetMaximum(root.Left));

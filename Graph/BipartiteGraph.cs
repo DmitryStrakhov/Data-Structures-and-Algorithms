@@ -381,13 +381,13 @@ namespace Data_Structures_and_Algorithms {
             BipartiteGraphMatching<T> graph = Clone<BipartiteGraphMatching<T>>(false);
             Func<int, int, double, EdgeData, EdgeData> func1 = (row, column, minVal, x) => {
                 var edgeData = x.WithWeight(x.Weight - minVal);
-                if(MathUtils.AreEquals(edgeData.Weight, 0))
+                if(MathUtils.AreEqual(edgeData.Weight, 0))
                     graph.EnsureEdge(column, row, x.Weight);
                 return edgeData;
             };
             Func<int, int, double, EdgeData, EdgeData> func2 = (row, column, minVal, x) => {
                 var edgeData = x.WithWeight(x.Weight + minVal);
-                if(!MathUtils.AreEquals(edgeData.Weight, 0))
+                if(!MathUtils.AreEqual(edgeData.Weight, 0))
                     graph.EnsureNoEdge(column, row);
                 return edgeData;
             };
@@ -416,7 +416,7 @@ namespace Data_Structures_and_Algorithms {
                     .ForEach(x => matrix.RowAttributes[x.Handle] = color1);
                 Color color2 = Color.CreateColor();
                 matrix.TranslateRowAttributes((row, rowColor) => rowColor != color1, x => color2);
-                matrix.ForEach((row, column, rowColor, columnColor, x) => rowColor == color2 && MathUtils.AreEquals(x.Weight, 0), (row, column, x) => {
+                matrix.ForEach((row, column, rowColor, columnColor, x) => rowColor == color2 && MathUtils.AreEqual(x.Weight, 0), (row, column, x) => {
                     matrix.ColumnAttributes[column] = color2;
                     for(int n = 0; n < matrix.Size.RowCount; n++) {
                         if(matching.AreVerticesAdjacent(column, n)) matrix.RowAttributes[n] = color2;

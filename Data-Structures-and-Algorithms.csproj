@@ -56,11 +56,15 @@
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue\Queue.cs" />
+    <Compile Include="SortAdv\SortAdv.cs" />
+    <Compile Include="Sort\Sort.cs" />
     <Compile Include="Stack\Stack.cs" />
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
     <Compile Include="Tests\RectMatrix.cs" />
+    <Compile Include="Tests\Sort.cs" />
+    <Compile Include="Tests\SortAdv.cs" />
     <Compile Include="Tests\SquareMatrix.cs" />
     <Compile Include="Tests\DisjointSet.cs" />
     <Compile Include="Tests\Graph.cs" />

@@ -34,7 +34,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
         }
         public static void AreDoublesEqual(double expected, double actual) {
-            if(!MathUtils.AreEquals(expected, actual))
+            if(!MathUtils.AreEqual(expected, actual))
                 throw new AssertFailedException();
         }
     }
