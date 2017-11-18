@@ -60,10 +60,23 @@ namespace Data_Structures_and_Algorithms {
         public static int Compare<T>(T x, T y) {
             return Comparer<T>.Default.Compare(x, y);
         }
-        public static void ForEach<T>(this IEnumerable<T> col, Action<T> action) {
-            foreach(var item in col) {
+        public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action) {
+            foreach(var item in @this) {
                 action(item);
             }
+        }
+        public static void ForEach<T>(this T[] @this, Predicate<T> predicate, Action<T> action) {
+            for(int i = 0; i < @this.Length; i++) {
+                if(predicate(@this[i])) action(@this[i]);
+            }
+        }
+        public static T[] Enlarge<T>(this T[] @this, int newSize) {
+            if(newSize <= @this.Length) {
+                throw new ArgumentException(nameof(newSize));
+            }
+            T[] result = new T[newSize];
+            Array.Copy(@this, result, @this.Length);
+            return result;
         }
         public static IEnumerable<T> Yield<T>(this T item) {
             yield return item;
