@@ -31,11 +31,11 @@ namespace Data_Structures_and_Algorithms {
                 if(item.Key < minKey || item.Key > maxKey)
                     throw new ArgumentException();
                 int bucketIndex = GetBucketByKey(item.Key, list.Count, minKey, maxKey);
-                T[] bucket = dataCore[bucketIndex] ?? new T[0];
+                T[] bucket = dataCore[bucketIndex] ?? new T[4];
                 if(bucketSizes[bucketIndex] == bucket.Length) {
-                    dataCore[bucketIndex] = bucket.Enlarge(Math.Max(4, bucket.Length * 2));
+                    bucket = bucket.Enlarge(bucket.Length * 2);
                 }
-                dataCore[bucketIndex][bucketSizes[bucketIndex]++] = item;
+                (dataCore[bucketIndex] = bucket)[bucketSizes[bucketIndex]++] = item;
             }
             SortBuckets(dataCore);
             for(int i = 0, n = 0; i < bucketSizes.Length; i++) {

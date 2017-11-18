@@ -25,7 +25,7 @@ namespace Data_Structures_and_Algorithms {
             int[] bucketSizes = new int[Radix];
             T[][] dataCore = new T[Radix][];
             int sortPassCount = Marshal.SizeOf(typeof(int)) * 2;
-            uint mask = 0x0F;
+            uint mask = 0xF;
             for(int i = 0; i < sortPassCount; i++) {
                 DoSortPass(list, dataCore, bucketSizes, mask);
                 mask <<= 4;
@@ -35,11 +35,11 @@ namespace Data_Structures_and_Algorithms {
         internal virtual void DoSortPass(IList<T> list, T[][] dataCore, int[] bucketSizes, uint keyMask) {
             foreach(T item in list) {
                 uint bucketIndex = GetBucketIndex(item, keyMask);
-                T[] bucket = dataCore[bucketIndex] ?? new T[0];
+                T[] bucket = dataCore[bucketIndex] ?? new T[4];
                 if(bucketSizes[bucketIndex] == bucket.Length) {
-                    dataCore[bucketIndex] = bucket.Enlarge(Math.Max(4, bucket.Length * 2));
+                    bucket = bucket.Enlarge(bucket.Length * 2);
                 }
-                dataCore[bucketIndex][bucketSizes[bucketIndex]++] = item;
+                (dataCore[bucketIndex] = bucket)[bucketSizes[bucketIndex]++] = item;
             }
             for(int i = 0, n = 0; i < Radix; i++) {
                 int bucketSize = bucketSizes[i];
