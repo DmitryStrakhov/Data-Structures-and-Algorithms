@@ -51,13 +51,19 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEquivalent(expected.ToList(), actual.ToList());
         }
         public static void IsCollectionAscOrdered<T>(IEnumerable<T> collection) {
+            IsCollectionOrdered(collection, x => x <= 0);
+        }
+        public static void IsCollectionDescOrdered<T>(IEnumerable<T> collection) {
+            IsCollectionOrdered(collection, x => x >= 0);
+        }
+        static void IsCollectionOrdered<T>(IEnumerable<T> collection, Predicate<int> acceptCompareResult) {
             if(collection == null)
                 throw new AssertFailedException();
             if(collection.Count() > 1) {
                 var array = collection.ToArray();
                 for(int i = 0; i < array.Length - 1; i++) {
                     int compareResult = Comparer<T>.Default.Compare(array[i], array[i + 1]);
-                    if(compareResult >= 0)
+                    if(!acceptCompareResult(compareResult))
                         throw new AssertFailedException();
                 }
             }

@@ -18,6 +18,7 @@ namespace Data_Structures_and_Algorithms {
         }
 
         public void EnQueue(T value) {
+            DemandEnQueue(value);
             SinglyLinkedListNode<T> node = new SinglyLinkedListNode<T>(value);
             if(IsEmpty) {
                 this.rear = this.front = node;
@@ -28,15 +29,20 @@ namespace Data_Structures_and_Algorithms {
             }
             this.size++;
         }
+        protected virtual void DemandEnQueue(T value) { }
+
         public T DeQueue() {
             if(IsEmpty) {
                 throw new InvalidOperationException("Queue is empty");
             }
+            DemandDeQueue();
             T value = this.front.Value;
             this.front = this.front.Next;
             this.size--;
             return value;
         }
+        protected virtual void DemandDeQueue() { }
+
         public T Peek() {
             if(IsEmpty) {
                 throw new InvalidOperationException("Queue is empty");
@@ -57,14 +63,23 @@ namespace Data_Structures_and_Algorithms {
             this.size = 0;
             this.front = this.rear = null;
         }
-
+        public T[] ToArray() {
+            T[] result = new T[Size];
+            int n = 0;
+            SinglyLinkedListNode<T> node = this.front;
+            while(node != null) {
+                result[n++] = node.Value;
+                node = node.Next;
+            }
+            return result;
+        }
         public int Size {
             get { return size; }
         }
         public bool IsEmpty {
             get { return Size == 0; }
         }
-        public bool IsFull {
+        public virtual bool IsFull {
             get { return false; }
         }
     }

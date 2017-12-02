@@ -14,6 +14,9 @@ namespace Data_Structures_and_Algorithms {
         public static void IsPositive(int value, string argument) {
             if(value <= 0) throw new ArgumentException(argument);
         }
+        public static void IsPositive(long value, string argument) {
+            if(value <= 0) throw new ArgumentException(argument);
+        }
         public static void IsNotNull(object value, string argument) {
             if(value == null) throw new ArgumentException(argument);
         }
@@ -81,11 +84,19 @@ namespace Data_Structures_and_Algorithms {
         public static IEnumerable<T> Yield<T>(this T item) {
             yield return item;
         }
+        public static void Initialize<T>(this T[] @this, Func<T> createInstance) {
+            for(int i = 0; i < @this.Length; i++) {
+                @this[i] = createInstance();
+            }
+        }
     }
 
     public static class MathUtils {
         public static bool AreEqual(double x, double y) {
             return Math.Abs(x - y) < Epsilon;
+        }
+        public static int Round(double value) {
+            return (int)(value + 0.5);
         }
         const double Epsilon = 0.000001;
     }
@@ -94,5 +105,19 @@ namespace Data_Structures_and_Algorithms {
         public static ReadOnlyCollection<T> ReadOnly<T>() {
             return new ReadOnlyCollection<T>(new T[0]);
         }
+    }
+
+    public abstract class EquatableObject<T> where T : EquatableObject<T> {
+        public EquatableObject() {
+        }
+        public sealed override bool Equals(object obj) {
+            T other = obj as T;
+            return other != null && EqualsTo(other);
+        }
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
+
+        protected abstract bool EqualsTo(T other);
     }
 }

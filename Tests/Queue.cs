@@ -116,6 +116,16 @@ namespace Data_Structures_and_Algorithms.Tests {
             Queue<int> queue = new Queue<int>();
             queue.Peek();
         }
+        [TestMethod]
+        public void QueueToArrayTest() {
+            Queue<int> queue = new Queue<int>();
+            CollectionAssertEx.IsEmpty(queue.ToArray());
+            queue.EnQueue(1);
+            queue.EnQueue(2);
+            queue.EnQueue(3);
+            queue.EnQueue(4);
+            CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, queue.ToArray());
+        }
     }
 }
 
