@@ -108,25 +108,18 @@ namespace Data_Structures_and_Algorithms {
             }
         }
         void Merge<T>(IList<T> list, Comparison<T> comparison, int startIndex, int pivotIndex, int endIndex, T[] tempData) {
-            int i = startIndex;
-            int j = pivotIndex + 1;
+            int left = startIndex, right = pivotIndex + 1;
             int tempIndex = startIndex;
-            while(i <= pivotIndex && j <= endIndex) {
-                if(comparison(list[i], list[j]) <= 0)
-                    tempData[tempIndex] = list[i++];
-                else
-                    tempData[tempIndex] = list[j++];
-                tempIndex++;
+            while(left <= pivotIndex && right <= endIndex) {
+                tempData[tempIndex++] = (comparison(list[left], list[right]) <= 0) ? list[left++] : list[right++];
             }
-            while(i <= pivotIndex) {
-                tempData[tempIndex++] = list[i++];
+            while(left <= pivotIndex) {
+                tempData[tempIndex++] = list[left++];
             }
-            while(j <= endIndex) {
-                tempData[tempIndex++] = list[j++];
+            while(right <= endIndex) {
+                tempData[tempIndex++] = list[right++];
             }
-            for(i = startIndex; i <= endIndex; i++) {
-                list[i] = tempData[i];
-            }
+            for(int n = startIndex; n <= endIndex; n++) list[n] = tempData[n];
         }
     }
 
