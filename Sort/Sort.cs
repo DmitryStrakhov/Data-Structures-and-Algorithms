@@ -32,7 +32,7 @@ namespace Data_Structures_and_Algorithms {
         protected override void DoSort<T>(IList<T> list, Comparison<T> comparison) {
             for(int n = list.Count - 1; n >= 0; n--) {
                 for(int i = 0; i < n; i++) {
-                    if(comparison(list[i], list[n]) > 0) list.Swap(i, n);
+                    if(comparison(list[i], list[i + 1]) > 0) list.Swap(i, i + 1);
                 }
             }
         }
