@@ -180,10 +180,10 @@ namespace Data_Structures_and_Algorithms {
         }
 
         internal static int PercolateDown(KeyValuePair[] heapData, int size, int pos) {
-            return DoPercolateDown(heapData, size, pos, (keyPos, childPos) => Utils.Compare(heapData[keyPos].Key, heapData[childPos].Key) < 0);
+            return DoPercolateDown(heapData, size, pos, (keyPos, childPos) => ComparisonCore.Compare(heapData[keyPos].Key, heapData[childPos].Key) < 0);
         }
         internal static int PercolateUp(KeyValuePair[] heapData, int size, int pos) {
-            return DoPercolateUp(heapData, size, pos, (keyPos, parentPos) => Utils.Compare(heapData[keyPos].Key, heapData[parentPos].Key) > 0);
+            return DoPercolateUp(heapData, size, pos, (keyPos, parentPos) => ComparisonCore.Compare(heapData[keyPos].Key, heapData[parentPos].Key) > 0);
         }
     }
 
@@ -213,10 +213,10 @@ namespace Data_Structures_and_Algorithms {
         }
 
         internal static int PercolateDown(KeyValuePair[] heapData, int size, int pos) {
-            return DoPercolateDown(heapData, size, pos, (keyPos, childPos) => Utils.Compare(heapData[keyPos].Key, heapData[childPos].Key) > 0);
+            return DoPercolateDown(heapData, size, pos, (keyPos, childPos) => ComparisonCore.Compare(heapData[keyPos].Key, heapData[childPos].Key) > 0);
         }
         internal static int PercolateUp(KeyValuePair[] heapData, int size, int pos) {
-            return DoPercolateUp(heapData, size, pos, (keyPos, parentPos) => Utils.Compare(heapData[keyPos].Key, heapData[parentPos].Key) < 0);
+            return DoPercolateUp(heapData, size, pos, (keyPos, parentPos) => ComparisonCore.Compare(heapData[keyPos].Key, heapData[parentPos].Key) < 0);
         }
     }
 }

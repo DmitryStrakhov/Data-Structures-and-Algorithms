@@ -10,12 +10,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Data_Structures_and_Algorithms.Tests {
     [TestClass]
     public class BinaryHeapTests {
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void BinaryHeapGetParentGuardCase1Test() {
             var heapData = GetMaxHeapTestData();
             var result = BinaryHeapBase<int, int>.GetParent(heapData.Length, - 1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void BinaryHeapGetParentGuardCase2Test() {
             var heapData = GetMinHeapTestData();
             var result = BinaryHeapBase<int, int>.GetParent(heapData.Length, 7);
@@ -29,12 +29,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { -1, 0, 0, 1, 1, 2, 2 }, parentList);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void BinaryHeapGetLeftChildGuardCase1Test() {
             var heapData = GetMaxHeapTestData();
             var result = BinaryHeapBase<int, int>.GetLeftChild(heapData.Length, -1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void BinaryHeapGetLeftChildGuardCase2Test() {
             var heapData = GetMaxHeapTestData();
             var result = BinaryHeapBase<int, int>.GetLeftChild(heapData.Length, 7);
@@ -48,12 +48,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { 1, 3, 5, -1, -1, -1, -1 }, childList);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void BinaryHeapGetRightChildGuardCase1Test() {
             var heapData = GetMaxHeapTestData();
             var result = BinaryHeapBase<int, int>.GetRightChild(heapData.Length, -1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void BinaryHeapGetRightChildGuardCase2Test() {
             var heapData = GetMaxHeapTestData();
             var result = BinaryHeapBase<int, int>.GetRightChild(heapData.Length, 7);
@@ -259,12 +259,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { 170, 130, 60, 50, 40, 20, 10 }, valueList);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MinBinaryHeapPercolateDownGuardCase1Test() {
             var heapData = GetMinHeapTestData();
             MinBinaryHeap<int, int>.PercolateDown(heapData, heapData.Length, -1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MinBinaryHeapPercolateDownGuardCase2Test() {
             var heapData = GetMinHeapTestData();
             MinBinaryHeap<int, int>.PercolateDown(heapData, heapData.Length, 7);
@@ -283,12 +283,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(5, MinBinaryHeap<int, int>.PercolateDown(heapData, heapData.Length, 2));
             CollectionAssertEx.AreEqual(new int[] { 2, 15, 4, 16, 17, 20, 40 }, heapData.Select(x => x.Key));
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MinBinaryHeapPercolateUpGuardCase1Test() {
             var heapData = GetMinHeapTestData();
             MinBinaryHeap<int, int>.PercolateUp(heapData, heapData.Length, -1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MinBinaryHeapPercolateUpGuardCase2Test() {
             var heapData = GetMinHeapTestData();
             MinBinaryHeap<int, int>.PercolateUp(heapData, heapData.Length, 7);
@@ -307,12 +307,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(1, heapData[2].Key);
             CollectionAssertEx.AreEqual(new int[] { 0, 1, 1, 15, 17, 4, 2 }, heapData.Select(x => x.Key));
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MaxBinaryHeapPercolateDownGuardCase1Test() {
             var heapData = GetMaxHeapTestData();
             MaxBinaryHeap<int, int>.PercolateDown(heapData, heapData.Length, -1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MaxBinaryHeapPercolateDownGuardCase2Test() {
             var heapData = GetMaxHeapTestData();
             MaxBinaryHeap<int, int>.PercolateDown(heapData, heapData.Length, 7);
@@ -331,12 +331,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(6, MaxBinaryHeap<int, int>.PercolateDown(heapData, heapData.Length, 0));
             CollectionAssertEx.AreEqual(new int[] { 6, 4, 5, 1, 0, 2, 3 }, heapData.Select(x => x.Key));
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MaxBinaryHeapPercolateUpGuardCase1Test() {
             var heapData = GetMaxHeapTestData();
             MaxBinaryHeap<int, int>.PercolateUp(heapData, heapData.Length, -1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MaxBinaryHeapPercolateUpGuardCase2Test() {
             var heapData = GetMaxHeapTestData();
             MaxBinaryHeap<int, int>.PercolateUp(heapData, heapData.Length, 7);
@@ -354,12 +354,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(2, MaxBinaryHeap<int, int>.PercolateUp(heapData, heapData.Length, 6));
             CollectionAssertEx.AreEqual(new int[] { 20, 13, 18, 1, 4, 6, 17 }, heapData.Select(x => x.Key));
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MinBinaryHeapGetValueGuardCase1Test() {
             var heap = CreateMinBinaryHeap();
             var result = heap.GetValue(-1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MinBinaryHeapGetValueGuardCase2Test() {
             var heap = CreateMinBinaryHeap();
             var result = heap.GetValue(7);
@@ -378,12 +378,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
             CollectionAssert.AreEqual(new int[] { 10, 20, 30, 40, 150, 160, 170 }, valueList);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MaxBinaryHeapGetValueGuardCase1Test() {
             var heap = CreateMaxBinaryHeap();
             var result = heap.GetValue(-1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void MaxBinaryHeapGetValueGuardCase2Test() {
             var heap = CreateMaxBinaryHeap();
             var result = heap.GetValue(7);

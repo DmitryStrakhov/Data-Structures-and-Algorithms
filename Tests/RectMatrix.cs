@@ -63,7 +63,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(new MatrixSize(4, 4), new RectMatrix<int>(1, 2).Capacity);
             Assert.AreEqual(new MatrixSize(64, 64), new RectMatrix<int>(64, 64).Capacity);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetRowItemListGuardCase1Test() {
             RectMatrix<int> matrix = new RectMatrix<int>();
             matrix.EnsureSize(4, 2);
@@ -77,7 +77,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix[3, 1] = 2;
             var result = matrix.GetRowItemList(-100);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetRowItemListGuardCase2Test() {
             RectMatrix<int> matrix = new RectMatrix<int>();
             matrix.EnsureSize(4, 2);
@@ -91,7 +91,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix[3, 1] = 2;
             var result = matrix.GetRowItemList(-1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetRowItemListGuardCase3Test() {
             RectMatrix<int> matrix = new RectMatrix<int>();
             matrix.EnsureSize(4, 2);
@@ -123,7 +123,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEqual(new int[] { 5, 2 }, matrix.GetRowItemList(3));
         }
 
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetColumnItemListGuardCase1Test() {
             RectMatrix<int> matrix = new RectMatrix<int>();
             matrix.EnsureSize(2, 4);
@@ -137,7 +137,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix[1, 3] = 2;
             var result = matrix.GetColumnItemList(-100);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetColumnItemListGuardCase2Test() {
             RectMatrix<int> matrix = new RectMatrix<int>();
             matrix.EnsureSize(2, 4);
@@ -151,7 +151,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix[1, 3] = 2;
             var result = matrix.GetColumnItemList(-1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetColumnItemListGuardCase3Test() {
             RectMatrix<int> matrix = new RectMatrix<int>();
             matrix.EnsureSize(2, 4);
@@ -182,25 +182,25 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEqual(new int[] { -7, -7 }, matrix.GetColumnItemList(2));
             CollectionAssert.AreEqual(new int[] { 6, 2 }, matrix.GetColumnItemList(3));
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase1Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 128);
             matrix.EnsureSize(256, 128);
             int result = matrix[-1, 0];
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase2Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 128);
             matrix.EnsureSize(256, 128);
             int result = matrix[0, -1];
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase3Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 128);
             matrix.EnsureSize(256, 128);
             int result = matrix[256, 0];
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase4Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 128);
             matrix.EnsureSize(256, 128);
@@ -216,25 +216,25 @@ namespace Data_Structures_and_Algorithms.Tests {
                 }
             }
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase1Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 512);
             matrix.EnsureSize(256, 512);
             matrix[-1, 0] = 1;
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase2Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 512);
             matrix.EnsureSize(256, 512);
             matrix[0, -1] = 1;
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase3Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 512);
             matrix.EnsureSize(256, 512);
             matrix[256, 0] = 1;
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase4Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(256, 512);
             matrix.EnsureSize(256, 512);
@@ -337,7 +337,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix.Translate((row, column, obj, x) => { result = obj; return x; }, dataObj);
             Assert.AreSame(dataObj, result);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TranslateRowGuardCase1Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(2, 3);
             matrix.EnsureSize(2, 3);
@@ -349,7 +349,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix[1, 2] = 6;
             matrix.TranslateRow(-1, (row, column, x) => x);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TranslateRowGuardCase2Test() {
             RectMatrix<int> matrix = new RectMatrix<int>(2, 3);
             matrix.EnsureSize(2, 3);
@@ -404,7 +404,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix.TranslateRow(0, (row, column, obj, x) => { result = obj; return x; }, dataObj);
             Assert.AreSame(dataObj, result);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TranslateColumnGuardCase1Test() {
             RectMatrix<string> matrix = new RectMatrix<string>(3, 2);
             matrix.EnsureSize(3, 2);
@@ -416,7 +416,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix[2, 1] = "A";
             matrix.TranslateColumn(-1, (row, column, x) => x);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void TranslateColumnGuardCase2Test() {
             RectMatrix<string> matrix = new RectMatrix<string>(3, 2);
             matrix.EnsureSize(3, 2);

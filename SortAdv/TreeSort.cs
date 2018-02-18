@@ -14,8 +14,8 @@ namespace Data_Structures_and_Algorithms {
 
         public TreeSorter() {
             Guard.IsAssignableFrom<IComparable, T>();
-            this.comparison = CompareDefault;
-            this.tree = new AVLTree<Node>(new NodeComparer(CompareDefault));
+            this.comparison = ComparisonCore.Compare;
+            this.tree = new AVLTree<Node>(new NodeComparer(ComparisonCore.Compare));
         }
         public TreeSorter(Comparison<T> comparison) {
             Guard.IsNotNull(comparison, nameof(comparison));
@@ -38,13 +38,10 @@ namespace Data_Structures_and_Algorithms {
             return new TreeWalker(this.tree, this.treeSize).Walk();
         }
 
-        #region Compare
+        #region AreEqual
 
         bool AreEqual(T x, T y) {
             return this.comparison(x, y) == 0;
-        }
-        int CompareDefault(T x, T y) {
-            return Comparer<T>.Default.Compare(x, y);
         }
 
         #endregion

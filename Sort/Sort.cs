@@ -16,7 +16,7 @@ namespace Data_Structures_and_Algorithms {
         public void Sort<T>(IList<T> list) {
             Guard.IsNotNull(list, nameof(list));
             Guard.IsAssignableFrom<IComparable, T>();
-            DoSort(list, (x, y) => Comparer<T>.Default.Compare(x, y));
+            DoSort(list, ComparisonCore.Compare);
         }
         public void Sort<T>(IList<T> list, Comparison<T> comparison) {
             Guard.IsNotNull(list, nameof(list));
@@ -55,11 +55,27 @@ namespace Data_Structures_and_Algorithms {
     public class InsertionSorter : SorterBase {
         public InsertionSorter() {
         }
+        public void Sort<T>(IList<T> list, int leftBound, int rightBound) {
+            Sort(list, ComparisonCore.Compare, leftBound, rightBound);
+        }
+        public void Sort<T>(IList<T> list, Comparison<T> comparison, int leftBound, int rightBound) {
+            Guard.IsNotNull(list, nameof(list));
+            Guard.IsNotNull(comparison, nameof(comparison));
+            Guard.IsInRange(leftBound, list, nameof(leftBound));
+            Guard.IsInRange(rightBound, list, nameof(rightBound));
+            if(leftBound > rightBound)
+                throw new ArgumentOutOfRangeException(nameof(rightBound));
+            DoSort(list, comparison, leftBound, rightBound);
+        }
         protected override void DoSort<T>(IList<T> list, Comparison<T> comparison) {
-            for(int n = 1; n < list.Count; n++) {
+            DoSort(list, comparison, 0, list.Count - 1);
+        }
+        void DoSort<T>(IList<T> list, Comparison<T> comparison, int leftBound, int rightBound) {
+            int startIndex = leftBound + 1;
+            for(int n = startIndex; n <= rightBound; n++) {
                 T item = list[n];
                 int i = n;
-                while(i >= 1 && comparison(item, list[i - 1]) < 0) {
+                while(i >= startIndex && comparison(item, list[i - 1]) < 0) {
                     list[i] = list[i - 1];
                     i--;
                 }

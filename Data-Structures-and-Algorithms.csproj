@@ -59,6 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue\Queue.cs" />
     <Compile Include="Search\Search.cs" />
+    <Compile Include="Selection\Selection.cs" />
     <Compile Include="SortAdv\BucketSort.cs" />
     <Compile Include="SortAdv\ExternalMergeSort.cs" />
     <Compile Include="SortAdv\RadixSort.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
     <Compile Include="Tests\RectMatrix.cs" />
+    <Compile Include="Tests\Selection.cs" />
     <Compile Include="Tests\Sort.cs" />
     <Compile Include="Tests\SortAdv.cs" />
     <Compile Include="Tests\SquareMatrix.cs" />

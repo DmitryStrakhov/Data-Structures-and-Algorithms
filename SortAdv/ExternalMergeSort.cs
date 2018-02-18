@@ -32,13 +32,13 @@ namespace Data_Structures_and_Algorithms {
         readonly ISort sorter;
 
         public ExternalMergeSort(IExternalMergeSortOwner<T> owner)
-            : this(owner, CompareDefault, new MergeSorter()) {
+            : this(owner, ComparisonCore.Compare, new MergeSorter()) {
         }
         public ExternalMergeSort(IExternalMergeSortOwner<T> owner, Comparison<T> comparison)
             : this(owner, comparison, new MergeSorter()) {
         }
         public ExternalMergeSort(IExternalMergeSortOwner<T> owner, ISort sorter)
-            : this(owner, CompareDefault, sorter) {
+            : this(owner, ComparisonCore.Compare, sorter) {
         }
         public ExternalMergeSort(IExternalMergeSortOwner<T> owner, Comparison<T> comparison, ISort sorter) {
             Guard.IsNotNull(owner, nameof(owner));
@@ -142,10 +142,6 @@ namespace Data_Structures_and_Algorithms {
         internal int GetQueueCapacity(long queueCount) {
             int capacity = MathUtils.Round((double)Owner.BufferSize / queueCount);
             return Math.Max(1, capacity);
-        }
-
-        static int CompareDefault(T x, T y) {
-            return Comparer<T>.Default.Compare(x, y);
         }
 
         #region DataBlockDescriptor

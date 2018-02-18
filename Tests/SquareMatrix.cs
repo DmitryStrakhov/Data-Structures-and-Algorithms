@@ -34,25 +34,25 @@ namespace Data_Structures_and_Algorithms.Tests {
             Assert.AreEqual(4, new SquareMatrix<int>(1).Capacity);
             Assert.AreEqual(64, new SquareMatrix<int>(64).Capacity);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase1Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
             int result = matrix[-1, 0];
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase2Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
             int result = matrix[0, -1];
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase3Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
             int result = matrix[256, 0];
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetValueGuardCase4Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
@@ -68,25 +68,25 @@ namespace Data_Structures_and_Algorithms.Tests {
                 }
             }
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase1Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
             matrix[-1, 0] = 1;
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase2Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
             matrix[0, -1] = 1;
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase3Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);
             matrix[256, 0] = 1;
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void SetValueGuardCase4Test() {
             SquareMatrix<int> matrix = new SquareMatrix<int>(256);
             matrix.EnsureSize(256);

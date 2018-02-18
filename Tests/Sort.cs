@@ -14,6 +14,7 @@ namespace Data_Structures_and_Algorithms.Tests {
         public SortTests(ISort sorter) {
             this.sorter = sorter;
         }
+        protected ISort Sorter { get { return sorter; } }
 
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void SortGuardCase1Test() {
@@ -123,6 +124,52 @@ namespace Data_Structures_and_Algorithms.Tests {
         public InsertionSorterTests()
             : base(new InsertionSorter()) {
         }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void PartialSortGuardCase1Test() {
+            Sorter.Sort<string>(null, ComparisonCore.Compare, 0, 0);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void PartialSortGuardCase2Test() {
+            Sorter.Sort(new int[] { 1 }, null, 0, 0);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void PartialSortGuardCase3Test() {
+            int[] array = new int[] { 1, 2, 3 };
+            Sorter.Sort(array, ComparisonCore.Compare, -1, 0);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void PartialSortGuardCase4Test() {
+            int[] array = new int[] { 1, 2, 3 };
+            Sorter.Sort(array, ComparisonCore.Compare, 3, 0);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void PartialSortGuardCase5Test() {
+            int[] array = new int[] { 1, 2, 3 };
+            Sorter.Sort(array, ComparisonCore.Compare, 0, -1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void PartialSortGuardCase6Test() {
+            int[] array = new int[] { 1, 2, 3 };
+            Sorter.Sort(array, ComparisonCore.Compare, 0, 3);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void PartialSortGuardCase7Test() {
+            int[] array = new int[] { 1, 2, 3 };
+            Sorter.Sort(array, ComparisonCore.Compare, 2, 1);
+        }
+        [TestMethod]
+        public void PartialSortSimpleTest() {
+            int[] array = new int[] { 18, 11, 3, 7, 15, 18, 13 };
+            Sorter.Sort(array, ComparisonCore.Compare, 2, 2);
+            CollectionAssert.AreEqual(new int[] { 18, 11, 3, 7, 15, 18, 13 }, array);
+        }
+        [TestMethod]
+        public void PartialSortTest() {
+            int[] array = new int[] { 18, 11, 3, 7, 5, 2, 13 };
+            Sorter.Sort(array, ComparisonCore.Compare, 1, 4);
+            CollectionAssert.AreEqual(new int[] { 18, 3, 5, 7, 11, 2, 13 }, array);
+        }
+        new InsertionSorter Sorter { get { return (InsertionSorter)base.Sorter; } }
     }
 
 

@@ -10,25 +10,25 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Data_Structures_and_Algorithms.Tests {
     public static class AssertEx {
         public static void Greater<T>(T value, T minValue) {
-            int result = Comparer<T>.Default.Compare(value, minValue);
+            int result = AssertUtils.Compare(value, minValue);
             if(result <= 0) {
                 throw new AssertFailedException();
             }
         }
         public static void GreaterOrEquals<T>(T value, T minValue) {
-            int result = Comparer<T>.Default.Compare(value, minValue);
+            int result = AssertUtils.Compare(value, minValue);
             if(result < 0) {
                 throw new AssertFailedException();
             }
         }
         public static void Less<T>(T value, T maxValue) {
-            int result = Comparer<T>.Default.Compare(value, maxValue);
+            int result = AssertUtils.Compare(value, maxValue);
             if(result >= 0) {
                 throw new AssertFailedException();
             }
         }
         public static void LessOrEquals<T>(T value, T maxValue) {
-            int result = Comparer<T>.Default.Compare(value, maxValue);
+            int result = AssertUtils.Compare(value, maxValue);
             if(result > 0) {
                 throw new AssertFailedException();
             }
@@ -62,7 +62,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             if(collection.Count() > 1) {
                 var array = collection.ToArray();
                 for(int i = 0; i < array.Length - 1; i++) {
-                    int compareResult = Comparer<T>.Default.Compare(array[i], array[i + 1]);
+                    int compareResult = AssertUtils.Compare(array[i], array[i + 1]);
                     if(!acceptCompareResult(compareResult))
                         throw new AssertFailedException();
                 }
@@ -108,5 +108,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             }
         }
     }
+
+    static class AssertUtils {
+        public static int Compare<T>(T x, T y) {
+            return Comparer<T>.Default.Compare(x, y);
+        }
+    }
+
 }
 #endif

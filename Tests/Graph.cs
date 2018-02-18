@@ -236,7 +236,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             Func<TVertex, bool> action = null;
             graph.BFSearch(vA, action);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetVertexGuardCase1Test() {
             var graph = CreateGraph();
             var vA = graph.CreateVertex('A');
@@ -244,7 +244,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             var vC = graph.CreateVertex('C');
             var result = graph.GetVertex(-1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetVertexGuardCase2Test() {
             var graph = CreateGraph();
             var vA = graph.CreateVertex('A');
@@ -3137,7 +3137,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssertEx.AreEquivalent(new char[] { 'C' }, graph.GetAdjacentVertextList(vB).Select(x => x.Value));
             CollectionAssertEx.AreEquivalent(new char[] { 'A', 'B' }, graph.GetAdjacentVertextList(vC).Select(x => x.Value));
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetVertexGuardCase1Test() {
             BipartiteGraph<char> graph = new BipartiteGraph<char>();
             var vA = graph.U.CreateVertex('A');
@@ -3145,7 +3145,7 @@ namespace Data_Structures_and_Algorithms.Tests {
             var vC = graph.U.CreateVertex('C');
             var result = graph.GetVertex(-1);
         }
-        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetVertexGuardCase2Test() {
             BipartiteGraph<char> graph = new BipartiteGraph<char>();
             var vA = graph.U.CreateVertex('A');
