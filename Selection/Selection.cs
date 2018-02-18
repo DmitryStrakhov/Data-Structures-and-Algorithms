@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
     public static class Selection {
-        public static T Select<T>(IList<T> list, int kTh) {
-            return SelectCore(list, kTh, ComparisonCore.Compare);
+        public static T Select<T>(IList<T> list, int k) {
+            return SelectCore(list, k, ComparisonCore.Compare);
         }
-        public static T Select<T>(IList<T> list, int kTh, Comparison<T> comparison) {
-            return SelectCore(list, kTh, comparison);
+        public static T Select<T>(IList<T> list, int k, Comparison<T> comparison) {
+            return SelectCore(list, k, comparison);
         }
 
-        static T SelectCore<T>(IList<T> list, int kTh, Comparison<T> comparison) {
+        static T SelectCore<T>(IList<T> list, int k, Comparison<T> comparison) {
             Guard.IsNotNull(list, nameof(list));
             Guard.IsNotNull(comparison, nameof(comparison));
-            Guard.IsInRange(kTh, list, nameof(kTh));
-            return list[SelectCore(list, comparison, 0, list.Count - 1, kTh)];
+            Guard.IsInRange(k, list, nameof(k));
+            return list[SelectCore(list, comparison, 0, list.Count - 1, k)];
         }
         static int SelectCore<T>(IList<T> list, Comparison<T> comparison, int lowBound, int highBound, int k) {
             if(lowBound == highBound) return lowBound;
@@ -31,11 +31,11 @@ namespace Data_Structures_and_Algorithms {
         internal static int Partition<T>(IList<T> list, Comparison<T> comparison, int lowBound, int highBound, int pivot) {
             int minIndex = lowBound;
             int maxIndex = highBound;
-            T value = list[pivot];
+            T median = list[pivot];
             list.Swap(minIndex, pivot);
             while(minIndex < maxIndex) {
-                while(minIndex <= maxIndex && comparison(list[minIndex], value) <= 0) minIndex++;
-                while(comparison(list[maxIndex], value) > 0) maxIndex--;
+                while(minIndex <= maxIndex && comparison(list[minIndex], median) <= 0) minIndex++;
+                while(comparison(list[maxIndex], median) > 0) maxIndex--;
                 if(minIndex < maxIndex) list.Swap(minIndex, maxIndex);
             }
             list.Swap(maxIndex, lowBound);
@@ -43,13 +43,13 @@ namespace Data_Structures_and_Algorithms {
         }
         static int FindMedianOfMedians<T>(IList<T> list, Comparison<T> comparison, int lowBound, int highBound) {
             if(highBound - lowBound < Partition5.MaxSize) return Partition5.Partition(list, comparison, lowBound, highBound);
-            int blockCount = 0;
-            for(int blockLowBound = lowBound; blockLowBound <= highBound; blockLowBound += Partition5.MaxSize, blockCount++) {
-                int blockHighBound = Math.Min(blockLowBound + Partition5.MaxSize - 1, highBound);
-                int median = Partition5.Partition(list, comparison, blockLowBound, blockHighBound);
-                list.Swap(lowBound + blockCount, median);
+            int partitionCount = 0;
+            for(int partitionLowBound = lowBound; partitionLowBound <= highBound; partitionLowBound += Partition5.MaxSize, partitionCount++) {
+                int partitionHighBound = Math.Min(partitionLowBound + Partition5.MaxSize - 1, highBound);
+                int median = Partition5.Partition(list, comparison, partitionLowBound, partitionHighBound);
+                list.Swap(lowBound + partitionCount, median);
             }
-            return SelectCore(list, comparison, lowBound, lowBound + blockCount - 1, lowBound + blockCount / 2);
+            return SelectCore(list, comparison, lowBound, lowBound + partitionCount - 1, lowBound + partitionCount / 2);
         }
 
         #region Partition5
@@ -60,10 +60,9 @@ namespace Data_Structures_and_Algorithms {
             public static int Partition<T>(IList<T> list, Comparison<T> comparison, int lowBound, int highBound) {
                 Guard.IsInRange(lowBound, list, nameof(lowBound));
                 Guard.IsInRange(highBound, list, nameof(highBound));
-                int spread = highBound - lowBound;
-                Guard.IsInRange(spread, 0, MaxSize - 1, nameof(highBound));
+                Guard.IsInRange(highBound - lowBound, 0, MaxSize - 1, nameof(highBound));
                 Sorter.Sort(list, comparison, lowBound, highBound);
-                return lowBound + spread / 2;
+                return lowBound + (highBound - lowBound) / 2;
             }
             static readonly InsertionSorter Sorter = new InsertionSorter();
         }
