@@ -20,6 +20,9 @@ namespace Data_Structures_and_Algorithms {
         public static void IsNotNull(object value, string argument) {
             if(value == null) throw new ArgumentException(argument);
         }
+        public static void IsLessOrEqual(int value, int threshold, string argument) {
+            if(value > threshold) throw new ArgumentOutOfRangeException(argument);
+        }
         public static void IsInRange<T>(int value, IList<T> list, string argument) {
             IsInRange(value, 0, list.Count - 1, argument);
         }
@@ -31,7 +34,7 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    public static class Utils {
+    public static class Extensions {
         public static void Swap<T>(this IList<T> list, int xPos, int yPos) {
             Guard.IsInRange(xPos, 0, list.Count - 1, nameof(xPos));
             Guard.IsInRange(yPos, 0, list.Count - 1, nameof(yPos));
@@ -40,27 +43,6 @@ namespace Data_Structures_and_Algorithms {
                 list[xPos] = list[yPos];
                 list[yPos] = temp;
             }
-        }
-        public static bool IsEven(int value) {
-            return (value & 0x1) == 0;
-        }
-        public static bool IsPowOfTwo(int value) {
-            Guard.IsPositive(value, nameof(value));
-            int setBitCount = 0;
-            while(value != 0) {
-                if((value & 0x1) == 1) setBitCount++;
-                value >>= 1;
-            }
-            return setBitCount == 1;
-        }
-        public static int GetPowOfTwo(int value) {
-            Guard.IsPositive(value, nameof(value));
-            int maxSetBitPos = -1;
-            for(int i = 0; value != 0; i++) {
-                if((value & 0x1) == 1) maxSetBitPos = i;
-                value >>= 1;
-            }
-            return 1 << maxSetBitPos;
         }
         public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action) {
             foreach(var item in @this) {
@@ -88,16 +70,46 @@ namespace Data_Structures_and_Algorithms {
                 @this[i] = createInstance();
             }
         }
+        public static int GetIndexOf<T>(this T[] @this, int startIndex, Predicate<T> predicate, int defaultIndex = -1) {
+            for(int n = startIndex; n < @this.Length; n++) {
+                if(predicate(@this[n])) return n;
+            }
+            return defaultIndex;
+        }
+        public static void Clear<T>(this T[] @this) {
+            Array.Clear(@this, 0, @this.Length);
+        }
     }
 
     public static class MathUtils {
         public static bool AreEqual(double x, double y) {
+            const double Epsilon = 0.000001;
             return Math.Abs(x - y) < Epsilon;
         }
         public static int Round(double value) {
             return (int)(value + 0.5);
         }
-        const double Epsilon = 0.000001;
+        public static bool IsEven(int value) {
+            return (value & 0x1) == 0;
+        }
+        public static bool IsPowOfTwo(int value) {
+            Guard.IsPositive(value, nameof(value));
+            int setBitCount = 0;
+            while(value != 0) {
+                if((value & 0x1) == 1) setBitCount++;
+                value >>= 1;
+            }
+            return setBitCount == 1;
+        }
+        public static int GetPowOfTwo(int value) {
+            Guard.IsPositive(value, nameof(value));
+            int maxSetBitPos = -1;
+            for(int i = 0; value != 0; i++) {
+                if((value & 0x1) == 1) maxSetBitPos = i;
+                value >>= 1;
+            }
+            return 1 << maxSetBitPos;
+        }
     }
 
     public static class ComparisonCore {

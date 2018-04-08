@@ -39,6 +39,13 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
     }
 
+    public static class StringAssertEx {
+        public static void IsNullOrEmpty(string actual) {
+            Assert.IsTrue(string.IsNullOrEmpty(actual));
+        }
+    }
+
+
     public static class CollectionAssertEx {
         public static void AreEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual) {
             if(expected == null || actual == null)
@@ -78,6 +85,11 @@ namespace Data_Structures_and_Algorithms.Tests {
             if(collection == null || collection.Count() != 0)
                 throw new AssertFailedException();
         }
+        public static void IsNotEmpty<T>(IEnumerable<T> collection) {
+            if(collection == null || collection.Count() == 0)
+                throw new AssertFailedException();
+        }
+
         public static void AreEqual<T>(T[,] expected, T[,] actual) {
             Assert.IsNotNull(expected);
             Assert.IsNotNull(actual);

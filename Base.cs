@@ -22,6 +22,103 @@ namespace Data_Structures_and_Algorithms {
         protected abstract IEnumerator<T> GetEnumerator();
     }
 
+
+    public abstract class EnumeratorBase<T> : IEnumerator<T> {
+        public EnumeratorBase() {
+        }
+
+        #region IEnumerator
+
+        bool IEnumerator.MoveNext() {
+            return MoveNext();
+        }
+        void IEnumerator.Reset() {
+            throw new NotSupportedException();
+        }
+        object IEnumerator.Current {
+            get { return CurrentValue; }
+        }
+        T IEnumerator<T>.Current {
+            get { return CurrentValue; }
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        void IDisposable.Dispose() {
+            Dispose();
+        }
+
+        #endregion
+
+        protected abstract bool MoveNext();
+        protected abstract T CurrentValue { get; }
+
+        protected virtual void Dispose() {
+        }
+    }
+
+
+    public abstract class CollectionBase<T> : ICollection<T> {
+        public CollectionBase() {
+        }
+
+        #region ICollection
+
+        void ICollection<T>.Add(T item) {
+            Add(item);
+        }
+        bool ICollection<T>.Remove(T item) {
+            return Remove(item);
+        }
+        void ICollection<T>.Clear() {
+            Clear();
+        }
+        bool ICollection<T>.Contains(T item) {
+            return Contains(item);
+        }
+        void ICollection<T>.CopyTo(T[] array, int arrayIndex) {
+            Guard.IsNotNull(array, nameof(array));
+            Guard.IsInRange(arrayIndex, array, nameof(arrayIndex));
+            Guard.IsLessOrEqual(arrayIndex, array.Length - Count, nameof(arrayIndex));
+            CopyTo(array, arrayIndex);
+        }
+        IEnumerator IEnumerable.GetEnumerator() {
+            return CreateEnumerator();
+        }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() {
+            return CreateEnumerator();
+        }
+        int ICollection<T>.Count {
+            get { return Count; }
+        }
+        bool ICollection<T>.IsReadOnly {
+            get { return IsReadOnly; }
+        }
+
+        #endregion
+
+        protected virtual void Add(T item) {
+            throw new NotSupportedException();
+        }
+        protected virtual bool Remove(T item) {
+            throw new NotSupportedException();
+        }
+        protected virtual void Clear() {
+            throw new NotSupportedException();
+        }
+        protected virtual bool Contains(T item) {
+            throw new NotSupportedException();
+        }
+        protected virtual void CopyTo(T[] array, int arrayIndex) {
+            throw new NotSupportedException();
+        }
+        protected abstract int Count { get; }
+        protected abstract bool IsReadOnly { get; }
+        protected abstract EnumeratorBase<T> CreateEnumerator();
+    }
+
     public class SimpleSet<T> : EnumerableBase<T> {
         int setSize;
         readonly T[] setCore;

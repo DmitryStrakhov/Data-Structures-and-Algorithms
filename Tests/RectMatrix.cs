@@ -246,12 +246,12 @@ namespace Data_Structures_and_Algorithms.Tests {
             matrix.EnsureSize(256, 512);
             for(int i = 0; i < 256; i++) {
                 for(int j = 0; j < 512; j++) {
-                    matrix[i, j] = Utils.IsEven(j);
+                    matrix[i, j] = MathUtils.IsEven(j);
                 }
             }
             for(int i = 0; i < 256; i++) {
                 for(int j = 0; j < 512; j++) {
-                    if(Utils.IsEven(j))
+                    if(MathUtils.IsEven(j))
                         Assert.IsTrue(matrix[i, j]);
                     else
                         Assert.IsFalse(matrix[i, j]);
