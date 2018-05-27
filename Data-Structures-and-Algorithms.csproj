@@ -69,6 +69,8 @@
     <Compile Include="SortAdv\TreeSort.cs" />
     <Compile Include="Sort\Sort.cs" />
     <Compile Include="Stack\Stack.cs" />
+    <Compile Include="Strings\Matching.cs" />
+    <Compile Include="Strings\RollingHash.cs" />
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Tests\PriorityQueue.cs" />
     <Compile Include="Tests\Queue.cs" />
     <Compile Include="Tests\Stack.cs" />
+    <Compile Include="Tests\StringMatching.cs" />
     <Compile Include="Tests\ThreadedBinaryTree.cs" />
     <Compile Include="Tests\BinaryTree.cs" />
     <Compile Include="BinaryHeap\BinaryHeap.cs" />

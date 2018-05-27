@@ -79,6 +79,13 @@ namespace Data_Structures_and_Algorithms {
         public static void Clear<T>(this T[] @this) {
             Array.Clear(@this, 0, @this.Length);
         }
+        public static int LastItemIndex(this string @this) {
+            int length = @this.Length;
+            if(length == 0) {
+                throw new InvalidOperationException();
+            }
+            return length - 1;
+        }
     }
 
     public static class MathUtils {
@@ -109,6 +116,18 @@ namespace Data_Structures_and_Algorithms {
                 value >>= 1;
             }
             return 1 << maxSetBitPos;
+        }
+        public static uint ModPow(uint @base, uint @exponent, uint @mod) {
+            uint modPow = 1;
+            uint baseSquare = @base % @mod;
+            while(@exponent != 0) {
+                if((@exponent & 1) != 0) {
+                    modPow = (modPow * baseSquare) % @mod;
+                }
+                @exponent >>= 1;
+                baseSquare = (baseSquare * baseSquare) % @mod;
+            }
+            return modPow;
         }
     }
 
