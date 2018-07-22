@@ -17,12 +17,15 @@ namespace Data_Structures_and_Algorithms {
         #region BaseHash
 
         public uint CalcBaseHash(string inputString) {
+            if(inputString.IsEmpty()) return 0;
             return CalcBaseHash(inputString, 0, inputString.LastItemIndex());
         }
         public uint CalcBaseHash(string inputString, int charCount) {
+            if(inputString.IsEmpty()) return 0;
             return CalcBaseHash(inputString, 0, charCount - 1);
         }
         public uint CalcBaseHash(string inputString, int startIndex, int stopIndex) {
+            if(inputString.IsEmpty()) return 0;
             uint hashCode = 0;
             for(int n = startIndex; n <= stopIndex; n++) {
                 uint digit = inputString[n];

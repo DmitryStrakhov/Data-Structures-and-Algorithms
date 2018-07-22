@@ -88,6 +88,29 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
+
+    public static class StringExtensions {
+        public static bool IsEmpty(this string @this) {
+            return @this.Length == 0;
+        }
+        public static bool Contains(this string @this, int startIndex, string pattern) {
+            int count;
+            for(count = 0; count < pattern.Length && startIndex < @this.Length; count++, startIndex++) {
+                if(pattern[count] != @this[startIndex]) return false;
+            }
+            return count == pattern.Length;
+        }
+        public static bool IsSuffixOf(this string @this, string text, int startIndex) {
+            if(@this.Length == 0) return true;
+            int count;
+            for(count = 0; count < @this.Length && startIndex < text.Length; count++, startIndex++) {
+                if(text[startIndex] != @this[count]) return false;
+            }
+            return true;
+        }
+    }
+
+
     public static class MathUtils {
         public static bool AreEqual(double x, double y) {
             const double Epsilon = 0.000001;

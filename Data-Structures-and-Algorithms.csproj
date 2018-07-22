@@ -69,8 +69,10 @@
     <Compile Include="SortAdv\TreeSort.cs" />
     <Compile Include="Sort\Sort.cs" />
     <Compile Include="Stack\Stack.cs" />
+    <Compile Include="Strings\FiniteAutomaton.cs" />
     <Compile Include="Strings\Matching.cs" />
     <Compile Include="Strings\RollingHash.cs" />
+    <Compile Include="Strings\StringMatchAutomaton.cs" />
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />

@@ -127,6 +127,9 @@ namespace Data_Structures_and_Algorithms {
         public int Count {
             get { return count; }
         }
+        public bool IsEmpty {
+            get { return count == 0; }
+        }
         public ICollection<TKey> Keys {
             get { return keys ?? (keys = new KeyCollection(this)); }
         }

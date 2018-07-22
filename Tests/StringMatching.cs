@@ -8,92 +8,101 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
-    public abstract class StringMatcherTests {
-        readonly IStringMatcher stringMatcher;
-
-        public StringMatcherTests(IStringMatcher stringMatcher) {
-            this.stringMatcher = stringMatcher;
-        }
+    public abstract class StringMatcherTests<TStringMatcher> where TStringMatcher : IStringMatcher {
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void MatchGuardCase1Test() {
-            stringMatcher.Match(null, "1");
+            IStringMatcher stringMatcher = CreateStringMatcher("1");
+            stringMatcher.MatchTo(null);
         }
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void MatchGuardCase2Test() {
-            stringMatcher.Match("1", null);
+            CreateStringMatcher(null);
         }
         [TestMethod]
-        public void MatchEmptyStringTest() {
-            Assert.IsFalse(stringMatcher.Match("", "1"));
-            Assert.IsFalse(stringMatcher.Match("", " "));
-            Assert.IsFalse(stringMatcher.Match("", "test"));
+        public void EmptyTextMatchTest() {
+            IStringMatcher stringMatcher = CreateStringMatcher("1");
+            Assert.IsFalse(stringMatcher.MatchTo(""));
+            stringMatcher = CreateStringMatcher(" ");
+            Assert.IsFalse(stringMatcher.MatchTo(""));
+            stringMatcher = CreateStringMatcher("test");
+            Assert.IsFalse(stringMatcher.MatchTo(""));
         }
         [TestMethod]
-        public void MatchToEmptyStringTest() {
-            Assert.IsTrue(stringMatcher.Match("1", ""));
-            Assert.IsTrue(stringMatcher.Match(" ", ""));
-            Assert.IsTrue(stringMatcher.Match("test", ""));
+        public void EmptyPatternMatchTest() {
+            IStringMatcher stringMatcher = CreateStringMatcher("");
+            Assert.IsTrue(stringMatcher.MatchTo("1"));
+            Assert.IsTrue(stringMatcher.MatchTo(" "));
+            Assert.IsTrue(stringMatcher.MatchTo("test"));
         }
         [TestMethod]
-        public void MatchTwoEmptyStringTest() {
-            Assert.IsTrue(stringMatcher.Match("", ""));
+        public void MatchTwoEmptyStringsTest() {
+            IStringMatcher stringMatcher = CreateStringMatcher("");
+            Assert.IsTrue(stringMatcher.MatchTo(""));
         }
         [TestMethod]
         public void MatchSimpleTest() {
-            Assert.IsTrue(stringMatcher.Match("some sentence", "t"));
+            IStringMatcher stringMatcher = CreateStringMatcher("t");
+            Assert.IsTrue(stringMatcher.MatchTo("some sentence"));
         }
         [TestMethod]
         public void MatchTest1() {
-            Assert.IsTrue(stringMatcher.Match("some sentence", "some"));
+            IStringMatcher stringMatcher = CreateStringMatcher("some");
+            Assert.IsTrue(stringMatcher.MatchTo("some sentence"));
         }
         [TestMethod]
         public void MatchTest2() {
-            Assert.IsTrue(stringMatcher.Match("some sentence", "ent"));
+            IStringMatcher stringMatcher = CreateStringMatcher("ent");
+            Assert.IsTrue(stringMatcher.MatchTo("some sentence"));
         }
         [TestMethod]
         public void MatchTest3() {
-            Assert.IsTrue(stringMatcher.Match("some sentence", "nce"));
+            IStringMatcher stringMatcher = CreateStringMatcher("nce");
+            Assert.IsTrue(stringMatcher.MatchTo("some sentence"));
         }
         [TestMethod]
         public void MatchTest4() {
-            Assert.IsFalse(stringMatcher.Match("some sentence", "ncet"));
+            IStringMatcher stringMatcher = CreateStringMatcher("ncet");
+            Assert.IsFalse(stringMatcher.MatchTo("some sentence"));
         }
         [TestMethod]
         public void MatchTest5() {
-            Assert.IsFalse(stringMatcher.Match("other input string", "y"));
+            IStringMatcher stringMatcher = CreateStringMatcher("y");
+            Assert.IsFalse(stringMatcher.MatchTo("other input string"));
         }
         [TestMethod]
         public void MatchTest6() {
-            Assert.IsFalse(stringMatcher.Match("other input string", "tense"));
+            IStringMatcher stringMatcher = CreateStringMatcher("tense");
+            Assert.IsFalse(stringMatcher.MatchTo("other input string"));
         }
-        protected IStringMatcher StringMatcher { get { return stringMatcher; } }
+        protected abstract TStringMatcher CreateStringMatcher(string pattern);
     }
 
 
     [TestClass]
-    public class BruteForceStringMatcherTests : StringMatcherTests {
-        public BruteForceStringMatcherTests()
-            : base(new BruteForceStringMatcher()) {
+    public class BruteForceStringMatcherTests : StringMatcherTests<BruteForceStringMatcher> {
+        public BruteForceStringMatcherTests() {
+        }
+        protected override BruteForceStringMatcher CreateStringMatcher(string pattern) {
+            return new BruteForceStringMatcher(pattern);
         }
     }
 
 
     [TestClass]
-    public class RabinKarpStringMatcherTests : StringMatcherTests {
-        public RabinKarpStringMatcherTests()
-            : base(new RabinKarpStringMatcher()) {
+    public class RabinKarpStringMatcherTests : StringMatcherTests<RabinKarpStringMatcher> {
+        public RabinKarpStringMatcherTests() {
         }
         [TestMethod]
         public void AreEqualTest1() {
-            Assert.IsTrue(StringMatcher.AreEqual("atckrm", 0, "atc"));
-            Assert.IsTrue(StringMatcher.AreEqual("atckrm", 2, "ck"));
-            Assert.IsTrue(StringMatcher.AreEqual("atckrm", 4, "rm"));
+            Assert.IsTrue("atckrm".Contains(0, "atc"));
+            Assert.IsTrue("atckrm".Contains(2, "ck"));
+            Assert.IsTrue("atckrm".Contains(4, "rm"));
         }
         [TestMethod]
         public void AreEqualTest2() {
-            Assert.IsFalse(StringMatcher.AreEqual("atckrm", 2, "cc"));
-            Assert.IsFalse(StringMatcher.AreEqual("atckrm", 1, "atc"));
-            Assert.IsFalse(StringMatcher.AreEqual("atckrm", 5, "mr"));
+            Assert.IsFalse("atckrm".Contains(2, "cc"));
+            Assert.IsFalse("atckrm".Contains(1, "atc"));
+            Assert.IsFalse("atckrm".Contains(5, "mr"));
         }
         [TestMethod]
         public void CalcBaseHashTest1() {
@@ -126,8 +135,159 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void ModPowTest2() {
             Assert.AreEqual(29116u, MathUtils.ModPow(65536, 7, 62851));
         }
-        new RabinKarpStringMatcher StringMatcher { get { return (RabinKarpStringMatcher)base.StringMatcher; } }
+        protected override RabinKarpStringMatcher CreateStringMatcher(string pattern) {
+            return new RabinKarpStringMatcher(pattern);
+        }
     }
+
+
+    [TestClass]
+    public class FiniteAutomatonStringMatcherTests : StringMatcherTests<FiniteAutomatonStringMatcher> {
+        public FiniteAutomatonStringMatcherTests() {
+        }
+        [TestMethod]
+        public void StringMatchAutomatonBuilderTest1() {
+            IFiniteAutomaton<char> finiteAutomaton = CreateFiniteAutomaton("ababaca");
+            finiteAutomaton.AssertID(0);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('a', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('a');
+            finiteAutomaton.AssertID(1);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('b', 2);
+            finiteAutomaton.AssertTransition('a', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('b');
+            finiteAutomaton.AssertID(2);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('a', 3);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('a');
+            finiteAutomaton.AssertID(3);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('b', 4);
+            finiteAutomaton.AssertTransition('a', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('b');
+            finiteAutomaton.AssertID(4);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('a', 5);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('a');
+            finiteAutomaton.AssertID(5);
+            finiteAutomaton.AssertDegree(3);
+            finiteAutomaton.AssertTransition('c', 6);
+            finiteAutomaton.AssertTransition('b', 4);
+            finiteAutomaton.AssertTransition('a', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('c');
+            finiteAutomaton.AssertID(6);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('a', 7);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('a');
+            finiteAutomaton.AssertID(7);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('a', 1);
+            finiteAutomaton.AssertTransition('b', 2);
+            Assert.IsTrue(finiteAutomaton.IsStringAccepted);
+        }
+        [TestMethod]
+        public void StringMatchAutomatonBuilderTest2() {
+            IFiniteAutomaton<char> finiteAutomaton = CreateFiniteAutomaton("ABCDABD");
+            finiteAutomaton.AssertID(0);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('A');
+            finiteAutomaton.AssertID(1);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('B', 2);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('B');
+            finiteAutomaton.AssertID(2);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('C', 3);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('C');
+            finiteAutomaton.AssertID(3);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('D', 4);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('D');
+            finiteAutomaton.AssertID(4);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('A', 5);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('A');
+            finiteAutomaton.AssertID(5);
+            finiteAutomaton.AssertDegree(2);
+            finiteAutomaton.AssertTransition('B', 6);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('B');
+            finiteAutomaton.AssertID(6);
+            finiteAutomaton.AssertDegree(3);
+            finiteAutomaton.AssertTransition('D', 7);
+            finiteAutomaton.AssertTransition('C', 3);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsFalse(finiteAutomaton.IsStringAccepted);
+            finiteAutomaton.MakeTransition('D');
+            finiteAutomaton.AssertID(7);
+            finiteAutomaton.AssertDegree(1);
+            finiteAutomaton.AssertTransition('A', 1);
+            Assert.IsTrue(finiteAutomaton.IsStringAccepted);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void CalculateSuffixFunctionGuardTest() {
+            StringMatchAutomatonBuilder.CalculateSuffixFunction("ab", string.Empty);
+        }
+        [TestMethod]
+        public void CalculateSuffixFunctionTest() {
+            Assert.AreEqual(0, StringMatchAutomatonBuilder.CalculateSuffixFunction(string.Empty, "ab"));
+            Assert.AreEqual(1, StringMatchAutomatonBuilder.CalculateSuffixFunction("ccaca", "ab"));
+            Assert.AreEqual(2, StringMatchAutomatonBuilder.CalculateSuffixFunction("ccab", "ab"));
+            Assert.AreEqual(0, StringMatchAutomatonBuilder.CalculateSuffixFunction("ab", "ccab"));
+            Assert.AreEqual(1, StringMatchAutomatonBuilder.CalculateSuffixFunction("dc", "ccab"));
+        }
+        [TestMethod]
+        public void MatchTest() {
+            IStringMatcher stringMatcher = CreateStringMatcher("ababaca");
+            Assert.IsTrue(stringMatcher.MatchTo("abababacaba"));
+        }
+        static IFiniteAutomaton<char> CreateFiniteAutomaton(string pattern) {
+            IFiniteAutomatonBuilder<char> builder = new StringMatchAutomatonBuilder(pattern);
+            return builder.Build();
+        }
+        protected override FiniteAutomatonStringMatcher CreateStringMatcher(string pattern) {
+            return new FiniteAutomatonStringMatcher(pattern);
+        }
+    }
+
+    #region FiniteAutomatonStateAssert
+
+    static class FiniteAutomatonStateAssert {
+        public static IFiniteAutomaton<T> AssertID<T>(this IFiniteAutomaton<T> @this, int id) {
+            Assert.AreEqual(id, @this.State.ID);
+            return @this;
+        }
+        public static IFiniteAutomaton<T> AssertDegree<T>(this IFiniteAutomaton<T> @this, int degree) {
+            Assert.AreEqual(degree, @this.State.Degree);
+            return @this;
+        }
+        public static IFiniteAutomaton<T> AssertTransition<T>(this IFiniteAutomaton<T> @this, T symbol, int stateID) {
+            IFiniteAutomatonState<T> state = @this.State[symbol];
+            Assert.IsNotNull(state);
+            Assert.AreEqual(state.ID, stateID);
+            return @this;
+        }
+    }
+
+    #endregion
 
 }
 #endif
