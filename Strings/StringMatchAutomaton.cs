@@ -176,7 +176,7 @@ namespace Data_Structures_and_Algorithms {
     }
 
 
-    #region DebugView
+    #region StringMatchAutomatonStateDebugView
 
     sealed class StringMatchAutomatonStateDebugView {
         readonly StringMatchAutomatonState owner;
@@ -196,21 +196,25 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
+    #endregion
+
+
+    #region StringMatchFiniteAutomatonDebugView
 
     sealed class StringMatchFiniteAutomatonDebugView {
-        readonly IFiniteAutomaton<char> owner;
+        readonly IFiniteAutomaton<char> coreOwner;
 
         public StringMatchFiniteAutomatonDebugView(StringMatchFiniteAutomaton owner) {
-            this.owner = owner;
+            this.coreOwner = owner;
         }
         public StringMatchAutomatonState StartState {
-            get { return (StringMatchAutomatonState)owner.StartState; }
+            get { return coreOwner.StartState.CastTo<StringMatchAutomatonState>(); }
         }
         public StringMatchAutomatonState State {
-            get { return (StringMatchAutomatonState)owner.State; }
+            get { return coreOwner.State.CastTo<StringMatchAutomatonState>(); }
         }
         public bool IsStringAccepted {
-            get { return owner.IsStringAccepted; }
+            get { return coreOwner.IsStringAccepted; }
         }
     }
 

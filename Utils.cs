@@ -86,6 +86,9 @@ namespace Data_Structures_and_Algorithms {
             }
             return length - 1;
         }
+        public static T CastTo<T>(this object @this) {
+            return (T)@this;
+        }
     }
 
 
