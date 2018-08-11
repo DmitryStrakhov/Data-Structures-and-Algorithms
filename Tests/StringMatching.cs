@@ -80,18 +80,12 @@ namespace Data_Structures_and_Algorithms.Tests {
 
     [TestClass]
     public class BruteForceStringMatcherTests : StringMatcherTests<BruteForceStringMatcher> {
-        public BruteForceStringMatcherTests() {
-        }
-        protected override BruteForceStringMatcher CreateStringMatcher(string pattern) {
-            return new BruteForceStringMatcher(pattern);
-        }
+        protected override BruteForceStringMatcher CreateStringMatcher(string pattern) { return new BruteForceStringMatcher(pattern); }
     }
 
 
     [TestClass]
     public class RabinKarpStringMatcherTests : StringMatcherTests<RabinKarpStringMatcher> {
-        public RabinKarpStringMatcherTests() {
-        }
         [TestMethod]
         public void AreEqualTest1() {
             Assert.IsTrue("atckrm".Contains(0, "atc"));
@@ -135,16 +129,12 @@ namespace Data_Structures_and_Algorithms.Tests {
         public void ModPowTest2() {
             Assert.AreEqual(29116u, MathUtils.ModPow(65536, 7, 62851));
         }
-        protected override RabinKarpStringMatcher CreateStringMatcher(string pattern) {
-            return new RabinKarpStringMatcher(pattern);
-        }
+        protected override RabinKarpStringMatcher CreateStringMatcher(string pattern) { return new RabinKarpStringMatcher(pattern); }
     }
 
 
     [TestClass]
     public class FiniteAutomatonStringMatcherTests : StringMatcherTests<FiniteAutomatonStringMatcher> {
-        public FiniteAutomatonStringMatcherTests() {
-        }
         [TestMethod]
         public void StringMatchAutomatonBuilderTest1() {
             IFiniteAutomaton<char> finiteAutomaton = CreateFiniteAutomaton("ababaca");
@@ -256,19 +246,48 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         [TestMethod]
         public void MatchTest() {
-            IStringMatcher stringMatcher = CreateStringMatcher("ababaca");
-            Assert.IsTrue(stringMatcher.MatchTo("abababacaba"));
+            Assert.IsTrue(CreateStringMatcher("ababaca").MatchTo("abababacaba"));
         }
         static IFiniteAutomaton<char> CreateFiniteAutomaton(string pattern) {
             IFiniteAutomatonBuilder<char> builder = new StringMatchAutomatonBuilder(pattern);
             return builder.Build();
         }
-        protected override FiniteAutomatonStringMatcher CreateStringMatcher(string pattern) {
-            return new FiniteAutomatonStringMatcher(pattern);
-        }
+        protected override FiniteAutomatonStringMatcher CreateStringMatcher(string pattern) { return new FiniteAutomatonStringMatcher(pattern); }
     }
 
-    #region FiniteAutomatonStateAssert
+
+    [TestClass]
+    public class KnuthMorrisPrattStringMatcherTests : StringMatcherTests<KnuthMorrisPrattStringMatcher> {
+        [TestMethod]
+        public void BuildPrefixTableTest1() {
+            int[] prefixTable = KnuthMorrisPrattStringMatcher.BuildPrefixTable("ababaca");
+            CollectionAssert.AreEqual(new int[] { 0, 0, 1, 2, 3, 0, 1 }, prefixTable);
+        }
+        [TestMethod]
+        public void BuildPrefixTableTest2() {
+            int[] prefixTable = KnuthMorrisPrattStringMatcher.BuildPrefixTable("ABCDABD");
+            CollectionAssert.AreEqual(new int[] { 0, 0, 0, 0, 1, 2, 0 }, prefixTable);
+        }
+        [TestMethod]
+        public void BuildPrefixTableTest3() {
+            int[] prefixTable = KnuthMorrisPrattStringMatcher.BuildPrefixTable("abacabab");
+            CollectionAssert.AreEqual(new int[] { 0, 0, 1, 0, 1, 2, 3, 2 }, prefixTable);
+        }
+        [TestMethod]
+        public void AdvMatchTest1() {
+            bool result = CreateStringMatcher("ababaca").MatchTo("bacbababaabcbab");
+            Assert.IsFalse(result);
+        }
+        [TestMethod]
+        public void AdvMatchTest2() {
+            bool result = CreateStringMatcher("ABCDABD").MatchTo("ABC ABCDAB ABCDABCDABDE");
+            Assert.IsTrue(result);
+        }
+        protected override KnuthMorrisPrattStringMatcher CreateStringMatcher(string pattern) { return new KnuthMorrisPrattStringMatcher(pattern); }
+    }
+
+
+    #region Asserts
 
     static class FiniteAutomatonStateAssert {
         public static IFiniteAutomaton<T> AssertID<T>(this IFiniteAutomaton<T> @this, int id) {
