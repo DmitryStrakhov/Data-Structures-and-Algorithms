@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,5 +112,97 @@ namespace Data_Structures_and_Algorithms {
             }
             return prefixTable;
         }
+    }
+
+
+    public sealed class BoyerMooreStringMatcher : StringMatcherBase {
+        readonly Delta1 delta1;
+        readonly Delta2 delta2;
+        readonly int patlen;
+
+        public BoyerMooreStringMatcher(string pattern) : base(pattern) {
+            this.patlen = Pattern.Length;
+            this.delta1 = CalculateDelta1();
+            this.delta2 = CalculateDelta2();
+        }
+        protected override bool MatchCore(string text) {
+            int i = patlen - 1;
+            int j = i;
+            while(i < text.Length) {
+                char symbol = text[i];
+                if(symbol == Pattern[j]) {
+                    if(j == 0) return true;
+                    i--;
+                    j--;
+                }
+                else {
+                    i += Math.Max(delta1[symbol], delta2[j]);
+                    j = patlen - 1;
+                }
+            }
+            return false;
+        }
+
+        Delta1 CalculateDelta1() {
+            int[] data = new int[char.MaxValue - char.MinValue + 1];
+            data.Fill(patlen);
+            for(int n = patlen - 1; n >= 0; n--) {
+                char symbol = Pattern[n];
+                if(data[symbol] == patlen) data[symbol] = patlen - n - 1;
+            }
+            return new Delta1(data);
+        }
+        Delta2 CalculateDelta2() {
+            int[] data = new int[patlen];
+            for(int n = patlen - 1; n >= 0; n--) {
+                data[n] = CalculateDelta2Core(n);
+            }
+            return new Delta2(data);
+        }
+        int CalculateDelta2Core(int n) {
+            for(int j = patlen - 2; true; j--) {
+                int i, index;
+                for(i = Pattern.Length - 1, index = j; i != n && Delta2Compare(Pattern, i, index); i--, index--);
+                if(i == n && (index < 0 || !Delta2Compare(Pattern, n, index))) return patlen - index - 1;
+            }
+        }
+        static bool Delta2Compare(string @string, int i, int j) { return j < 0 || @string[i] == @string[j]; }
+
+        #region Delta1
+
+        [DebuggerDisplay("Delta1")]
+        internal class Delta1 {
+            readonly int[] coreData;
+
+            public Delta1(int[] data) {
+                this.coreData = data;
+            }
+            public int this[char symbol] { get { return coreData[symbol]; } }
+        }
+
+        #endregion
+
+        #region Delta2
+
+
+        [DebuggerDisplay("Delta2")]
+        internal class Delta2 {
+            readonly int[] coreData;
+
+            public Delta2(int[] data) {
+                this.coreData = data;
+            }
+            public int this[int index] {
+                get {
+                    Guard.IsInRange(index, coreData, nameof(index));
+                    return coreData[index];
+                }
+            }
+        }
+
+        #endregion
+
+        internal Delta1 GetDelta1() { return delta1; }
+        internal Delta2 GetDelta2() { return delta2; }
     }
 }

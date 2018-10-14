@@ -287,6 +287,69 @@ namespace Data_Structures_and_Algorithms.Tests {
     }
 
 
+    [TestClass]
+    public class BoyerMooreStringMatcherTests : StringMatcherTests<BoyerMooreStringMatcher> {
+        [TestMethod]
+        public void AdvMatchTest() {
+            Assert.IsTrue(CreateStringMatcher("AT-THAT").MatchTo("WHICH-FINALLY-HALTS.--AT-THAT-POINT"));
+        }
+        [TestMethod]
+        public void Delta1Test1() {
+            BoyerMooreStringMatcher.Delta1 delta1 = CreateStringMatcher("TEXT").GetDelta1();
+            char[] chars = new char[] { 'T', 'X', 'E' };
+            CollectionAssertEx.AreEqual(new int[] { 0, 1, 2 }, chars.Select(x => delta1[x]));
+            CollectionAssertEx.TrueForAllItems(CharsRange().Except(chars).Select(x => delta1[x]), x => x == 4);
+        }
+        [TestMethod]
+        public void Delta1Test2() {
+            BoyerMooreStringMatcher.Delta1 delta1 = CreateStringMatcher("LONG LONG STRING").GetDelta1();
+            char[] chars = new char[] { 'L', 'O', 'N', 'G', 'S', 'T', 'R', 'I', ' ' };
+            CollectionAssertEx.AreEqual(new int[] { 10, 9, 1, 0, 5, 4, 3, 2, 6 }, chars.Select(x => delta1[x]));
+            CollectionAssertEx.TrueForAllItems(CharsRange().Except(chars).Select(x => delta1[x]), x => x == 16);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void Delta2GuardCase1Test() {
+            BoyerMooreStringMatcher.Delta2 delta2 = CreateStringMatcher("STRING").GetDelta2();
+            int result = delta2[-1];
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void Delta2GuardCase2Test() {
+            BoyerMooreStringMatcher.Delta2 delta2 = CreateStringMatcher("STRING").GetDelta2();
+            int result = delta2[6];
+        }
+        [TestMethod]
+        public void Delta2Test1() {
+            BoyerMooreStringMatcher.Delta2 delta2 = CreateStringMatcher("ABCXXXABC").GetDelta2();
+            CollectionAssertEx.AreEqual(new int[] { 14, 13, 12, 11, 10, 9, 11, 10, 1 }, Enumerable.Range(0, 9).Select(x => delta2[x]));
+        }
+        [TestMethod]
+        public void Delta2Test2() {
+            BoyerMooreStringMatcher.Delta2 delta2 = CreateStringMatcher("ABYXCDEYX").GetDelta2();
+            CollectionAssertEx.AreEqual(new int[] { 17, 16, 15, 14, 13, 12, 7, 10, 1 }, Enumerable.Range(0, 9).Select(x => delta2[x]));
+        }
+        [TestMethod]
+        public void Delta2Test3() {
+            BoyerMooreStringMatcher.Delta2 delta2 = CreateStringMatcher("CC").GetDelta2();
+            CollectionAssertEx.AreEqual(new int[] { 2, 2 }, Enumerable.Range(0, 2).Select(x => delta2[x]));
+        }
+        [TestMethod]
+        public void Delta2Test4() {
+            BoyerMooreStringMatcher.Delta2 delta2 = CreateStringMatcher("CCCC").GetDelta2();
+            CollectionAssertEx.AreEqual(new int[] { 4, 4, 4, 4 }, Enumerable.Range(0, 4).Select(x => delta2[x]));
+        }
+
+        static IEnumerable<char> CharsRange() {
+            char symbol = char.MinValue;
+            do {
+                yield return symbol;
+                symbol++;
+            }
+            while(symbol != char.MinValue);
+        }
+        protected override BoyerMooreStringMatcher CreateStringMatcher(string pattern) { return new BoyerMooreStringMatcher(pattern); }
+    }
+
+
     #region Asserts
 
     static class FiniteAutomatonStateAssert {

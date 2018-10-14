@@ -79,6 +79,11 @@ namespace Data_Structures_and_Algorithms {
         public static void Clear<T>(this T[] @this) {
             Array.Clear(@this, 0, @this.Length);
         }
+        public static void Fill<T>(this T[] @this, T value) {
+            for(int n = 0; n < @this.Length; n++) {
+                @this[n] = value;
+            }
+        }
         public static int LastItemIndex(this string @this) {
             int length = @this.Length;
             if(length == 0) {
