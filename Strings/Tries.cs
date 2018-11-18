@@ -65,7 +65,7 @@ namespace Data_Structures_and_Algorithms {
             return node != null;
         }
 
-        TrieNode<T> SearchNode(string key) {
+        internal TrieNode<T> SearchNode(string key) {
             TrieKeyReader keyReader = new TrieKeyReader(key);
             TrieNode<T> node = root;
             while(node != null && !keyReader.IsFinished) {
