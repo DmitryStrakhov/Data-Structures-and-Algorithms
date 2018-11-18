@@ -28,8 +28,8 @@ namespace Data_Structures_and_Algorithms {
             TrieNode<T> node = root;
             while(!keyReader.IsFinished) {
                 int index = keyReader.ReadChunk();
-                TrieNode<T> child = node[index];
-                if(child == null) {
+                var child = node[index];
+                if(child == null || (keyReader.IsFinished && !child.IsTerminal)) {
                     node[index] = child = keyReader.IsFinished ? new TrieNode<T>(tag, true) : new TrieNode<T>();
                 }
                 node = child;

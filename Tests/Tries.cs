@@ -47,6 +47,16 @@ namespace Data_Structures_and_Algorithms.Tests {
                 new TrieNode("Word3", null),
                 new TrieNode("OtherWord3", null));
         }
+        [TestMethod]
+        public void InsertTest2() {
+            trie.Insert("Word1", 1);
+            trie.Insert("Word2", 2);
+            trie.Insert("Word3", 3);
+            trie.Delete("Word1");
+            trie.AssertNodes(new TrieNode("Word2", 2), new TrieNode("Word3", 3));
+            trie.Insert("Word1", 11);
+            trie.AssertNodes(new TrieNode("Word1", 11), new TrieNode("Word2", 2), new TrieNode("Word3", 3));
+        }
         [TestMethod, ExpectedException(typeof(ArgumentException))]
         public void DeleteGuardTest() {
             trie.Insert("Word1");
