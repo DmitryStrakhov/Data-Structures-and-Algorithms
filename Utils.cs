@@ -32,17 +32,26 @@ namespace Data_Structures_and_Algorithms {
         public static void IsAssignableFrom<TExpected, TActual>() {
             if(!typeof(TExpected).IsAssignableFrom(typeof(TActual))) throw new NotSupportedException();
         }
+        public static void IsTrue(bool value) {
+            if(!value) throw new InvalidOperationException();
+        }
     }
 
     public static class Extensions {
-        public static void Swap<T>(this IList<T> list, int xPos, int yPos) {
-            Guard.IsInRange(xPos, 0, list.Count - 1, nameof(xPos));
-            Guard.IsInRange(yPos, 0, list.Count - 1, nameof(yPos));
+        public static void Swap<T>(this IList<T> @this, int xPos, int yPos) {
+            Guard.IsInRange(xPos, 0, @this.Count - 1, nameof(xPos));
+            Guard.IsInRange(yPos, 0, @this.Count - 1, nameof(yPos));
             if(xPos != yPos) {
-                T temp = list[xPos];
-                list[xPos] = list[yPos];
-                list[yPos] = temp;
+                T temp = @this[xPos];
+                @this[xPos] = @this[yPos];
+                @this[yPos] = temp;
             }
+        }
+        public static void RemoveLastItem<T>(this IList<T> @this) {
+            if(@this.Count == 0) {
+                throw new InvalidOperationException();
+            }
+            @this.RemoveAt(@this.Count - 1);
         }
         public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action) {
             foreach(var item in @this) {

@@ -73,6 +73,7 @@
     <Compile Include="Strings\Matching.cs" />
     <Compile Include="Strings\RollingHash.cs" />
     <Compile Include="Strings\StringMatchAutomaton.cs" />
+    <Compile Include="Strings\Tries.cs" />
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
@@ -95,6 +96,7 @@
     <Compile Include="BinaryHeap\BinaryHeap.cs" />
     <Compile Include="Tests\Assertions.cs" />
     <Compile Include="Tests\Search.cs" />
+    <Compile Include="Tests\Tries.cs" />
     <Compile Include="Tree\BinaryNode.cs" />
     <Compile Include="Tree\BinarySearchTree.cs" />
     <Compile Include="Tree\BinarySearchNode.cs" />
