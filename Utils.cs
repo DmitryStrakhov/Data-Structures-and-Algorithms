@@ -37,7 +37,34 @@ namespace Data_Structures_and_Algorithms {
         }
     }
 
-    public static class Extensions {
+
+    public static class GenericExtensions {
+        public static T CastTo<T>(this object @this) {
+            return (T)@this;
+        }
+        public static IEnumerable<T> Yield<T>(this T item) {
+            yield return item;
+        }
+        public static T[] YieldArray<T>(this T item) {
+            return new T[] { item };
+        }
+        public static TR Return<TI, TR>(this TI @this, Func<TI, TR> getValue, TR defaultValue) where TI : class {
+            if(@this == null) return defaultValue;
+            return getValue(@this);
+        }
+    }
+
+
+    public static class EnumerableExtensions {
+        public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action) {
+            foreach(var item in @this) {
+                action(item);
+            }
+        }
+    }
+
+
+    public static class ListExtensions {
         public static void Swap<T>(this IList<T> @this, int xPos, int yPos) {
             Guard.IsInRange(xPos, 0, @this.Count - 1, nameof(xPos));
             Guard.IsInRange(yPos, 0, @this.Count - 1, nameof(yPos));
@@ -53,15 +80,22 @@ namespace Data_Structures_and_Algorithms {
             }
             @this.RemoveAt(@this.Count - 1);
         }
-        public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action) {
-            foreach(var item in @this) {
-                action(item);
-            }
-        }
+    }
+
+
+    static class ArrayExtensions {
         public static void ForEach<T>(this T[] @this, Predicate<T> predicate, Action<T> action) {
             for(int i = 0; i < @this.Length; i++) {
                 if(predicate(@this[i])) action(@this[i]);
             }
+        }
+        public static void Fill<T>(this T[] @this, T value) {
+            for(int n = 0; n < @this.Length; n++) {
+                @this[n] = value;
+            }
+        }
+        public static void Clear<T>(this T[] @this) {
+            Array.Clear(@this, 0, @this.Length);
         }
         public static T[] Enlarge<T>(this T[] @this, int newSize) {
             if(newSize <= @this.Length) {
@@ -70,9 +104,6 @@ namespace Data_Structures_and_Algorithms {
             T[] result = new T[newSize];
             Array.Copy(@this, result, @this.Length);
             return result;
-        }
-        public static IEnumerable<T> Yield<T>(this T item) {
-            yield return item;
         }
         public static void Initialize<T>(this T[] @this, Func<T> createInstance) {
             for(int i = 0; i < @this.Length; i++) {
@@ -85,13 +116,15 @@ namespace Data_Structures_and_Algorithms {
             }
             return defaultIndex;
         }
-        public static void Clear<T>(this T[] @this) {
-            Array.Clear(@this, 0, @this.Length);
+    }
+
+
+    public static class StringExtensions {
+        public static bool IsEmpty(this string @this) {
+            return @this.Length == 0;
         }
-        public static void Fill<T>(this T[] @this, T value) {
-            for(int n = 0; n < @this.Length; n++) {
-                @this[n] = value;
-            }
+        public static bool IsIndexValid(this string @this, int index) {
+            return index >= 0 && index <= @this.Length - 1;
         }
         public static int LastItemIndex(this string @this) {
             int length = @this.Length;
@@ -99,16 +132,6 @@ namespace Data_Structures_and_Algorithms {
                 throw new InvalidOperationException();
             }
             return length - 1;
-        }
-        public static T CastTo<T>(this object @this) {
-            return (T)@this;
-        }
-    }
-
-
-    public static class StringExtensions {
-        public static bool IsEmpty(this string @this) {
-            return @this.Length == 0;
         }
         public static bool Contains(this string @this, int startIndex, string pattern) {
             int count;
@@ -124,6 +147,16 @@ namespace Data_Structures_and_Algorithms {
                 if(text[startIndex] != @this[count]) return false;
             }
             return true;
+        }
+    }
+
+
+    public static class StringBuilderExtensions {
+        public static void RemoveLastChar(this StringBuilder @this) {
+            if(@this.Length == 0) {
+                throw new InvalidOperationException();
+            }
+            @this.Remove(@this.Length - 1, 1);
         }
     }
 

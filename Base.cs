@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +13,14 @@ namespace Data_Structures_and_Algorithms {
 
         #region IEnumerable
         IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
+            return CreateEnumerator();
         }
         IEnumerator<T> IEnumerable<T>.GetEnumerator() {
-            return GetEnumerator();
+            return CreateEnumerator();
         }
         #endregion
 
-        protected abstract IEnumerator<T> GetEnumerator();
+        protected abstract IEnumerator<T> CreateEnumerator();
     }
 
 
@@ -119,6 +120,52 @@ namespace Data_Structures_and_Algorithms {
         protected abstract EnumeratorBase<T> CreateEnumerator();
     }
 
+
+    [DebuggerDisplay("KeyValuePair(Key={Key},Value={Value})")]
+    public struct KeyValuePair<TKey, TValue> {
+        readonly TKey key;
+        readonly TValue value;
+
+        public KeyValuePair(TKey key, TValue value) {
+            this.key = key;
+            this.value = value;
+        }
+        public TKey Key { get { return key; } }
+        public TValue Value { get { return value; } }
+    }
+
+
+    [DebuggerDisplay("Triplet(First={First},Second={Second},Third={Third})")]
+    public class Triplet<T1, T2, T3> {
+        readonly T1 first;
+        readonly T2 second;
+        readonly T3 third;
+
+        public Triplet(T1 first, T2 second, T3 third) {
+            this.first = first;
+            this.second = second;
+            this.third = third;
+        }
+
+        #region Equals & GetHashCode
+
+        public override bool Equals(object obj) {
+            Triplet<T1, T2, T3> other = obj as Triplet<T1, T2, T3>;
+            if(other == null) return false;
+            return EqualityComparer<T1>.Default.Equals(first, other.first) && EqualityComparer<T2>.Default.Equals(second, other.second) && EqualityComparer<T3>.Default.Equals(third, other.third);
+        }
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        } 
+
+        #endregion
+
+        public T1 First { get { return first; } }
+        public T2 Second { get { return second; } }
+        public T3 Third { get { return third; } }
+    }
+
+
     public class SimpleSet<T> : EnumerableBase<T> {
         int setSize;
         readonly T[] setCore;
@@ -141,7 +188,7 @@ namespace Data_Structures_and_Algorithms {
             get { return setSize; }
         }
         #region IEnumerable
-        protected override IEnumerator<T> GetEnumerator() {
+        protected override IEnumerator<T> CreateEnumerator() {
             for(int n = 0; n < Size; n++)
                 yield return setCore[n];
         }
