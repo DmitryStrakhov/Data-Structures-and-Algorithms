@@ -38,7 +38,7 @@ namespace Data_Structures_and_Algorithms {
         public bool Search(string key, out T tag) {
             Guard.IsNotNull(key, nameof(key));
             var node = SearchCore(root, key, 0);
-            tag = node.Return(x => x.Value, default(T));
+            tag = node.Return(x => x.Value);
             return node != null;
         }
 

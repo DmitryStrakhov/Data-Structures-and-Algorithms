@@ -17,12 +17,16 @@ namespace Data_Structures_and_Algorithms {
         KeyCollection keys;
         ValueCollection values;
         IEqualityComparer<TKey> keyComparer;
+        const int DefaultCapacity = 17;
 
         public HashMap()
-            : this(17) {
+            : this(DefaultCapacity) {
         }
         public HashMap(int capacity)
             : this(capacity, null) {
+        }
+        public HashMap(IEqualityComparer<TKey> keyComparer)
+            : this(DefaultCapacity, keyComparer) {
         }
         public HashMap(int capacity, IEqualityComparer<TKey> keyComparer) {
             Guard.IsPositive(capacity, nameof(capacity));
@@ -84,6 +88,11 @@ namespace Data_Structures_and_Algorithms {
                 return value;
             }
             return buckets[bucket].Value;
+        }
+        public TValue GetValueOrDefault(TKey key) {
+            Guard.IsNotNull(key, nameof(key));
+            TValue value;
+            return TryGetValue(key, out value) ? value : default(TValue);
         }
         public TValue this[TKey key] {
             get {

@@ -73,6 +73,7 @@
     <Compile Include="Strings\Matching.cs" />
     <Compile Include="Strings\RollingHash.cs" />
     <Compile Include="Strings\StringMatchAutomaton.cs" />
+    <Compile Include="Strings\SuffixTree.cs" />
     <Compile Include="Strings\TernarySearchTree.cs" />
     <Compile Include="Strings\Tries.cs" />
     <Compile Include="Tests\AVLTree.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Tests\Queue.cs" />
     <Compile Include="Tests\Stack.cs" />
     <Compile Include="Tests\StringMatching.cs" />
+    <Compile Include="Tests\SuffixTree.cs" />
     <Compile Include="Tests\TernarySearchTree.cs" />
     <Compile Include="Tests\ThreadedBinaryTree.cs" />
     <Compile Include="Tests\BinaryTree.cs" />

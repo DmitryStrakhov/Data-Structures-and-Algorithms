@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Data_Structures_and_Algorithms {
     public static class Guard {
+        public static void Fail() {
+            throw new InvalidOperationException();
+        }
         public static void IsNotNegative(long value, string argument) {
             if(value < 0) throw new ArgumentException(argument);
         }
@@ -35,6 +38,9 @@ namespace Data_Structures_and_Algorithms {
         public static void IsTrue(bool value) {
             if(!value) throw new InvalidOperationException();
         }
+        public static void IsNotNullOrEmpty(string value) {
+            if(string.IsNullOrEmpty(value)) throw new ArgumentException();
+        }
     }
 
 
@@ -48,7 +54,14 @@ namespace Data_Structures_and_Algorithms {
         public static T[] YieldArray<T>(this T item) {
             return new T[] { item };
         }
-        public static TR Return<TI, TR>(this TI @this, Func<TI, TR> getValue, TR defaultValue) where TI : class {
+        public static TR With<TI, TR>(this TI @this, Func<TI, TR> getValue)
+            where TI : class
+            where TR: class {
+
+            if(@this == null) return null;
+            return getValue(@this);
+        }
+        public static TR Return<TI, TR>(this TI @this, Func<TI, TR> getValue, TR defaultValue = default(TR)) where TI : class {
             if(@this == null) return defaultValue;
             return getValue(@this);
         }
@@ -93,6 +106,13 @@ namespace Data_Structures_and_Algorithms {
             for(int n = 0; n < @this.Length; n++) {
                 @this[n] = value;
             }
+        }
+        public static T[] Transform<T>(this T[] @this, Func<T, T> transformFunc) {
+            T[] result = new T[@this.Length];
+            for(int n = 0; n < @this.Length; n++) {
+                result[n] = transformFunc(@this[n]);
+            }
+            return result;
         }
         public static void Clear<T>(this T[] @this) {
             Array.Clear(@this, 0, @this.Length);
@@ -147,6 +167,26 @@ namespace Data_Structures_and_Algorithms {
                 if(text[startIndex] != @this[count]) return false;
             }
             return true;
+        }
+    }
+
+
+    public static class StringUtils {
+        public static string CalculateLargePrefix(string[] @strings, bool sort = true) {
+            if(@strings.Length <= 1) return string.Empty;
+            if(sort) Array.Sort(@strings, (x, y) => x.Length.CompareTo(y.Length));
+
+            int maximumSz = strings[0].Length;
+            StringBuilder stringBuilder = new StringBuilder(maximumSz);
+
+            for(int i = 0; i < maximumSz; i++) {
+                char symbol = strings[0][i];
+                for(int j = 1; j < @strings.Length; j++) {
+                    if(symbol != @strings[j][i]) return stringBuilder.ToString();
+                }
+                stringBuilder.Append(symbol);
+            }
+            return stringBuilder.ToString();
         }
     }
 

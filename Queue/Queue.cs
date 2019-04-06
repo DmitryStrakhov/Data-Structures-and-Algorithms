@@ -29,6 +29,11 @@ namespace Data_Structures_and_Algorithms {
             }
             this.size++;
         }
+        public void Fill(IEnumerable<T> values) {
+            foreach(T value in values) {
+                EnQueue(value);
+            }
+        }
         protected virtual void DemandEnQueue(T value) { }
 
         public T DeQueue() {
