@@ -139,19 +139,18 @@ namespace Data_Structures_and_Algorithms {
 
 
     static class SuffixTreeBuilder {
-        public static SuffixTreeNode Build(char terminalSymbol, string text) {
-            string fullText = text + terminalSymbol;
-            return BuildCore(BuildSuffixGroup(fullText), fullText.Length);
+        public static SuffixTreeNode Build(char terminalSymbol, string coreText) {
+            string @string = coreText + terminalSymbol;
+            return BuildCore(BuildSuffixGroup(@string), @string.Length);
         }
         static SuffixTreeNode BuildCore(SuffixGroup group, int index) {
             if(group.Size == 1) return new SuffixTreeNode(index, true);
 
             SuffixTreeNode node = new SuffixTreeNode(-1, false);
             foreach(SuffixGroup subGroup in group.BuildGroups()) {
-                string prefix = null;
+                string prefix;
                 SuffixGroup reducedGroup = subGroup.Reduce(out prefix);
-                SuffixTreeNode child = BuildCore(reducedGroup, index - prefix.Length);
-                node.AddChild(prefix, child);
+                node.AddChild(prefix, BuildCore(reducedGroup, index - prefix.Length));
             }
             return node;
         }
