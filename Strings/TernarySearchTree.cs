@@ -22,6 +22,7 @@ namespace Data_Structures_and_Algorithms {
         }
         public void Insert(string key, T tag) {
             Guard.IsNotNull(key, nameof(key));
+            if(key.IsEmpty()) return;
             root = InsertCore(root, key, 0, tag);
         }
         public void Delete(string key) {

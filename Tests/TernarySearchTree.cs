@@ -413,6 +413,14 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.Contains(null);
         }
         [TestMethod]
+        public void ContainsEmptyStringTest() {
+            Assert.IsFalse(tree.Contains(""));
+            tree.Insert("1");
+            tree.Insert("");
+            tree.Insert("2");
+            Assert.IsFalse(tree.Contains(""));
+        }
+        [TestMethod]
         public void ContainsTest1() {
             tree.Insert("box", 1);
             tree.Insert("cat");
@@ -470,6 +478,16 @@ namespace Data_Structures_and_Algorithms.Tests {
             tree.Delete("cut");
             Assert.IsFalse(tree.Search("cat", out tag) && tag == 0);
             Assert.IsFalse(tree.Search("cut", out tag) && tag == 0);
+        }
+        [TestMethod]
+        public void InsertEmptyStringTest() {
+            tree.Insert("1");
+            tree.Insert("2");
+            tree.Insert("");
+            tree.Insert("3");
+            Assert.IsTrue(tree.Contains("1"));
+            Assert.IsTrue(tree.Contains("2"));
+            Assert.IsTrue(tree.Contains("3"));
         }
     }
 
