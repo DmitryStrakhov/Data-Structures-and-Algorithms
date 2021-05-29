@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base.cs" />
+    <Compile Include="Combinatorial\Combinatorial.cs" />
     <Compile Include="DisjointSet\DisjointSet.cs" />
     <Compile Include="Graph\AdjListGraph.cs" />
     <Compile Include="Graph\AdjMatrixGraph.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Tests\AVLTree.cs" />
     <Compile Include="Tests\BinaryHeap.cs" />
     <Compile Include="Tests\BinarySearchTree.cs" />
+    <Compile Include="Tests\CombinatorialTests.cs" />
     <Compile Include="Tests\HashMap.cs" />
     <Compile Include="Tests\RectMatrix.cs" />
     <Compile Include="Tests\Selection.cs" />
