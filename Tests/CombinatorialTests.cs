@@ -105,18 +105,18 @@ namespace Data_Structures_and_Algorithms.Tests {
         }
         [TestMethod]
         public void PermutationsTest1() {
-            TestPermutation(1, new[] {"1"});
+            TestPermutations(1, new[] {"1"});
         }
         [TestMethod]
         public void PermutationsTest2() {
-            TestPermutation(2, new[] {"12", "21"});
+            TestPermutations(2, new[] {"12", "21"});
         }
         [TestMethod]
         public void PermutationsTest3() {
-            TestPermutation(3, new[] {"123", "132", "213", "231", "312", "321"});
+            TestPermutations(3, new[] {"123", "132", "213", "231", "312", "321"});
         }
 
-        void TestPermutation(int n, string[] expected) {
+        void TestPermutations(int n, string[] expected) {
             List<string> valueList = new List<string>(16);
             Combinatorial.Permutations(n, x => {
                 string s = string.Join(string.Empty, x);
