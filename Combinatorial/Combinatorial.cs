@@ -6,6 +6,51 @@ using System.Threading.Tasks;
 
 namespace Data_Structures_and_Algorithms {
     public static class Combinatorial {
+        public static void Permutations(int n, Action<int[]> action) {
+            Guard.IsPositive(n, nameof(n));
+            Guard.IsNotNull(action, nameof(action));
+
+            bool[] flags = new bool[n + 1];
+            int[] sequence = new int[n];
+            int sequencePosition = 0;
+            bool stepForward = true;
+
+            while(sequencePosition >= 0 && sequencePosition < n) {
+                int prevElement = stepForward
+                    ? 0
+                    : sequence[sequencePosition];
+
+                // find next available element of sequence 1 ... n
+                int nextElement = prevElement;
+
+                do {
+                    nextElement++;
+                }
+                while(nextElement <= n && flags[nextElement]);
+
+                if(nextElement <= n) {
+                    // new element was found - fix it and do step forward
+                    sequence[sequencePosition] = nextElement;
+                    flags[prevElement] = false;
+                    flags[nextElement] = true;
+                    if(sequencePosition == n - 1) {
+                        stepForward = false;
+                    }
+                    else {
+                        sequencePosition++;
+                        stepForward = true;
+                    }
+                }
+                else {
+                    // all elements are set and permutation is ready - notify and do step backward
+                    if(sequencePosition == n - 1) {
+                        action(sequence);
+                    }
+                    flags[sequence[sequencePosition]] = false;
+                    sequencePosition--;
+                }
+            }
+        }
         public static void Combinations<T>(IList<T> list, int k, Action<T[]> action) {
             if(list == null) throw new ArgumentNullException(nameof(list));
             if(action == null) throw new ArgumentNullException(nameof(action));
