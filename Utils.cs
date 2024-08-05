@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace Data_Structures_and_Algorithms {
     public static class Guard {
@@ -78,6 +79,7 @@ namespace Data_Structures_and_Algorithms {
 
 
     public static class ListExtensions {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Swap<T>(this IList<T> @this, int xPos, int yPos) {
             Guard.IsInRange(xPos, 0, @this.Count - 1, nameof(xPos));
             Guard.IsInRange(yPos, 0, @this.Count - 1, nameof(yPos));

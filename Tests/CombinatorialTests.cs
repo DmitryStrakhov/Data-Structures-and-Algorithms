@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Data_Structures_and_Algorithms.Tests {
@@ -123,6 +124,67 @@ namespace Data_Structures_and_Algorithms.Tests {
                 valueList.Add(s);
             });
             CollectionAssert.AreEqual(expected, valueList);
+        }
+    }
+
+    [TestClass]
+    public class Permutations2Tests {
+        [TestMethod, ExpectedException(typeof(ArgumentException))]
+        public void EnumeratePermutationsGuardTest() {
+            Combinatorial.EnumeratePermutations(-1, true);
+        }
+        [TestMethod]
+        public void EnumerateEmptyEmptySequencePermutationsTest() {
+            CollectionAssertEx.IsEmpty(Combinatorial.EnumeratePermutations(0, true));
+        }
+        [TestMethod]
+        public void EnumerateSequence1PermutationsTest() {
+            Combinatorial.Permutation[] expected = {
+                Combinatorial.Permutation.FromArray(new[] {0}),
+            };
+            CollectionAssert.AreEqual(expected, Combinatorial.EnumeratePermutations(1, false).ToArray());
+        }
+        [TestMethod]
+        public void EnumerateSequence3PermutationsTest() {
+            Combinatorial.Permutation[] expected = {
+                Combinatorial.Permutation.FromArray(new[] {0, 1, 2}),
+                Combinatorial.Permutation.FromArray(new[] {0, 2, 1}),
+                Combinatorial.Permutation.FromArray(new[] {2, 0, 1}),
+                Combinatorial.Permutation.FromArray(new[] {2, 1, 0}),
+                Combinatorial.Permutation.FromArray(new[] {1, 2, 0}),
+                Combinatorial.Permutation.FromArray(new[] {1, 0, 2}),
+            };
+            CollectionAssert.AreEqual(expected, Combinatorial.EnumeratePermutations(3, true).ToArray());
+        }
+        [TestMethod]
+        public void EnumerateSequence4PermutationsTest() {
+            Combinatorial.Permutation[] expected = {
+                Combinatorial.Permutation.FromArray(new[] {0, 1, 2, 3}),
+                Combinatorial.Permutation.FromArray(new[] {0, 1, 3, 2}),
+                Combinatorial.Permutation.FromArray(new[] {0, 3, 1, 2}),
+                Combinatorial.Permutation.FromArray(new[] {3, 0, 1, 2}),
+                Combinatorial.Permutation.FromArray(new[] {3, 0, 2, 1}),
+                Combinatorial.Permutation.FromArray(new[] {0, 3, 2, 1}),
+                Combinatorial.Permutation.FromArray(new[] {0, 2, 3, 1}),
+                Combinatorial.Permutation.FromArray(new[] {0, 2, 1, 3}),
+                Combinatorial.Permutation.FromArray(new[] {2, 0, 1, 3}),
+                Combinatorial.Permutation.FromArray(new[] {2, 0, 3, 1}),
+                Combinatorial.Permutation.FromArray(new[] {2, 3, 0, 1}),
+                Combinatorial.Permutation.FromArray(new[] {3, 2, 0, 1}),
+                Combinatorial.Permutation.FromArray(new[] {3, 2, 1, 0}),
+                Combinatorial.Permutation.FromArray(new[] {2, 3, 1, 0}),
+                Combinatorial.Permutation.FromArray(new[] {2, 1, 3, 0}),
+                Combinatorial.Permutation.FromArray(new[] {2, 1, 0, 3}),
+                Combinatorial.Permutation.FromArray(new[] {1, 2, 0, 3}),
+                Combinatorial.Permutation.FromArray(new[] {1, 2, 3, 0}),
+                Combinatorial.Permutation.FromArray(new[] {1, 3, 2, 0}),
+                Combinatorial.Permutation.FromArray(new[] {3, 1, 2, 0}),
+                Combinatorial.Permutation.FromArray(new[] {3, 1, 0, 2}),
+                Combinatorial.Permutation.FromArray(new[] {1, 3, 0, 2}),
+                Combinatorial.Permutation.FromArray(new[] {1, 0, 3, 2}),
+                Combinatorial.Permutation.FromArray(new[] {1, 0, 2, 3}),
+            };
+            CollectionAssert.AreEqual(expected, Combinatorial.EnumeratePermutations(4, true).ToArray());
         }
     }
 }
