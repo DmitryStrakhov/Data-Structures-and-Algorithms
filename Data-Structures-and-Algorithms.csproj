@@ -59,6 +59,7 @@
     <Compile Include="Misc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queue\Queue.cs" />
+    <Compile Include="Randomness.cs" />
     <Compile Include="Search\Search.cs" />
     <Compile Include="Selection\Selection.cs" />
     <Compile Include="SortAdv\BucketSort.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Tests\BinarySearchTree.cs" />
     <Compile Include="Tests\CombinatorialTests.cs" />
     <Compile Include="Tests\HashMap.cs" />
+    <Compile Include="Tests\Randomness.cs" />
     <Compile Include="Tests\RectMatrix.cs" />
     <Compile Include="Tests\Selection.cs" />
     <Compile Include="Tests\Sort.cs" />
