@@ -6,8 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace Data_Structures_and_Algorithms {
     public static class Combinatorial {
-        #region Efficent permutations
-        
+        #region Efficient permutations
+
         // Efficient permutations
         // Steinhaus–Johnson–Trotter algorithm implementation
         public static IEnumerable<Permutation> EnumeratePermutations(int n, bool cloneData) {
@@ -177,6 +177,150 @@ namespace Data_Structures_and_Algorithms {
             Zero,
             Positive,
             Negative
+        }
+
+        #endregion
+
+
+        #region Efficient combinations
+
+        // Efficient combinations
+        // Chase's algorithm implementation (see Art of Computer Programming - Volume 4A, 7.2.1.3)
+        public static IEnumerable<ReadOnlySequence<T>> Combinations<T>(IList<T> list, int k) {
+            if(list == null)
+                throw new ArgumentNullException(nameof(list));
+            if(k < 0 || k > list.Count)
+                throw new ArgumentOutOfRangeException(nameof(k));
+            if(k == 0)
+                return Enumerable.Empty<ReadOnlySequence<T>>();
+
+            return CombinationsCore(list, k);
+        }
+        static IEnumerable<ReadOnlySequence<T>> CombinationsCore<T>(IList<T> list, int t) {
+            int n = list.Count;
+            bool[] aFlags = new bool[n];
+            bool[] wFlags = new bool[n + 1];
+            int s = n - t;
+            int r = s > 0 ? s : t;
+
+            // initialize flags
+            for(int i = s; i < aFlags.Length; i++) {
+                aFlags[i] = true;
+            }
+
+            for(int i = 0; i < wFlags.Length; i++) {
+                wFlags[i] = true;
+            }
+
+            for(;;) {
+                yield return new ReadOnlySequence<T>(list, aFlags);
+
+                int j = r;
+
+                // update wFlags
+                for(; j < n && !wFlags[j]; j++)
+                    wFlags[j] = true;
+
+                if(j == n)
+                    break;
+
+                wFlags[j] = false;
+
+                // calculate a branch
+                Branch branch;
+
+                // check if j is odd
+                if((j & 1) == 1)
+                    branch = aFlags[j] ? Branch.C4 : Branch.C7;
+                else
+                    branch = aFlags[j] ? Branch.C5 : Branch.C6;
+
+                switch(branch) {
+                    // j is odd, a[j] is true
+                    case Branch.C4:
+                        aFlags[j - 1] = true;
+                        aFlags[j] = false;
+
+                        if(r == j && r > 1)
+                            r = j - 1;
+                        else if(r == j - 1)
+                            r = j;
+                        break;
+
+                    // j is even, a[j] is true                
+                    case Branch.C5:
+                        if(aFlags[j - 2])
+                            goto case Branch.C4;
+
+                        aFlags[j - 2] = true;
+                        aFlags[j] = false;
+
+                        if(r == j)
+                            r = Math.Max(j - 2, 1);
+                        else if(r == j - 2)
+                            r = j - 1;
+                        break;
+
+                    // j is even, a[j] is false
+                    case Branch.C6:
+                        aFlags[j] = true;
+                        aFlags[j - 1] = false;
+
+                        if(r == j && r > 1)
+                            r = j - 1;
+                        else if(r == j - 1)
+                            r = j;
+                        break;
+
+                    // j is odd, a[j] is false
+                    case Branch.C7:
+                        if(aFlags[j - 1])
+                            goto case Branch.C6;
+
+                        aFlags[j] = true;
+                        aFlags[j - 2] = false;
+
+                        if(r == j - 2)
+                            r = j;
+                        else if(r == j - 1)
+                            r = j - 2;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(branch), "Internal error: unexpected branch.");
+                }
+            }
+        }
+
+
+        public struct ReadOnlySequence<T> : IEnumerable<T> {
+            readonly IList<T> data;
+            readonly bool[] flags;
+
+            public ReadOnlySequence(IList<T> data, bool[] flags) {
+                this.data = data;
+                this.flags = flags;
+            }
+
+            #region IEnumerable<T>
+
+            public IEnumerator<T> GetEnumerator() {
+                for(int n = 0; n < data.Count; n++) {
+                    if(flags[n])
+                        yield return data[n];
+                }
+            }
+            IEnumerator IEnumerable.GetEnumerator() {
+                return GetEnumerator();
+            }
+
+            #endregion
+        }
+
+        enum Branch {
+            C4,
+            C5,
+            C6,
+            C7
         }
 
         #endregion

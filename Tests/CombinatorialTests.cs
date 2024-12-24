@@ -187,5 +187,118 @@ namespace Data_Structures_and_Algorithms.Tests {
             CollectionAssert.AreEqual(expected, Combinatorial.EnumeratePermutations(4, true).ToArray());
         }
     }
+
+    [TestClass]
+    public class AdvCombinationsTests {
+        [TestMethod, ExpectedException(typeof(ArgumentNullException))]
+        public void GuardCase1Test() {
+            Combinatorial.Combinations<object>(null, 1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void GuardCase2Test() {
+            Combinatorial.Combinations(new[] {1, 2, 3}, -1);
+        }
+        [TestMethod, ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void GuardCase3Test() {
+            Combinatorial.Combinations(new[] {1, 2, 3}, 4);
+        }
+        [TestMethod]
+        public void EmptyCombinationTest() {
+            CollectionAssertEx.IsEmpty(Combinatorial.Combinations(new[] {1, 2, 3}, 0));
+        }
+        [TestMethod]
+        public void Test1() {
+            IEnumerable<IEnumerable<int>> expected = new[] {
+                new[] {5},
+                new[] {3},
+                new[] {1},
+                new[] {2},
+                new[] {4},
+            };
+            var actual = Combinatorial.Combinations(new[] {1, 2, 3, 4, 5}, 1).Select(x => x.AsEnumerable());
+            DoAssert(actual, expected);
+        }
+        [TestMethod]
+        public void Test2() {
+            IEnumerable<IEnumerable<int>> expected = new[] {
+                new[] {1, 2, 3, 4, 5}
+            };
+
+            var actual = Combinatorial.Combinations(new[] {1, 2, 3, 4, 5}, 5).Select(x => x.AsEnumerable());
+            DoAssert(actual, expected);
+        }
+        [TestMethod]
+        public void Test3() {
+            IEnumerable<IEnumerable<int>> expected = new[] {
+                new[] {4, 5},
+                new[] {3, 5},
+                new[] {1, 5},
+                new[] {2, 5},
+                new[] {2, 3},
+                new[] {1, 3},
+                new[] {1, 2},
+                new[] {1, 4},
+                new[] {2, 4},
+                new[] {3, 4},
+            };
+            var actual = Combinatorial.Combinations(new[] {1, 2, 3, 4, 5}, 2).Select(x => x.AsEnumerable());
+            DoAssert(actual, expected);
+        }
+        [TestMethod]
+        public void Test4() {
+            IEnumerable<IEnumerable<int>> expected = new[] {
+                new[] {3, 4, 5},
+                new[] {1, 4, 5},
+                new[] {2, 4, 5},
+                new[] {2, 3, 5},
+                new[] {1, 3, 5},
+                new[] {1, 2, 5},
+                new[] {1, 2, 3},
+                new[] {1, 2, 4},
+                new[] {1, 3, 4},
+                new[] {2, 3, 4},
+            };
+
+            var actual = Combinatorial.Combinations(new[] {1, 2, 3, 4, 5}, 3).Select(x => x.AsEnumerable());
+            DoAssert(actual, expected);
+        }
+        [TestMethod]
+        public void Test5() {
+            IEnumerable<IEnumerable<int>> expected = new[] {
+                new[] {2, 3, 4, 5},
+                new[] {1, 3, 4, 5},
+                new[] {1, 2, 4, 5},
+                new[] {1, 2, 3, 5},
+                new[] {1, 2, 3, 4},
+            };
+
+            var actual = Combinatorial.Combinations(new[] {1, 2, 3, 4, 5}, 4).Select(x => x.AsEnumerable());
+            DoAssert(actual, expected);
+        }
+
+        static void DoAssert(IEnumerable<IEnumerable<int>> en1, IEnumerable<IEnumerable<int>> en2) {
+            var e1 = en1.GetEnumerator();
+            var e2 = en2.GetEnumerator();
+
+            try {
+                for(;;) {
+                    bool canMove1 = e1.MoveNext();
+                    bool canMove2 = e2.MoveNext();
+
+                    if(!canMove1 && !canMove2)
+                        break;
+
+                    if(canMove1 ^ canMove2)
+                        Assert.Fail("Enumerable objects have different elements count");
+
+                    CollectionAssertEx.AreEqual(e1.Current, e2.Current);
+                }
+            }
+            finally {
+                e1.Dispose();
+                e2.Dispose();
+            }
+        }
+    }
 }
 #endif
