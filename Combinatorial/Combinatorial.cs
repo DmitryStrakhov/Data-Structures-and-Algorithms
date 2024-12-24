@@ -6,6 +6,10 @@ using System.Runtime.CompilerServices;
 
 namespace Data_Structures_and_Algorithms {
     public static class Combinatorial {
+        #region Efficent permutations
+        
+        // Efficient permutations
+        // Steinhaus–Johnson–Trotter algorithm implementation
         public static IEnumerable<Permutation> EnumeratePermutations(int n, bool cloneData) {
             if(n < 0)
                 throw new ArgumentException(nameof(n));
@@ -97,93 +101,21 @@ namespace Data_Structures_and_Algorithms {
             }
         }
 
-        public static void Permutations(int n, Action<int[]> action) {
-            Guard.IsPositive(n, nameof(n));
-            Guard.IsNotNull(action, nameof(action));
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static int FindMaxMovableItemIndex(int[] data, PermutationFlag[] flags) {
+            int maxNonZeroItem = -1, itsIndex = -1;
 
-            bool[] flags = new bool[n + 1];
-            int[] sequence = new int[n];
-            int sequencePosition = 0;
-            bool stepForward = true;
+            for(int n = 0; n < data.Length; n++) {
+                int item = data[n];
 
-            while(sequencePosition >= 0 && sequencePosition < n) {
-                int prevElement = stepForward
-                    ? 0
-                    : sequence[sequencePosition];
-
-                // find next available element of sequence 1 ... n
-                int nextElement = prevElement;
-
-                do {
-                    nextElement++;
-                }
-                while(nextElement <= n && flags[nextElement]);
-
-                if(nextElement <= n) {
-                    // new element was found - fix it and do step forward
-                    sequence[sequencePosition] = nextElement;
-                    flags[prevElement] = false;
-                    flags[nextElement] = true;
-                    if(sequencePosition == n - 1) {
-                        stepForward = false;
-                    }
-                    else {
-                        sequencePosition++;
-                        stepForward = true;
-                    }
-                }
-                else {
-                    // all elements are set and permutation is ready - notify and do step backward
-                    if(sequencePosition == n - 1) {
-                        action(sequence);
-                    }
-                    flags[sequence[sequencePosition]] = false;
-                    sequencePosition--;
+                if(item > maxNonZeroItem && flags[item] != PermutationFlag.Zero) {
+                    maxNonZeroItem = item;
+                    itsIndex = n;
                 }
             }
-        }
-        public static void Combinations<T>(IList<T> list, int k, Action<T[]> action) {
-            if(list == null) throw new ArgumentNullException(nameof(list));
-            if(action == null) throw new ArgumentNullException(nameof(action));
-            Guard.IsInRange(k, 1, list.Count, nameof(k));
-
-            T[] combination = new T[k];
-            CombinationsCore(list, combination, 0, list.Count - 1, 0, action);
-        }
-        public static void Combinations2<T>(IList<T> list, int k, Action<T[]> action) {
-            if(list == null) throw new ArgumentNullException(nameof(list));
-            if(action == null) throw new ArgumentNullException(nameof(action));
-            Guard.IsInRange(k, 1, list.Count, nameof(k));
-
-            T[] combination = new T[k];
-            int[] indices = new int[k];
-
-            for(int n = 0; n < k; n++) {
-                indices[n] = n;
-                combination[n] = list[n];
-            }
-
-            int listSize = list.Count;
-            while (indices[k - 1] < listSize) {
-                action(combination);
-
-                int t = k - 1;
-                while (t != 0 && indices[t] == listSize - k + t) {
-                    t--;
-                }
-                indices[t]++;
-
-                if(indices[t] < listSize) {
-                    combination[t] = list[indices[t]];
-                }
-
-                for (int i = t + 1; i < k; i++) {
-                    indices[i] = indices[i - 1] + 1;
-                    if(indices[i] < listSize) {
-                        combination[i] = list[indices[i]];
-                    }
-                }
-            }
+            if(itsIndex == -1)
+                throw new InvalidOperationException();
+            return itsIndex;
         }
 
         public struct Permutation : IEnumerable<int>, IEquatable<Permutation> {
@@ -241,6 +173,111 @@ namespace Data_Structures_and_Algorithms {
             #endregion
         }
 
+        enum PermutationFlag {
+            Zero,
+            Positive,
+            Negative
+        }
+
+        #endregion
+
+        #region Naive permutations
+
+        // Permutations: naive implementations
+        public static void Permutations(int n, Action<int[]> action) {
+            Guard.IsPositive(n, nameof(n));
+            Guard.IsNotNull(action, nameof(action));
+
+            bool[] flags = new bool[n + 1];
+            int[] sequence = new int[n];
+            int sequencePosition = 0;
+            bool stepForward = true;
+
+            while(sequencePosition >= 0 && sequencePosition < n) {
+                int prevElement = stepForward
+                    ? 0
+                    : sequence[sequencePosition];
+
+                // find next available element of sequence 1 ... n
+                int nextElement = prevElement;
+
+                do {
+                    nextElement++;
+                }
+                while(nextElement <= n && flags[nextElement]);
+
+                if(nextElement <= n) {
+                    // new element was found - fix it and do step forward
+                    sequence[sequencePosition] = nextElement;
+                    flags[prevElement] = false;
+                    flags[nextElement] = true;
+                    if(sequencePosition == n - 1) {
+                        stepForward = false;
+                    }
+                    else {
+                        sequencePosition++;
+                        stepForward = true;
+                    }
+                }
+                else {
+                    // all elements are set and permutation is ready - notify and do step backward
+                    if(sequencePosition == n - 1) {
+                        action(sequence);
+                    }
+                    flags[sequence[sequencePosition]] = false;
+                    sequencePosition--;
+                }
+            }
+        }
+        #endregion
+
+        #region Naive combinations
+
+        // Combinations: naive implementation
+        public static void Combinations<T>(IList<T> list, int k, Action<T[]> action) {
+            if(list == null) throw new ArgumentNullException(nameof(list));
+            if(action == null) throw new ArgumentNullException(nameof(action));
+            Guard.IsInRange(k, 1, list.Count, nameof(k));
+
+            T[] combination = new T[k];
+            CombinationsCore(list, combination, 0, list.Count - 1, 0, action);
+        }
+        public static void Combinations2<T>(IList<T> list, int k, Action<T[]> action) {
+            if(list == null) throw new ArgumentNullException(nameof(list));
+            if(action == null) throw new ArgumentNullException(nameof(action));
+            Guard.IsInRange(k, 1, list.Count, nameof(k));
+
+            T[] combination = new T[k];
+            int[] indices = new int[k];
+
+            for(int n = 0; n < k; n++) {
+                indices[n] = n;
+                combination[n] = list[n];
+            }
+
+            int listSize = list.Count;
+            while (indices[k - 1] < listSize) {
+                action(combination);
+
+                int t = k - 1;
+                while (t != 0 && indices[t] == listSize - k + t) {
+                    t--;
+                }
+                indices[t]++;
+
+                if(indices[t] < listSize) {
+                    combination[t] = list[indices[t]];
+                }
+
+                for (int i = t + 1; i < k; i++) {
+                    indices[i] = indices[i - 1] + 1;
+                    if(indices[i] < listSize) {
+                        combination[i] = list[indices[i]];
+                    }
+                }
+            }
+        }
+
         static void CombinationsCore<T>(IList<T> list, T[] combination, int start, int end, int index, Action<T[]> action) {
             if(index == combination.Length) {
                 action(combination);
@@ -254,27 +291,6 @@ namespace Data_Structures_and_Algorithms {
             }
         }
 
-        enum PermutationFlag {
-            Zero,
-            Positive,
-            Negative
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static int FindMaxMovableItemIndex(int[] data, PermutationFlag[] flags) {
-            int maxNonZeroItem = -1, itsIndex = -1;
-
-            for(int n = 0; n < data.Length; n++) {
-                int item = data[n];
-
-                if(item > maxNonZeroItem && flags[item] != PermutationFlag.Zero) {
-                    maxNonZeroItem = item;
-                    itsIndex = n;
-                }
-            }
-            if(itsIndex == -1)
-                throw new InvalidOperationException();
-            return itsIndex;
-        }
+        #endregion
     }
 }
